@@ -18,13 +18,9 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'employee_id' => '1001',
-            'email' => 'admin@intelli.hr',
-
-            'password' => Hash::make('123456'),
-
-            'role' => 'Admin',
-        ]);
+        $this->call([
+        DepartmentSeeder::class, 
+        AdminUserSeeder::class,
+    ]);
     }
 }
