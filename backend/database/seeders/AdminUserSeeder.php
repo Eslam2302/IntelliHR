@@ -18,20 +18,31 @@ class AdminUserSeeder extends Seeder
     {
         $hrDepartment = Department::where('name', 'Human Resources')->first();
 
-        $adminUser = User::create([
-            'employee_id' => '0001',
-            'email' => 'admin@intelli.hr',
-            'password' => Hash::make('password'),
-            'role' => 'Admin',
+        $adminEmployee = Employee::create([
+            'name' => 'Admin User',
+            'job_title' => 'System Administrator',
+            'department_id' => $hrDepartment->id,
+            'hire_date' => now()->subYears(5)->format('Y-m-d'),
         ]);
 
-        Employee::create([
-            'user_id' => $adminUser->id,
+        User::create([
+            'employee_id' => $adminEmployee->id,
+            'email' => 'admin@hr.com',
+            'password' => Hash::make('password'),
+        ]);
+
+        // يمكن إضافة موظف عادxي آخر للتجربة
+        $testEmployee = Employee::create([
+            'name' => 'Test Employee',
+            'job_title' => 'Software Developer',
             'department_id' => $hrDepartment->id,
-            'name' => 'Eslam Elsaid',
-            'personal_email' => 'eslam.admin@intelli.hr',
-            'job_title' => 'System Administrator',
-            'hire_date' => now()->subYear(),
+            'hire_date' => now()->subYears(1)->format('Y-m-d'),
+        ]);
+
+        User::create([
+            'employee_id' => $testEmployee->id,
+            'email' => 'test@hr.com',
+            'password' => Hash::make('password'),
         ]);
     }
 }

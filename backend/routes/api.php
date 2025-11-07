@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\RoleController;
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -24,5 +25,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('employees', EmployeeController::class);
+
+    Route::middleware('permission:assign-roles')->prefix('roles')->group(function () {
+
+        Route::get('/', [RoleController::class, 'index']);
+        Route::get('/permissions', [RoleController::class, 'indexPermissions']);
+        Route::post('/', [RoleController::class, 'store']);
+        Route::get('/{role}', [RoleController::class, 'show']);
+        Route::put('/{role}', [RoleController::class, 'update']);
+        Route::delete('/{role}', [RoleController::class, 'destroy']);
+
+    });
 
 });

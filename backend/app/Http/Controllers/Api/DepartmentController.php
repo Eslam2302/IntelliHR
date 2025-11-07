@@ -42,7 +42,7 @@ class DepartmentController extends Controller
 
     public function update(UpdateDepartmentRequest $request, Department $department)
     {
-        $department->update([$request->validated()]);
+        $department->update($request->validated());
 
         return response()->json([
             'status' => 'success',

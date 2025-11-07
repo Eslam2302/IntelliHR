@@ -9,17 +9,18 @@ use App\Models\Department;
 class Employee extends Model
 {
     protected $fillable = [
-        'user_id',
+        'name',
         'personal_email',
         'phone',
         'manager_id',
         'job_title',
         'hire_date',
+        'department_id',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(User::class);
     }
 
     public function department()
