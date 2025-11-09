@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Hash;
 class EmployeeController extends Controller
 {
 
+     protected $middleware = [
+        'permission:view-all-employees' => ['only' => ['index']],
+        'permission:view-employee' => ['only' => ['show']],
+        'permission:create-employee' => ['only' => ['store']],
+        'permission:edit-employee' => ['only' => ['update']],
+        'permission:delete-employee' => ['only' => ['destroy']],
+    ];
+
     public function index()
     {
         $employees = Employee::with(['department', 'manager', 'user'])->get();

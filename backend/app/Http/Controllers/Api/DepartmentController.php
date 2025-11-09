@@ -9,9 +9,19 @@ use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\Employee;
+use Illuminate\Routing\Middleware;
 
 class DepartmentController extends Controller
 {
+
+    protected $middleware = [
+        'permission:view-all-departments' => ['only' => ['index']],
+        'permission:view-department' => ['only' => ['show']],
+        'permission:create-department' => ['only' => ['store']],
+        'permission:edit-department' => ['only' => ['update']],
+        'permission:delete-department' => ['only' => ['destroy']],
+    ];
+
     public function index()
     {
         $departments = Department::latest()->paginate(10);
@@ -19,7 +29,7 @@ class DepartmentController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => DepartmentResource::collection($departments),
-        ],200);
+        ], 200);
     }
 
     public function store(StoreDepartmentRequest $request)

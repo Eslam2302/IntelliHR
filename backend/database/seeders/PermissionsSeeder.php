@@ -17,16 +17,22 @@ class PermissionsSeeder extends Seeder
         // Basic Permissions
         $permissions = [
             // (Departments)
-            'view-department', 'create-department', 'edit-department', 'delete-department',
+            'view-department',
+            'view-all-departments',
+            'create-department',
+            'edit-department',
+            'delete-department',
 
             // (Employees)
-            'view-employee', 'view-any-employee', 'create-employee', 'edit-employee', 'delete-employee',
+            'view-employee',
+            'view-all-employees',
+            'create-employee',
+            'edit-employee',
+            'delete-employee',
 
-            'is-supervisor',
+            // Mangage Roles in UI (Work in the future)
+            'assign-roles',
 
-            'manage-salaries',
-            'view-audit-logs',
-            'assign-roles', // Add or delete role
         ];
 
         foreach ($permissions as $permission) {
@@ -34,10 +40,16 @@ class PermissionsSeeder extends Seeder
         }
 
 
-        // 2. إنشاء الدور الوحيد (Super Admin)
-        $adminRole = Role::firstOrCreate(['name' => 'Super Admin']);
+        // Create (Super Admin) Role
+        $superAdminRole = Role::firstOrCreate(['name' => 'Super Admin']);
+        $superAdminRole->syncPermissions(Permission::all());
 
-        $adminRole->givePermissionTo(Permission::all());
+        // Employee Role
+        $employeeRole = Role::firstOrCreate(['name' => 'Employee']);
+        $employeeRole->syncPermissions([
+            'view-employee',
+            'view-department',
+        ]);
 
 
         $firstUser = \App\Models\User::first();

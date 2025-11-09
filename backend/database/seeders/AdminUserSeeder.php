@@ -25,7 +25,7 @@ class AdminUserSeeder extends Seeder
             'hire_date' => now()->subYears(5)->format('Y-m-d'),
         ]);
 
-        User::create([
+        $adminUser = User::create([
             'employee_id' => $adminEmployee->id,
             'email' => 'admin@hr.com',
             'password' => Hash::make('password'),
@@ -39,10 +39,14 @@ class AdminUserSeeder extends Seeder
             'hire_date' => now()->subYears(1)->format('Y-m-d'),
         ]);
 
-        User::create([
+        $testUser = User::create([
             'employee_id' => $testEmployee->id,
             'email' => 'test@hr.com',
             'password' => Hash::make('password'),
         ]);
+
+        $adminUser->assignRole('Super Admin');
+        $testUser->assignRole('Employee');
+
     }
 }
