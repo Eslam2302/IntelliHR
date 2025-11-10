@@ -30,6 +30,10 @@ return [
 
     'table_names' => [
 
+        'guard_name' => 'web',
+
+        'default_guard' => 'web',
+
         /*
          * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your roles. We have chosen a basic
@@ -72,6 +76,8 @@ return [
     ],
 
     'column_names' => [
+
+        'guard_name' => 'guard_name',
         /*
          * Change this if you want to name the related pivots other than defaults
          */

@@ -10,17 +10,26 @@ use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class EmployeeController extends Controller
+
+class EmployeeController extends Controller implements HasMiddleware
 {
 
-     protected $middleware = [
-        'permission:view-all-employees' => ['only' => ['index']],
-        'permission:view-employee' => ['only' => ['show']],
-        'permission:create-employee' => ['only' => ['store']],
-        'permission:edit-employee' => ['only' => ['update']],
-        'permission:delete-employee' => ['only' => ['destroy']],
-    ];
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+
+            new Middleware('permission:view-all-employees|Super Admin', only: ['index']),
+            new Middleware('permission:view-employee|Super Admin', only: ['show']),
+            new Middleware('permission:create-employee|Super Admin', only: ['store']),
+            new Middleware('permission:edit-employee|Super Admin', only: ['update']),
+            new Middleware('permission:delete-employee|Super Admin', only: ['destroy']),
+
+        ];
+    }
 
     public function index()
     {

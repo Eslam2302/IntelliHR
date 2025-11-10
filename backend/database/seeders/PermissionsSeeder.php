@@ -16,6 +16,7 @@ class PermissionsSeeder extends Seeder
 
         // Basic Permissions
         $permissions = [
+
             // (Departments)
             'view-department',
             'view-all-departments',
@@ -36,7 +37,7 @@ class PermissionsSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
 
@@ -45,10 +46,10 @@ class PermissionsSeeder extends Seeder
         $superAdminRole->syncPermissions(Permission::all());
 
         // Employee Role
-        $employeeRole = Role::firstOrCreate(['name' => 'Employee']);
+        $employeeRole = Role::firstOrCreate(['name' => 'Employee', 'guard_name' => 'web']);
         $employeeRole->syncPermissions([
-            'view-employee',
-            'view-department',
+            Permission::findByName('view-employee', 'web'),
+            Permission::findByName('view-department', 'web'),
         ]);
 
 

@@ -22,5 +22,10 @@ class DepartmentSeeder extends Seeder
             'name'  => 'Information Technology',
             'description' => 'Responsible for managing the company\'s technology infrastructure and support.',
         ]);
+
+        Department::create([
+            'name'  => 'ssss',
+            'description' => 'Responsibsle for managing the company\'s technology infrastructure and support.',
+        ]);
     }
 }

@@ -12,14 +12,14 @@ class AuthController extends Controller
 {
     public function store(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'employee_id' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($request->only('employee_id', 'password'))) {
+        if (!Auth::attempt($credentials)) {
             return response()->json([
-                'message' => 'Invalid Employee ID or password.'
+                'message' => 'Invalid credentials'
             ], 401);
         }
 
@@ -27,11 +27,17 @@ class AuthController extends Controller
 
         $token = $user->createToken('access_token')->plainTextToken;
 
+        $roleName = $user->getRoleNames()->first();
+
+        $permissions = $user->getAllPermissions()->pluck('name');
+
         return response()->json([
             'status' => 'success',
             'message' => 'Login successful.',
             'user' => [
                 'id' => $user->employee_id,
+                'role'  => $roleName,
+                'permissions' => $permissions,
             ],
             'token' => $token
         ], 200);

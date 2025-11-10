@@ -10,7 +10,7 @@ class UpdateDepartmentRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return Auth::check() && Auth::user()->role === 'Admin';
+        return true;
     }
 
     public function rules(): array

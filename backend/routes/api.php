@@ -12,11 +12,13 @@ Route::get('home', [HomeController::class, 'index']);
 
 Route::post('login', [AuthController::class, 'store']);
 
+
+
 // (Protected Routes)
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', function (Request $request) {
-    return $request->user();
+        return $request->user();
     });
 
     Route::post('logout', [AuthController::class, 'destroy']);
@@ -25,6 +27,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('employees', EmployeeController::class);
-
-
 });

@@ -9,19 +9,26 @@ use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Models\Employee;
-use Illuminate\Routing\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class DepartmentController extends Controller
+class DepartmentController extends Controller implements HasMiddleware
 {
 
-    protected $middleware = [
-        'permission:view-all-departments' => ['only' => ['index']],
-        'permission:view-department' => ['only' => ['show']],
-        'permission:create-department' => ['only' => ['store']],
-        'permission:edit-department' => ['only' => ['update']],
-        'permission:delete-department' => ['only' => ['destroy']],
-    ];
 
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+
+            new Middleware('permission:view-all-departments|Super Admin', only: ['index']),
+            new Middleware('permission:view-department|Super Admin', only: ['show']),
+            new Middleware('permission:create-department|Super Admin', only: ['store']),
+            new Middleware('permission:edit-department|Super Admin', only: ['update']),
+            new Middleware('permission:delete-department|Super Admin', only: ['destroy']),
+
+        ];
+    }
     public function index()
     {
         $departments = Department::latest()->paginate(10);
@@ -47,6 +54,7 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
+
         return new DepartmentResource($department);
     }
 
