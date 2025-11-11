@@ -33,7 +33,7 @@ class EmployeeController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $employees = Employee::with(['department', 'manager', 'user'])->get();
+        $employees = Employee::with(['department', 'manager', 'user'])->latest()->paginate(10);
         return EmployeeResource::collection($employees);
     }
 
