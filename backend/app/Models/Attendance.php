@@ -44,14 +44,14 @@ class Attendance extends Model
         $allowedEmployeeIds = [];
         $currentEmployeeId = $employeeModel->id;
 
-        // Authorization Principle 1: An employee always sees their own records.
+        // Authorization Principle 1. An employee always sees their own records.
         $allowedEmployeeIds[] = $currentEmployeeId;
 
         // Authorization Principle 2. Check for managerial subordinates.
         // If the employee model has subordinates (they are a manager).
         if ($employeeModel->subordinates->isNotEmpty()) {
 
-            // Get the IDs of all direct subordinates reporting to this user.
+            // 3. Get the IDs of all direct subordinates reporting to this user.
             $subordinateIds = $employeeModel->subordinates->pluck('id')->toArray();
             $allowedEmployeeIds = array_merge($allowedEmployeeIds, $subordinateIds);
         }

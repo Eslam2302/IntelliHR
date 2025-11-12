@@ -31,6 +31,11 @@ class PermissionsSeeder extends Seeder
             'edit-employee',
             'delete-employee',
 
+            // (Leave Type)
+            'create-leave-type',
+            'edit-leave-type',
+            'delete-leave-type',
+
             // Mangage Roles in UI (Work in the future)
             'assign-roles',
 
