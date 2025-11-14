@@ -33,13 +33,10 @@ class EmployeeResource extends JsonResource
             ],
 
             'user_account' => [
-                // الـ ID هنا هو رقم الموظف التسلسلي الذي يُستخدم في جدول Users
                 'employee_id' => $this->id,
-
-                // نستخدم العلاقة user() للوصول لحساب الدخول
                 'login_email' => $this->user->email ?? 'N/A',
             ],
-            
+
             'hire_date' => $this->hire_date,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];

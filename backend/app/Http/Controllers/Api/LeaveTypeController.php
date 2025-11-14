@@ -32,7 +32,6 @@ class LeaveTypeController extends Controller implements HasMiddleware
             'status' => 'success',
             'data' => LeaveTypeResource::collection($leaveType),
         ], 200);
-
     }
 
     public function store(LeaveTypeRequest $request)
@@ -43,7 +42,7 @@ class LeaveTypeController extends Controller implements HasMiddleware
             'status' => 'success',
             'message' => 'Leave type created successfully',
             'data' => new LeaveTypeResource($leaveType)
-        ],201);
+        ], 201);
     }
 
     public function show(LeaveType $leaveType)
@@ -59,7 +58,7 @@ class LeaveTypeController extends Controller implements HasMiddleware
             'status' => 'success',
             'message' => 'Leave type updated successfully',
             'data' => new LeaveTypeResource($request)
-        ],200);
+        ], 200);
     }
 
     public function destroy(LeaveType $leaveType)
@@ -70,6 +69,6 @@ class LeaveTypeController extends Controller implements HasMiddleware
         return response()->json([
             'status' => 'success',
             'message' => $leaveTypeName . ' Deleted successfully'
-        ],200);
+        ], 200);
     }
 }
