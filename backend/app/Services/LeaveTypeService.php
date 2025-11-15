@@ -16,6 +16,9 @@ class LeaveTypeService
         protected LeaveTypeRepositoryInterface $repository
     ) {}
 
+    /*
+     * Get all paginated leave type 10 per page
+    */
     public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
     {
         try {
@@ -38,7 +41,7 @@ class LeaveTypeService
 
             DB::commit();
 
-            Log::info("Department created successfully", [
+            Log::info("Leave type created successfully", [
                 'id' => $leaveType->id,
                 'name' => $leaveType->name
             ]);
@@ -51,7 +54,10 @@ class LeaveTypeService
         }
     }
 
-    public function update(LeaveType $leaveType, LeaveType $dto): LeaveType
+    /**
+     * Update existing leave type
+     */
+    public function update(LeaveType $leaveType, LeaveTypeDTO $dto): LeaveType
     {
         try {
             DB::beginTransaction();
@@ -60,7 +66,7 @@ class LeaveTypeService
 
             DB::commit();
 
-            Log::info("Department Updated successfully", [
+            Log::info("Leave type Updated successfully", [
                 'id' => $leaveType->id,
                 'name' => $leaveType->name
             ]);
@@ -68,13 +74,16 @@ class LeaveTypeService
             return $UpdatedLeaveType;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error updating department {$leaveType->id}: " . $e->getMessage(), [
+            Log::error("Error updating leave type {$leaveType->id}: " . $e->getMessage(), [
                 'data' => $dto->toArray()
             ]);
             throw $e;
         }
     }
 
+    /**
+     * Delete existing leave type
+     */
     public function delete(LeaveType $leaveType): bool
     {
         try {
@@ -84,7 +93,7 @@ class LeaveTypeService
 
             DB::commit();
 
-            Log::info("Department deleted successfully", [
+            Log::info("Leave type deleted successfully", [
                 'id' => $leaveType->id,
                 'name' => $leaveType->name
             ]);
@@ -92,7 +101,7 @@ class LeaveTypeService
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error deleting department {$leaveType->id}: " . $e->getMessage());
+            Log::error("Error deleting leave type {$leaveType->id}: " . $e->getMessage());
             throw $e;
         }
     }

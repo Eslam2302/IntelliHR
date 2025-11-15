@@ -2,9 +2,10 @@
 
 namespace App\DataTransferObjects;
 
+use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
 
-class UpdateDepartmentDTO
+class DepartmentDTO
 {
     public function __construct(
         public readonly string $name,
@@ -12,9 +13,20 @@ class UpdateDepartmentDTO
     ) {}
 
     /**
-     * Create DTO from request
+     * Create DTO from store request
      */
-    public static function fromRequest(UpdateDepartmentRequest $request): self
+    public static function fromStoreRequest(StoreDepartmentRequest $request): self
+    {
+        return new self(
+            name: $request->validated('name'),
+            description: $request->validated('description'),
+        );
+    }
+
+     /**
+     * Create DTO from store request
+     */
+    public static function fromUpdateRequest(UpdateDepartmentRequest $request): self
     {
         return new self(
             name: $request->validated('name'),

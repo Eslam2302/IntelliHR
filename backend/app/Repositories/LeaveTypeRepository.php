@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\LeaveType;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LeaveTypeRepository implements LeaveTypeRepositoryInterface

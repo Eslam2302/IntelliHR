@@ -15,30 +15,32 @@ class EmployeeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-
-            'full_name' => $this->name,
-            'job_title' => $this->job_title,
+            'id'             => $this->id,
+            'name'           => $this->name,
+            'job_title'      => $this->job_title,
             'personal_email' => $this->personal_email,
-            'phone' => $this->phone,
-
-            'department' => [
-                'id' => $this->department->id ?? null,
-                'name' => $this->department->name ?? 'N/A',
-            ],
-
-            'manager' => [
-                'id' => $this->manager->id ?? null,
-                'name' => $this->manager->name ?? 'None',
-            ],
-
-            'user_account' => [
-                'employee_id' => $this->id,
-                'login_email' => $this->user->email ?? 'N/A',
-            ],
-
-            'hire_date' => $this->hire_date,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'phone'          => $this->phone,
+            'hire_date'      => $this->hire_date,
+            'department'     => $this->whenLoaded('department', function () {
+                return [
+                    'id'   => $this->department?->id,
+                    'name' => $this->department?->name,
+                ];
+            }),
+            'manager'        => $this->whenLoaded('manager', function () {
+                return $this->manager ? [
+                    'id'   => $this->manager->id,
+                    'name' => $this->manager->name,
+                ] : null;
+            }),
+            'user'           => $this->whenLoaded('user', function () {
+                return $this->user ? [
+                    'id'    => $this->user->id,
+                    'email' => $this->user->email,
+                ] : null;
+            }),
+            'created_at'     => $this->created_at?->format('Y-m-d H:i'),
+            'updated_at'     => $this->updated_at?->format('Y-m-d H:i'),
         ];
     }
 }

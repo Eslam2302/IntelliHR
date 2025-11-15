@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DataTransferObjects\CreateDepartmentDTO;
-use App\DataTransferObjects\UpdateDepartmentDTO;
+use App\DataTransferObjects\DepartmentDTO;
 use App\Exceptions\DepartmentHasEmployeesException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDepartmentRequest;
@@ -67,7 +66,7 @@ class DepartmentController extends Controller implements HasMiddleware
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
         try {
-            $dto = CreateDepartmentDTO::fromRequest($request);
+            $dto = DepartmentDTO::fromStoreRequest($request);
             $department = $this->departmentService->create($dto);
 
             return response()->json([
@@ -109,7 +108,7 @@ class DepartmentController extends Controller implements HasMiddleware
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
         try {
-            $dto = UpdateDepartmentDTO::fromRequest($request);
+            $dto = DepartmentDTO::fromUpdateRequest($request);
             $updatedDepartment = $this->departmentService->update($department, $dto);
 
             return response()->json([

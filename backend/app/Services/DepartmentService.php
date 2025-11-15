@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\DataTransferObjects\CreateDepartmentDTO;
-use App\DataTransferObjects\UpdateDepartmentDTO;
+use App\DataTransferObjects\DepartmentDTO;
 use App\Exceptions\DepartmentHasEmployeesException;
 use App\Models\Department;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
@@ -73,7 +72,7 @@ class DepartmentService
     /**
      * Create a new department
      */
-    public function create(CreateDepartmentDTO $dto): Department
+    public function create(DepartmentDTO $dto): Department
     {
         try {
             DB::beginTransaction();
@@ -100,7 +99,7 @@ class DepartmentService
     /**
      * Update existing department
      */
-    public function update(Department $department, UpdateDepartmentDTO $dto): Department
+    public function update(Department $department, DepartmentDTO $dto): Department
     {
         try {
             DB::beginTransaction();
