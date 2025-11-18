@@ -19,10 +19,15 @@ class AdminUserSeeder extends Seeder
         $hrDepartment = Department::where('name', 'Human Resources')->first();
 
         $adminEmployee = Employee::create([
-            'name' => 'Admin User',
-            'job_title' => 'System Administrator',
+            'first_name' => 'Admin',
+            'last_name' => 'User',
+            'gender' => 'Male',
+            'national_id' => '3000230162951',
+            'employee_status' => 'Active',
             'department_id' => $hrDepartment->id,
             'hire_date' => now()->subYears(5)->format('Y-m-d'),
+            'birth_date' => now()->subYears(3)->format('Y-m-d'),
+
         ]);
 
         $adminUser = User::create([
@@ -31,12 +36,17 @@ class AdminUserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        // يمكن إضافة موظف عادxي آخر للتجربة
+        // Add a test employee
         $testEmployee = Employee::create([
-            'name' => 'Test Employee',
-            'job_title' => 'Software Developer',
+            'first_name' => 'Test',
+            'last_name' => 'Employee',
+            'gender' => 'Female',
+            'national_id' => '3010230162951',
+            'employee_status' => 'active',
             'department_id' => $hrDepartment->id,
             'hire_date' => now()->subYears(1)->format('Y-m-d'),
+            'birth_date' => now()->subYears(2)->format('Y-m-d'),
+
         ]);
 
         $testUser = User::create([
@@ -47,6 +57,5 @@ class AdminUserSeeder extends Seeder
 
         $adminUser->assignRole('Super Admin');
         $testUser->assignRole('Employee');
-
     }
 }

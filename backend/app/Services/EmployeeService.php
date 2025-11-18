@@ -46,7 +46,7 @@ class EmployeeService
 
             Log::info('Employee created successfully', ['id' => $employee->id, 'name' => $employee->name]);
 
-            return $employee->load(['department', 'manager', 'user']);
+            return $employee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating employee: ' . $e->getMessage(), ['data' => $dto->toArray()]);
@@ -75,7 +75,7 @@ class EmployeeService
 
             Log::info('Employee updated successfully', ['id' => $employee->id, 'name' => $employee->name]);
 
-            return $updatedEmployee->load(['department', 'manager', 'user']);
+            return $updatedEmployee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Error updating employee {$employee->id}: " . $e->getMessage(), ['data' => $dto->toArray()]);

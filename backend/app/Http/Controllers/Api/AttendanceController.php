@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\AttendanceDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAttendanceRequest;
 use App\Http\Requests\UpdateAttendanceRequest;
@@ -22,18 +23,12 @@ class AttendanceController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => AttendanceResource::collection($attendances),
-            'meta' => [
-                'current_page' => $attendances->currentPage(),
-                'per_page' => $attendances->perPage(),
-                'total' => $attendances->total(),
-                'last_page' => $attendances->lastPage(),
-            ]
         ]);
     }
 
     public function checkIn(StoreAttendanceRequest $request): JsonResponse
     {
-        $attendance = $this->service->checkIn(\App\DataTransferObjects\AttendanceDTO::fromCheckInRequest($request, Auth::user()->employee_id));
+        $attendance = $this->service->checkIn(AttendanceDTO::fromCheckInRequest($request, Auth::user()->employee_id));
         return response()->json([
             'status' => 'success',
             'message' => 'Checked in successfully',
@@ -43,7 +38,7 @@ class AttendanceController extends Controller
 
     public function checkOut(UpdateAttendanceRequest $request): JsonResponse
     {
-        $attendance = $this->service->checkOut(\App\DataTransferObjects\AttendanceDTO::fromCheckOutRequest($request, Auth::user()->employee_id, now()));
+        $attendance = $this->service->checkOut(AttendanceDTO::fromCheckOutRequest($request, Auth::user()->employee_id, now()));
         return response()->json([
             'status' => 'success',
             'message' => 'Checked out successfully',

@@ -9,13 +9,19 @@ use App\Models\Department;
 class Employee extends Model
 {
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'personal_email',
         'phone',
-        'manager_id',
-        'job_title',
-        'hire_date',
+        'gender',
+        'national_id',
+        'birth_date',
+        'address',
+        'employee_status',
         'department_id',
+        'manager_id',
+        'job_id',
+        'hire_date',
     ];
 
     public function user()
@@ -41,5 +47,10 @@ class Employee extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class, 'employee_id');
+    }
+
+    public function job()
+    {
+        return $this->belongsTo(JobPosition::class, 'job_id');
     }
 }

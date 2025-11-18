@@ -37,27 +37,13 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        try {
-            $perPage = request('per_page', 10);
-            $departments = $this->departmentService->getAllPaginated((int) $perPage);
+        $perPage = request('per_page', 10);
+        $departments = $this->departmentService->getAllPaginated((int) $perPage);
 
-            return response()->json([
-                'status' => 'success',
-                'data' => DepartmentResource::collection($departments),
-                'meta' => [
-                    'current_page' => $departments->currentPage(),
-                    'per_page' => $departments->perPage(),
-                    'total' => $departments->total(),
-                    'last_page' => $departments->lastPage(),
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch departments.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'data' => DepartmentResource::collection($departments),
+        ], 200);
     }
 
     /**
@@ -65,22 +51,14 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function store(StoreDepartmentRequest $request): JsonResponse
     {
-        try {
-            $dto = DepartmentDTO::fromStoreRequest($request);
-            $department = $this->departmentService->create($dto);
+        $dto = DepartmentDTO::fromStoreRequest($request);
+        $department = $this->departmentService->create($dto);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Department created successfully.',
-                'data' => new DepartmentResource($department),
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create department.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Department created successfully.',
+            'data' => new DepartmentResource($department),
+        ], 201);
     }
 
     /**
@@ -88,18 +66,10 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function show(Department $department): JsonResponse
     {
-        try {
-            return response()->json([
-                'status' => 'success',
-                'data' => new DepartmentResource($department),
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch department.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new DepartmentResource($department),
+        ], 200);
     }
 
     /**
@@ -107,22 +77,14 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function update(UpdateDepartmentRequest $request, Department $department): JsonResponse
     {
-        try {
-            $dto = DepartmentDTO::fromUpdateRequest($request);
-            $updatedDepartment = $this->departmentService->update($department, $dto);
+        $dto = DepartmentDTO::fromUpdateRequest($request);
+        $updatedDepartment = $this->departmentService->update($department, $dto);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Department updated successfully.',
-                'data' => new DepartmentResource($updatedDepartment),
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update department.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Department updated successfully.',
+            'data' => new DepartmentResource($updatedDepartment),
+        ], 200);
     }
 
     /**
@@ -130,22 +92,11 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function destroy(Department $department): JsonResponse
     {
-        try {
-            $this->departmentService->delete($department);
+        $this->departmentService->delete($department);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Department deleted successfully.'
-            ], 200);
-        } catch (DepartmentHasEmployeesException $e) {
-            // Business logic exception - handled by exception itself
-            return $e->render();
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete department.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Department deleted successfully.'
+        ], 200);
     }
 }

@@ -5,9 +5,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ContractController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\JobPositionController;
 use App\Http\Controllers\Api\LeaveTypeController;
+use App\Models\JobPosition;
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -37,4 +40,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::apiResource('leave-types', LeaveTypeController::class);
+    Route::apiResource('job-positions', JobPositionController::class);
+    Route::apiResource('contracts', ContractController::class);
 });

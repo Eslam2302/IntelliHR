@@ -20,10 +20,10 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
-        DepartmentSeeder::class,
-        PermissionsSeeder::class,
-        AdminUserSeeder::class,
-        LeaveTypeSeeder::class,
-    ]);
+            DepartmentSeeder::class,
+            PermissionsSeeder::class,
+            AdminUserSeeder::class,
+            LeaveTypeSeeder::class,
+        ]);
     }
 }

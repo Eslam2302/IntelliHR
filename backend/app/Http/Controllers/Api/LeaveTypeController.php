@@ -37,27 +37,13 @@ class LeaveTypeController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        try {
-            $perpage = request('per_page', 10);
-            $leaveType = $this->leaveTypeService->getAllPaginated($perpage);
+        $perpage = request('per_page', 10);
+        $leaveType = $this->leaveTypeService->getAllPaginated($perpage);
 
-            return response()->json([
-                'status' => 'success',
-                'data'  => LeaveTypeResource::collection($leaveType),
-                'meta' => [
-                    'current_page' => $leaveType->currentPage(),
-                    'per_page' => $leaveType->perPage(),
-                    'total' => $leaveType->total(),
-                    'last_page' => $leaveType->lastPage(),
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch leave types.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'data'  => LeaveTypeResource::collection($leaveType),
+        ], 200);
     }
 
     /**
@@ -65,22 +51,14 @@ class LeaveTypeController extends Controller implements HasMiddleware
      */
     public function store(LeaveTypeRequest $request): JsonResponse
     {
-        try {
-            $dto = LeaveTypeDTO::fromRequest($request);
-            $leaveType = $this->leaveTypeService->create($dto);
+        $dto = LeaveTypeDTO::fromRequest($request);
+        $leaveType = $this->leaveTypeService->create($dto);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Leave type created successfully.',
-                'data' => new LeaveTypeResource($leaveType),
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to create leave type.',
-                'data' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Leave type created successfully.',
+            'data' => new LeaveTypeResource($leaveType),
+        ], 201);
     }
 
     /**
@@ -88,18 +66,10 @@ class LeaveTypeController extends Controller implements HasMiddleware
      */
     public function show(LeaveType $leaveType): JsonResponse
     {
-        try {
-            return response()->json([
-                'status' => 'success',
-                'data' => new LeaveTypeResource($leaveType),
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch leave type.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'data' => new LeaveTypeResource($leaveType),
+        ], 200);
     }
 
     /**
@@ -107,22 +77,14 @@ class LeaveTypeController extends Controller implements HasMiddleware
      */
     public function update(LeaveTypeRequest $request, LeaveType $leaveType): JsonResponse
     {
-        try {
-            $dto = LeaveTypeDTO::fromRequest($request);
-            $UpdatedLeaveType = $this->leaveTypeService->update($leaveType, $dto);
+        $dto = LeaveTypeDTO::fromRequest($request);
+        $UpdatedLeaveType = $this->leaveTypeService->update($leaveType, $dto);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Leave type updated successfully.',
-                'data' => new LeaveTypeResource($UpdatedLeaveType),
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to update leave type.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Leave type updated successfully.',
+            'data' => new LeaveTypeResource($UpdatedLeaveType),
+        ], 200);
     }
 
     /**
@@ -130,19 +92,11 @@ class LeaveTypeController extends Controller implements HasMiddleware
      */
     public function destroy(LeaveType $leaveType): JsonResponse
     {
-        try {
-            $this->leaveTypeService->delete($leaveType);
+        $this->leaveTypeService->delete($leaveType);
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Leave type deleted successfully.'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete leave type.',
-                'error' => config('app.debug') ? $e->getMessage() : null
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Leave type deleted successfully.'
+        ], 200);
     }
 }

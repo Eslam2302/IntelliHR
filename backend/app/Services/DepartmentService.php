@@ -75,11 +75,8 @@ class DepartmentService
     public function create(DepartmentDTO $dto): Department
     {
         try {
-            DB::beginTransaction();
 
             $department = $this->repository->create($dto->toArray());
-
-            DB::commit();
 
             Log::info("Department created successfully", [
                 'id' => $department->id,
@@ -102,11 +99,8 @@ class DepartmentService
     public function update(Department $department, DepartmentDTO $dto): Department
     {
         try {
-            DB::beginTransaction();
 
             $updatedDepartment = $this->repository->update($department, $dto->toArray());
-
-            DB::commit();
 
             Log::info("Department updated successfully", [
                 'id' => $updatedDepartment->id,
@@ -138,11 +132,7 @@ class DepartmentService
                 );
             }
 
-            DB::beginTransaction();
-
             $deleted = $this->repository->delete($department);
-
-            DB::commit();
 
             Log::info("Department deleted successfully", [
                 'id' => $department->id,

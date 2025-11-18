@@ -17,27 +17,71 @@ class UpdateEmployeeRequest extends FormRequest
     {
         $employeeId = $this->route('employees');
         return [
-            'name' => 'required|string|max:255',
-            'job_title' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'hire_date' => 'required|date',
-
-            'personal_email' => [
-                'nullable',
-                'email',
-                Rule::unique('employees', 'personal_email')->ignore($employeeId),
+            'first_name' => [
+                'required',
+                'string',
+                'max:100'
             ],
+            'last_name' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'personal_email' => ['nullable', 'email', 'unique:employees,personal_email'],
 
-            'department_id' => 'required|exists:departments,id',
-            'manager_id' => 'nullable|exists:employees,id',
+            'phone' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'gender' => [
+                'required',
+                'in:male,female'
+            ],
+            'national_id' => [
+                'required',
+                'string',
+                'max:20'
+            ],
+            'birth_date' => [
+                'required',
+                'date',
+                'before:today'
+            ],
+            'address' => [
+                'nullable',
+                'string'
+            ],
+            'employee_status' => [
+                'required',
+                'in:active,resigned,terminated'
+            ],
+            'department_id' => [
+                'required',
+                'exists:departments,id'
+            ],
+            'manager_id' => [
+                'nullable',
+                'exists:employees,id'
+            ],
+            'job_id' => [
+                'nullable',
+                'exists:job_positions,id',
+            ],
+            'hire_date' => [
+                'required',
+                'date',
+            ],
 
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($employeeId, 'employee_id'),
+                'unique:users,email',
             ],
-
-            'password' => 'string|min:8',
+            'password' => [
+                'string',
+                'min:8',
+            ],
         ];
     }
 }

@@ -28,11 +28,29 @@ class LeaveTypeRequest extends FormRequest
         }
 
         return [
-            'name' => ['required', 'string', 'max:100', $uniqueRule],
-            'description' => ['nullable', 'string', 'max:500'],
-            'max_days_per_year' => ['required', 'integer', 'min:0'],
-            'is_paid' => ['required', 'boolean'],
-            'requires_proof' => ['required', 'boolean'],
+            'name' => [
+                'required',
+                'string',
+                'max:100', $uniqueRule
+            ],
+            'description' => [
+                'nullable',
+                'string',
+                'max:500'
+            ],
+            'max_days_per_year' => [
+                'required',
+                'integer',
+                'min:0'
+            ],
+            'is_paid' => [
+                'required',
+                'boolean'
+            ],
+            'requires_proof' => [
+                'required',
+                'boolean'
+            ],
         ];
     }
     public function messages(): array

@@ -16,17 +16,72 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'job_title' => 'required|string|max:255',
-            'personal_email' => 'nullable|email|unique:employees,personal_email',
-            'phone' => 'nullable|string|max:20',
-            'hire_date' => 'required|date',
+            'first_name' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'last_name' => [
+                'required',
+                'string',
+                'max:100'
+            ],
+            'personal_email' => [
+                'nullable',
+                'email',
+                'unique:employees,personal_email'
+            ],
+            'phone' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+            'gender' => [
+                'required',
+                'in:male,female'
+            ],
+            'national_id' => [
+                'required',
+                'string',
+                'max:20'
+            ],
+            'birth_date' => [
+                'required',
+                'date',
+                'before:today'
+            ],
+            'address' => [
+                'nullable',
+                'string'
+            ],
+            'employee_status' => [
+                'required',
+                'in:active,resigned,terminated'
+            ],
+            'department_id' => [
+                'required',
+                'exists:departments,id',
+            ],
+            'manager_id' => [
+                'nullable',
+                'exists:employees,id',
+            ],
+            'job_id' => [
+                'nullable',
+                'exists:job_positions,id',
+            ],
+            'hire_date' => [
+                'required',
+                'date',
+            ],
 
-            'department_id' => 'required|exists:departments,id',
-            'manager_id' => 'nullable|exists:employees,id',
+            'email' => ['required', 'email', 'unique:users,email'],
 
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+            ],
         ];
     }
 }

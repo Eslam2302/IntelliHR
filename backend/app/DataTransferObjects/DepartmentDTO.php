@@ -12,6 +12,8 @@ class DepartmentDTO
         public readonly ?string $description = null,
     ) {}
 
+
+
     /**
      * Create DTO from store request
      */
@@ -23,7 +25,7 @@ class DepartmentDTO
         );
     }
 
-     /**
+    /**
      * Create DTO from store request
      */
     public static function fromUpdateRequest(UpdateDepartmentRequest $request): self

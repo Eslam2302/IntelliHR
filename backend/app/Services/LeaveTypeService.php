@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DataTransferObjects\LeaveTypeDTO;
 use App\Models\LeaveType;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -35,11 +34,8 @@ class LeaveTypeService
     public function create(LeaveTypeDTO $dto): LeaveType
     {
         try {
-            DB::beginTransaction();
 
             $leaveType = $this->repository->create($dto->toArray());
-
-            DB::commit();
 
             Log::info("Leave type created successfully", [
                 'id' => $leaveType->id,
@@ -48,7 +44,6 @@ class LeaveTypeService
 
             return $leaveType;
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Error creating LeaveType: ' . $e->getMessage(), ['data' => $dto->toArray()]);
             throw $e;
         }
@@ -60,11 +55,8 @@ class LeaveTypeService
     public function update(LeaveType $leaveType, LeaveTypeDTO $dto): LeaveType
     {
         try {
-            DB::beginTransaction();
 
             $UpdatedLeaveType = $this->repository->update($leaveType, $dto->toArray());
-
-            DB::commit();
 
             Log::info("Leave type Updated successfully", [
                 'id' => $leaveType->id,
@@ -73,7 +65,6 @@ class LeaveTypeService
 
             return $UpdatedLeaveType;
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error("Error updating leave type {$leaveType->id}: " . $e->getMessage(), [
                 'data' => $dto->toArray()
             ]);
@@ -87,11 +78,8 @@ class LeaveTypeService
     public function delete(LeaveType $leaveType): bool
     {
         try {
-            DB::beginTransaction();
 
             $deleted = $this->repository->delete($leaveType);
-
-            DB::commit();
 
             Log::info("Leave type deleted successfully", [
                 'id' => $leaveType->id,
