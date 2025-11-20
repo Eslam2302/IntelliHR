@@ -22,6 +22,7 @@ class ContractResource extends JsonResource
                 'name'       => $this->employee->first_name . ' ' . $this->employee->last_name,
             ],
             'contract_type'  => $this->contract_type,
+            'probation_period_days' => $this->probation_period_days,
             'salary'         => $this->salary,
             'terms'          => $this->terms,
 

@@ -11,54 +11,98 @@ class LeaveTypeRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-
-        $leaveTypeId = $this->route('leave_type') ? $this->route('leave_type')->id : null;
-
-        // For update unique type name except this type u need to update
-        $uniqueRule = 'unique:leave_types,name';
-        if ($leaveTypeId) {
-            $uniqueRule = 'unique:leave_types,name,' . $leaveTypeId;
-        }
+        // Get ID for update (unique rule exception)
+        $leaveTypeId = $this->route('leave_type')?->id;
 
         return [
+            // Name
             'name' => [
                 'required',
                 'string',
-                'max:100', $uniqueRule
+                'max:100',
+                'unique:leave_types,name,' . ($leaveTypeId ?? 'NULL'),
             ],
-            'description' => [
-                'nullable',
+
+            // Short code (AL, SL, ML)
+            'code' => [
+                'required',
                 'string',
-                'max:500'
+                'max:10',
+                'unique:leave_types,code,' . ($leaveTypeId ?? 'NULL'),
             ],
-            'max_days_per_year' => [
+
+            // Annual leave entitlement
+            'annual_entitlement' => [
                 'required',
                 'integer',
-                'min:0'
+                'min:0',
+                'max:365'
             ],
-            'is_paid' => [
+
+            // Accrual method
+            'accrual_policy' => [
+                'required',
+                'in:none,monthly,annual'
+            ],
+
+            // Carry over limit
+            'carry_over_limit' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:365'
+            ],
+
+            // Minimum request days
+            'min_request_days' => [
+                'required',
+                'integer',
+                'min:1'
+            ],
+
+            // Maximum request days
+            'max_request_days' => [
+                'required',
+                'integer',
+                'min:1',
+                'gte:min_request_days'
+            ],
+
+            // Workflow – HR approval needed?
+            'requires_hr_approval' => [
                 'required',
                 'boolean'
             ],
+
+            // Is the leave type active?
+            'is_active' => [
+                'sometimes',
+                'boolean'
+            ],
+
+            // paid / unpaid / partially paid
+            'payment_type' => [
+                'required',
+                'in:paid,unpaid,partially_paid'
+            ],
+
+            // Does it require proof (e.g. sick leave)?
             'requires_proof' => [
                 'required',
                 'boolean'
             ],
         ];
     }
+
     public function messages(): array
     {
         return [
-            'name.unique' => 'This name for the type of leave is already in use.',
-            'is_paid.required' => 'It must be determined whether the leave is paid or not.',
-            'max_days_per_year.min' => 'The maximum number of days must be a positive number or zero.',
+            'name.unique' => 'This leave type name is already in use.',
+            'code.unique' => 'This leave type code is already taken.',
+            'max_request_days.gte' => 'Maximum request days must be greater than or equal to minimum request days.',
+            'annual_entitlement.min' => 'Annual entitlement must be zero or above.',
         ];
     }
 }

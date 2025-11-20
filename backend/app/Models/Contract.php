@@ -15,6 +15,7 @@ class Contract extends Model
         'start_date',
         'end_date',
         'contract_type',
+        'probation_period_days',
         'salary',
         'terms'
     ];
@@ -29,4 +30,5 @@ class Contract extends Model
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
+    
 }

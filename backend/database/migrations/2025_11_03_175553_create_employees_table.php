@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('national_id');
             $table->date('birth_date');
             $table->text('address')->nullable();
-            $table->enum('employee_status', ['active', 'resigned', 'terminated']);
+            $table->enum('employee_status', ['active','probation', 'resigned', 'terminated'])->default('probation');
 
             $table->foreignId('department_id')->nullable()->constrained();
             $table->foreignId('manager_id')->nullable()->constrained('employees');

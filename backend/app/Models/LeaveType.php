@@ -11,18 +11,20 @@ class LeaveType extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'description',
-        'max_days_per_year',
-        'is_paid',
-        'requires_proof',
+        'code',
+        'annual_entitlement',
+        'accrual_policy',
+        'carry_over_limit',
+        'min_request_days',
+        'max_request_days',
+        'requires_hr_approval',
+        'is_active',
+        'payment_type',
+        'requires_proof'
     ];
 
-    protected $casts = [
-        'is_paid' => 'boolean',
-        'requires_proof' => 'boolean',
-        'max_days_per_year' => 'integer',
-        'created_at',
-        'updated_at',
-
-    ];
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
 }

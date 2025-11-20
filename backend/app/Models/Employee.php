@@ -53,4 +53,14 @@ class Employee extends Model
     {
         return $this->belongsTo(JobPosition::class, 'job_id');
     }
+
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
+
+    public function contract()
+    {
+        return $this->hasOne(Contract::class);
+    }
 }

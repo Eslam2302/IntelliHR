@@ -22,7 +22,7 @@ class ContractRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => ['required', 'exists:employees,id'],
+            'employee_id' => ['required','unique:contracts,employee_id', 'exists:employees,id'],
             'start_date' => ['required', 'date'],
             'end_date'  => ['nullable', 'date', 'after_or_equal:start_date'],
             'contract_type' => [

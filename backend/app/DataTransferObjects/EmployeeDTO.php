@@ -36,10 +36,10 @@ class EmployeeDTO
             national_id: $request->validated('national_id'),
             birth_date: $request->validated('birth_date'),
             address: $request->validated('address'),
-            employee_status: $request->validated('employee_status'),
+            employee_status: $request->validated('employee_status') ?? 'probation',
             hire_date: $request->validated('hire_date'),
             department_id: $request->validated('department_id'),
-            manager_id: $request->validated('manager_id'),
+            manager_id: $request->validated('manager_id') ?? null,
             job_id: $request->validated('job_id'),
             email: $request->validated('email'),
             password: $request->validated('password'),
@@ -49,7 +49,7 @@ class EmployeeDTO
     public static function fromUpdateRequest(UpdateEmployeeRequest $request): self
     {
         return new self(
-           first_name: $request->validated('first_name'),
+            first_name: $request->validated('first_name'),
             last_name: $request->validated('last_name'),
             personal_email: $request->validated('personal_email'),
             phone: $request->validated('phone'),
@@ -60,7 +60,7 @@ class EmployeeDTO
             employee_status: $request->validated('employee_status'),
             hire_date: $request->validated('hire_date'),
             department_id: $request->validated('department_id'),
-            manager_id: $request->validated('manager_id'),
+            manager_id: $request->validated('manager_id') ?? null,
             job_id: $request->validated('job_id'),
             email: $request->validated('email'),
             password: $request->filled('password') ? $request->validated('password') : null,

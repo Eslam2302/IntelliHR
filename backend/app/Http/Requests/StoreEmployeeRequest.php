@@ -55,8 +55,7 @@ class StoreEmployeeRequest extends FormRequest
                 'string'
             ],
             'employee_status' => [
-                'required',
-                'in:active,resigned,terminated'
+                'in:active,probation,resigned,terminated'
             ],
             'department_id' => [
                 'required',

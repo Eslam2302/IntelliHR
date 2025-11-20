@@ -37,6 +37,7 @@ return new class extends Migration
                 'commission_based',
                 'on_call'
             ]);
+            $table->unsignedSmallInteger('probation_period_days')->default(90);
             $table->decimal('salary', 12, 2);
             $table->text('terms')->nullable();
 
