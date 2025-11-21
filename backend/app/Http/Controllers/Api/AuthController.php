@@ -17,14 +17,14 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        if (!Auth::attempt(['employee_id' => $credentials['employee_id'], 'password' => $credentials['password']])) {
             return response()->json([
                 'message' => 'Invalid credentials'
             ], 401);
         }
 
-        $user = User::where('employee_id', $request->employee_id)->firstOrFail();
-
+        $user = User::where('employee_id', $request->employee_id)->first();
+        
         $token = $user->createToken('access_token')->plainTextToken;
 
         $roleName = $user->getRoleNames()->first();

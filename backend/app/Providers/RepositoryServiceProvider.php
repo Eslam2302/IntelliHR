@@ -7,11 +7,13 @@ use App\Repositories\ContractRepository;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
 use App\Repositories\Contracts\ContractRepositoryInterface;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
+use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
 use App\Repositories\DepartmentRepository;
+use App\Repositories\DocumentRepository;
 use App\Repositories\EmployeeRepository;
 use App\Repositories\JobPositionRepository;
 use App\Repositories\LeaveRequestRepository;
@@ -65,6 +67,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             LeaveRequestRepositoryInterface::class,
             LeaveRequestRepository::class
+        );
+
+        // Bind document Repository
+        $this->app->bind(
+            DocumentRepositoryInterface::class,
+            DocumentRepository::class
         );
     }
 

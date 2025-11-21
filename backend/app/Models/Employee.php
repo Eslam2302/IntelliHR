@@ -5,9 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Department;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Employee extends Model
 {
+    use HasFactory, HasRoles;
+    protected $guard_name = 'web';
+
     protected $fillable = [
         'first_name',
         'last_name',
@@ -67,5 +72,10 @@ class Employee extends Model
     public function leaveRequests()
     {
         return $this->hasMany(LeaveRequest::class, 'employee_id');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
     }
 }

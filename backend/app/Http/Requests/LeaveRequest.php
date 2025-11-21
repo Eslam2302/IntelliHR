@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\LeaveType;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveRequest extends FormRequest
 {
@@ -41,5 +42,7 @@ class LeaveRequest extends FormRequest
             }
         });
     }
+
+    
 
 }

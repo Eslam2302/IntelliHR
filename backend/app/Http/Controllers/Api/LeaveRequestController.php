@@ -8,6 +8,7 @@ use App\DataTransferObjects\LeaveRequestDTO;
 use App\Services\LeaveRequestService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveRequestController extends Controller
 {
@@ -39,15 +40,23 @@ class LeaveRequestController extends Controller
      * @param int $managerId
      * @return JsonResponse
      */
-    public function managerApprove(int $id, int $managerId): JsonResponse
+    public function managerApprove(int $id): JsonResponse
     {
-        $leaveRequest = $this->service->managerApprove($id, $managerId);
+        $managerId = Auth::id();
 
-        return response()->json([
-            'success' => true,
-            'data' => new LeaveRequestResource($leaveRequest),
-            'message' => 'Leave request approved by manager.'
-        ]);
+        try {
+            $updatedRequest = $this->service->managerApprove($id, $managerId);
+            return response()->json([
+                'success' => true,
+                'data' => new LeaveRequestResource($updatedRequest),
+                'message' => 'Leave request approved by manager successfully.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 403);
+        }
     }
 
     /**

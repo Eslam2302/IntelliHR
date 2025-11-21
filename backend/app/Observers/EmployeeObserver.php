@@ -8,6 +8,7 @@ use App\Models\LeaveBalance;
 use App\Models\LeaveType;
 use App\Models\Contract;
 use App\Services\ContractService;
+use Spatie\Permission\Models\Role;
 
 class EmployeeObserver
 {
@@ -42,8 +43,6 @@ class EmployeeObserver
                 'remaining_days' => $employee->employee_status === 'probation' ? 0 : $type->annual_entitlement,
             ]);
         }
-
-
     }
 
     /**

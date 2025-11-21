@@ -21,8 +21,10 @@ class ContractRequest extends FormRequest
      */
     public function rules(): array
     {
+        $contractId = $this->route('contract')?->id;
+
         return [
-            'employee_id' => ['required','unique:contracts,employee_id', 'exists:employees,id'],
+            'employee_id' => ['required', 'unique:contracts,employee_id,' . $contractId, 'exists:employees,id'],
             'start_date' => ['required', 'date'],
             'end_date'  => ['nullable', 'date', 'after_or_equal:start_date'],
             'contract_type' => [

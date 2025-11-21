@@ -94,6 +94,10 @@ class LeaveRequestService
      */
     public function managerApprove(int $id, int $managerId): LeaveRequest
     {
+
+        
+
+
         $request = $this->repository->findById($id); // make sure with('employee.manager') loaded
 
         // Prevent employee from approving own leave
