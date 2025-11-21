@@ -36,7 +36,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
 
             $table->enum('payment_type', ['paid', 'unpaid', 'partially_paid'])->default('paid');
-            $table->boolean('requires_proof')->default(false);
+            $table->boolean('requires_attachment')->default(false);
             $table->timestamps();
         });
     }

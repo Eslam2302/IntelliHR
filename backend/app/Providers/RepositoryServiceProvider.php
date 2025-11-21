@@ -9,10 +9,12 @@ use App\Repositories\Contracts\ContractRepositoryInterface;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
+use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\EmployeeRepository;
 use App\Repositories\JobPositionRepository;
+use App\Repositories\LeaveRequestRepository;
 use App\Repositories\LeaveTypeRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -47,7 +49,7 @@ class RepositoryServiceProvider extends ServiceProvider
             JobPositionRepository::class
         );
 
-        // Bind Leave Type Repository
+        // Bind Attendance Repository
         $this->app->bind(
             AttendanceRepositoryInterface::class,
             AttendanceRepository::class
@@ -57,6 +59,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             LeaveTypeRepositoryInterface::class,
             LeaveTypeRepository::class
+        );
+
+        // Bind Leave Request Repository
+        $this->app->bind(
+            LeaveRequestRepositoryInterface::class,
+            LeaveRequestRepository::class
         );
     }
 

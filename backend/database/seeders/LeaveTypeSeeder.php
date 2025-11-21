@@ -21,7 +21,7 @@ class LeaveTypeSeeder extends Seeder
                 'max_request_days' => 7,
                 'requires_hr_approval' => false,
                 'payment_type' => 'paid',
-                'requires_proof' => false,
+                'requires_attachment' => false,
                 'is_active' => true,
             ],
             [
@@ -34,7 +34,7 @@ class LeaveTypeSeeder extends Seeder
                 'max_request_days' => 14,
                 'requires_hr_approval' => true,
                 'payment_type' => 'paid',
-                'requires_proof' => true,
+                'requires_attachment' => true,
                 'is_active' => true,
             ],
             [
@@ -47,7 +47,7 @@ class LeaveTypeSeeder extends Seeder
                 'max_request_days' => 2,
                 'requires_hr_approval' => false,
                 'payment_type' => 'paid',
-                'requires_proof' => false,
+                'requires_attachment' => false,
                 'is_active' => true,
             ],
         ];

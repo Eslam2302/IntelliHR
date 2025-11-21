@@ -33,7 +33,7 @@ class LeaveTypeResource extends JsonResource
 
             // Workflow
             'requires_hr_approval' => $this->requires_hr_approval,
-            'requires_proof' => $this->requires_proof,
+            'requires_attachment' => $this->requires_attachment,
 
             // Status
             'payment_type' => $this->payment_type,

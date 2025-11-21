@@ -63,4 +63,9 @@ class Employee extends Model
     {
         return $this->hasOne(Contract::class);
     }
+
+    public function leaveRequests()
+    {
+        return $this->hasMany(LeaveRequest::class, 'employee_id');
+    }
 }

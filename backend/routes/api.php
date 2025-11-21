@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\JobPositionController;
 use App\Http\Controllers\Api\LeaveTypeController;
-use App\Models\JobPosition;
+use App\Http\Controllers\Api\LeaveRequestController;
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -42,4 +42,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('leave-types', LeaveTypeController::class);
     Route::apiResource('job-positions', JobPositionController::class);
     Route::apiResource('contracts', ContractController::class);
+
+    Route::prefix('leave-requests')->group(function () {
+
+        // Create leave request
+        Route::post('/', [LeaveRequestController::class, 'store']);
+
+        // Manager approval
+        // {id} = leave request id, {managerId} = manager user id
+        Route::post('{id}/manager-approve/{managerId}', [LeaveRequestController::class, 'managerApprove']);
+
+        // HR approval
+        // {id} = leave request id, {hrId} = HR user id
+        Route::post('{id}/hr-approve/{hrId}', [LeaveRequestController::class, 'hrApprove']);
+
+        // Manager Dashboard: view all leave requests of team
+        Route::get('/manager-dashboard/{managerId}', [LeaveRequestController::class, 'managerDashboard']);
+    });
 });

@@ -89,7 +89,7 @@ class LeaveTypeRequest extends FormRequest
             ],
 
             // Does it require proof (e.g. sick leave)?
-            'requires_proof' => [
+            'requires_attachment' => [
                 'required',
                 'boolean'
             ],

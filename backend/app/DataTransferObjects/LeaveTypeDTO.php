@@ -16,7 +16,7 @@ class LeaveTypeDTO
         public readonly int $max_request_days,
         public readonly bool $requires_hr_approval,
         public readonly string $payment_type,
-        public readonly bool $requires_proof,
+        public readonly bool $requires_attachment,
         public readonly bool $is_active,
     ) {}
 
@@ -35,7 +35,7 @@ class LeaveTypeDTO
             max_request_days: $request->validated('max_request_days'),
             requires_hr_approval: $request->validated('requires_hr_approval'),
             payment_type: $request->validated('payment_type'),
-            requires_proof: $request->validated('requires_proof'),
+            requires_attachment: $request->validated('requires_attachment'),
             is_active: $request->validated('is_active') ?? true,
         );
     }
@@ -55,7 +55,7 @@ class LeaveTypeDTO
             max_request_days: $data['max_request_days'],
             requires_hr_approval: $data['requires_hr_approval'],
             payment_type: $data['payment_type'],
-            requires_proof: $data['requires_proof'],
+            requires_attachment: $data['requires_attachment'],
             is_active: $data['is_active'] ?? true,
         );
     }
@@ -75,7 +75,7 @@ class LeaveTypeDTO
             'max_request_days' => $this->max_request_days,
             'requires_hr_approval' => $this->requires_hr_approval,
             'payment_type' => $this->payment_type,
-            'requires_proof' => $this->requires_proof,
+            'requires_attachment' => $this->requires_attachment,
             'is_active' => $this->is_active,
         ];
     }
