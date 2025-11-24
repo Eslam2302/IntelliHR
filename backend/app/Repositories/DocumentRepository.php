@@ -37,16 +37,14 @@ class DocumentRepository implements DocumentRepositoryInterface
         return $this->model->create($data);
     }
 
-    public function update(int $id, array $data): Document
+    public function update(Document $document, array $data): Document
     {
-        $document = $this->model->findOrFail($id);
         $document->update($data);
-        return $document->refresh();
+        return $document->fresh();
     }
 
-    public function delete(int $id): bool
+    public function delete(Document $document): bool
     {
-        $document = $this->model->findOrFail($id);
         return $document->delete();
     }
 }

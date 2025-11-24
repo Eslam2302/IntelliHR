@@ -24,10 +24,23 @@ class DocumentRequest extends FormRequest
         $isUpdate = $this->method() === 'PUT' || $this->method() === 'PATCH';
 
         return [
-            'employee_id' => [$isUpdate ? 'sometimes' : 'required', 'exists:employees,id'],
-            'doc_type'    => [$isUpdate ? 'sometimes' : 'required', 'string', 'max:255'],
+            'employee_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:employees,id'
+            ],
 
-            'attachment'  => [$isUpdate ? 'sometimes' : 'required', 'file', 'max:5120'],
+            'doc_type' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
+
+            // Attachment is required ONLY on create
+            'attachment' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'file',
+                'max:5120'
+            ],
 
         ];
     }

@@ -23,7 +23,10 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             PermissionsSeeder::class,
             AdminUserSeeder::class,
+            ContractSeeder::class,
             LeaveTypeSeeder::class,
+            LeaveBalanceSeeder::class,
+            JobPositionSeeder::class,
         ]);
     }
 }

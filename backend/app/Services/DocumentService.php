@@ -69,47 +69,49 @@ class DocumentService
         }
     }
 
-    public function update(int $id, DocumentDTO $dto): Document
+    public function update(Document $document, DocumentDTO $dto): Document
     {
         try {
-            $document = $this->repository->find($id);
 
-            $filePath = $document->file_path; // keep old file
-            $docType    = $dto->doc_type ?? $document->doc_type;
-
-            Log::info("Update Document {$id}", [
-                'dto_doc_type' => $dto->doc_type,
-                'document_doc_type' => $document->doc_type,
-                'final_doc_type' => $docType,
-            ]);
-
-            // If new file uploaded → replace old
+            // 1. If a new file is uploaded → store it
             if ($dto->attachment) {
                 $filePath = $dto->attachment->store('documents', 'public');
+            } else {
+                // keep the old file
+                $filePath = $document->file_path;
             }
 
+
+            // 2. Create the update data
             $data = [
                 'employee_id' => $dto->employee_id ?? $document->employee_id,
-                'doc_type'    => $docType,
+                'doc_type'    => $dto->doc_type    ?? $document->doc_type,
                 'file_path'   => $filePath,
                 'uploaded_at' => $dto->attachment ? now() : $document->uploaded_at,
             ];
 
-            Log::info("Data to update", $data);
+            // 3. Update using repository
+            $updated = $this->repository->update($document, $data);
+            Log::info("Document updated successfully", [
+                'id' => $updated->id,
+                'employee_id' => $updated->employee_id,
+                'doc_type' => $updated->doc_type,
+                'file_path' => $updated->file_path,
+            ]);
 
-            return $this->repository->update($id, $data);
+            return $updated;
         } catch (\Exception $e) {
-            Log::error("Error updating document {$id}: " . $e->getMessage());
+            Log::error("Error updating document {$document->id}: " . $e->getMessage());
             throw $e;
         }
     }
 
-    public function delete(int $id): bool
+    public function delete(Document $document): bool
     {
         try {
-            return $this->repository->delete($id);
+            return $this->repository->delete($document);
         } catch (\Exception $e) {
-            Log::error("Error deleting document {$id}: " . $e->getMessage());
+            Log::error("Error deleting document " . $e->getMessage());
             throw $e;
         }
     }

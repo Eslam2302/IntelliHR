@@ -47,7 +47,7 @@ interface DocumentRepositoryInterface
      * @param array $data Updated data.
      * @return Document
      */
-    public function update(int $id, array $data): Document;
+    public function update(Document $document, array $data): Document;
 
     /**
      * Delete a document by its ID.
@@ -55,5 +55,5 @@ interface DocumentRepositoryInterface
      * @param int $id Document ID.
      * @return bool
      */
-    public function delete(int $id): bool;
+    public function delete(Document $document): bool;
 }

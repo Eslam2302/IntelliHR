@@ -2,16 +2,22 @@
 
 namespace App\Providers;
 
+use App\Repositories\AllowanceRepository;
 use App\Repositories\AttendanceRepository;
+use App\Repositories\BenefitRepository;
 use App\Repositories\ContractRepository;
+use App\Repositories\Contracts\AllowanceRepositoryInterface;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
+use App\Repositories\Contracts\BenefitRepositoryInterface;
 use App\Repositories\Contracts\ContractRepositoryInterface;
+use App\Repositories\Contracts\DeductionRepositoryInterface;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
+use App\Repositories\DeductionRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\EmployeeRepository;
@@ -73,6 +79,24 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             DocumentRepositoryInterface::class,
             DocumentRepository::class
+        );
+
+        // Bind Benefit Repository
+        $this->app->bind(
+            BenefitRepositoryInterface::class,
+            BenefitRepository::class
+        );
+
+        // Bind Allowance Repository
+        $this->app->bind(
+            AllowanceRepositoryInterface::class,
+            AllowanceRepository::class
+        );
+
+        // Bind Deduction Repository
+        $this->app->bind(
+            DeductionRepositoryInterface::class,
+            DeductionRepository::class
         );
     }
 

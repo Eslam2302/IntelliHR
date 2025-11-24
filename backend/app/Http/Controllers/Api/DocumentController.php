@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DocumentRequest;
 use App\Http\Resources\DocumentResource;
 use App\DataTransferObjects\DocumentDTO;
+use App\Models\Document;
 use App\Services\DocumentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class DocumentController extends Controller
 {
@@ -24,14 +26,8 @@ class DocumentController extends Controller
         );
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Document $document): JsonResponse
     {
-        $document = $this->service->findById($id);
-
-        if (!$document) {
-            return response()->json(['message' => 'Document not found'], 404);
-        }
-
         return response()->json(new DocumentResource($document));
     }
 
@@ -54,19 +50,23 @@ class DocumentController extends Controller
         return response()->json(new DocumentResource($document), 201);
     }
 
-    public function update(DocumentRequest $request, int $id): JsonResponse
+    public function update(DocumentRequest $request, Document $document): JsonResponse
     {
+
         $dto = DocumentDTO::fromRequest($request);
 
-        $document = $this->service->update($id, $dto);
+        $document = $this->service->update($document, $dto);
 
         return response()->json(new DocumentResource($document));
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Document $document): JsonResponse
     {
-        $this->service->delete($id);
+        $this->service->delete($document);
 
-        return response()->json(['message' => 'Document deleted']);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Document deleted successfully.'
+        ], 200);
     }
 }

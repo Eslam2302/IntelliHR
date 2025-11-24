@@ -4,6 +4,7 @@ namespace App\DataTransferObjects;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\DocumentRequest;
+use Illuminate\Support\Facades\Log;
 
 class DocumentDTO
 {
@@ -23,17 +24,28 @@ class DocumentDTO
             doc_type: $request->input('doc_type'),
             attachment: $request->file('attachment'),
         );
+
     }
 
     /**
-     * Convert DTO to array
+     * Convert DTO to array (only includes non-null values)
      */
     public function toArray(): array
     {
-        return [
-            'employee_id' => $this->employee_id,
-            'doc_type' => $this->doc_type,
-            'attachment' => $this->attachment,
-        ];
+        $data = [];
+
+        if ($this->employee_id !== null) {
+            $data['employee_id'] = $this->employee_id;
+        }
+
+        if ($this->doc_type !== null) {
+            $data['doc_type'] = $this->doc_type;
+        }
+
+        if ($this->attachment !== null) {
+            $data['attachment'] = $this->attachment;
+        }
+
+        return $data;
     }
 }

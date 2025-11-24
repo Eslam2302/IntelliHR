@@ -4,18 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Document extends Model
+class Deduction extends Model
 {
+
     protected $fillable = [
+        'payroll_id',
         'employee_id',
-        'doc_type',
-        'file_path',
-        'uploaded_at',
+        'type',
+        'amount',
     ];
 
-    /**
-     * Relation: Each document belongs to one employee
-     */
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
+    }
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
