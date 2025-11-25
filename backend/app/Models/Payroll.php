@@ -18,6 +18,10 @@ class Payroll extends Model
         'processed_at',
     ];
 
+    protected $casts = [
+        'processed_at' => 'datetime',
+    ];
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);

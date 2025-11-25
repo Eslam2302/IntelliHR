@@ -17,6 +17,7 @@ use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
+use App\Repositories\Contracts\PayrollRepositoryInterface;
 use App\Repositories\DeductionRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
@@ -24,6 +25,7 @@ use App\Repositories\EmployeeRepository;
 use App\Repositories\JobPositionRepository;
 use App\Repositories\LeaveRequestRepository;
 use App\Repositories\LeaveTypeRepository;
+use App\Repositories\PayrollRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -97,6 +99,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             DeductionRepositoryInterface::class,
             DeductionRepository::class
+        );
+
+        // Bind Payroll Repository
+        $this->app->bind(
+            PayrollRepositoryInterface::class,
+            PayrollRepository::class
         );
     }
 

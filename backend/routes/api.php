@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\BenefitController;
 use App\Http\Controllers\Api\DeductionController;
+use App\Http\Controllers\Api\PayrollController;
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -112,5 +113,31 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{deduction}', [DeductionController::class, 'show']); // Show single deduction
         Route::put('/{deduction}', [DeductionController::class, 'update']); // Update deduction
         Route::delete('/{deduction}', [DeductionController::class, 'destroy']); // Delete deduction
+    });
+
+    Route::prefix('payrolls')->group(function () {
+
+        // GET /api/payrolls → paginated list
+        Route::get('/', [PayrollController::class, 'index'])->name('payrolls.index');
+
+        // POST /api/payrolls → create new payroll
+        Route::post('/', [PayrollController::class, 'store'])->name('payrolls.store');
+
+        // GET /api/payrolls/{payroll} → show single payroll
+        Route::get('/{payroll}', [PayrollController::class, 'show'])->name('payrolls.show');
+
+        // PUT /api/payrolls/{payroll} → update payroll
+        Route::put('/{payroll}', [PayrollController::class, 'update'])->name('payrolls.update');
+
+        // DELETE /api/payrolls/{payroll} → delete payroll
+        Route::delete('/{payroll}', [PayrollController::class, 'destroy'])->name('payrolls.destroy');
+
+        // GET /api/payrolls/employee/{employeeId} → all payrolls for employee
+        Route::get('/employee/{employeeId}', [PayrollController::class, 'employeePayrolls'])
+            ->name('payrolls.employee');
+
+        // GET /api/payrolls/month/{year}/{month} → all payrolls for a specific month
+        Route::get('/month/{year}/{month}', [PayrollController::class, 'monthPayrolls'])
+            ->name('payrolls.month');
     });
 });
