@@ -139,5 +139,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // GET /api/payrolls/month/{year}/{month} → all payrolls for a specific month
         Route::get('/month/{year}/{month}', [PayrollController::class, 'monthPayrolls'])
             ->name('payrolls.month');
+
+        // POST /api/payrolls/process → process payroll for current month
+        Route::post('/process', [PayrollController::class, 'processPayroll']);
     });
 });

@@ -73,6 +73,17 @@ class PayrollRepository implements PayrollRepositoryInterface
     }
 
     /**
+     * Check if payrolls exist for specific year + month
+     */
+    public function existForMonth(int $year, int $month): bool
+    {
+        return $this->model
+            ->where('year', $year)
+            ->where('month', $month)
+            ->exists();
+    }
+
+    /**
      * Check if payroll exists for period
      */
     public function existsForPeriod(int $employeeId, int $year, int $month): bool

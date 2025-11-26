@@ -8,22 +8,29 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ProcessPayrollJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected int $year;
-    protected int $month;
+    public int $year;
+    public int $month;
 
     public function __construct(int $year, int $month)
     {
-        $this->year = $year;
+        $this->year  = $year;
         $this->month = $month;
     }
 
-    public function handle(PayrollProcessingService $service)
+    public function handle(PayrollProcessingService $payrollProcessingService)
     {
-        $service->processMonth($this->year, $this->month);
+        try {
+            $payrollProcessingService->processMonth($this->year, $this->month);
+        } catch (Throwable $e) {
+            Log::error("Payroll job failed: " . $e->getMessage());
+            throw $e; // allows retrying
+        }
     }
 }

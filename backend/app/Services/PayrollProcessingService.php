@@ -19,7 +19,7 @@ class PayrollProcessingService
 {
 
     protected string $lockKeyPrefix = 'payroll_process_lock_';
-    protected int $lockTtl = 600; // seconds
+    protected int $lockTtl = 3600; // seconds
     public function __construct(
         protected PayrollRepositoryInterface $payrollRepository,
         protected AllowanceRepositoryInterface $allowanceRepository,
@@ -47,14 +47,15 @@ class PayrollProcessingService
     {
         $lockKey = $this->lockKeyPrefix . "{$year}_{$month}";
 
+        $lock = Cache::lock($lockKey, 3600);
+
+
         // -------------------------------------------
         // Prevent duplicate processing (Lock)
         // -------------------------------------------
-        if (Cache::has($lockKey)) {
-            throw new \Exception("Payroll for {$year}-{$month} is already running.");
+        if (!$lock->get()) {
+            throw new \Exception("Payroll for {$year}-{$month} already running");
         }
-
-        Cache::put($lockKey, true, $this->lockTtl);
 
         try {
 
@@ -193,7 +194,9 @@ class PayrollProcessingService
             }); // end chunk
 
         } finally {
-            Cache::forget($lockKey); // release lock
+            $lock->release();
         }
     }
+
+    
 }

@@ -10,12 +10,13 @@ use App\Http\Resources\PayrollResource;
 use App\Models\Payroll;
 use App\Services\PayrollService;
 use Illuminate\Http\JsonResponse;
+use App\Jobs\ProcessPayrollJob;
 
 class PayrollController extends Controller
 {
 
     public function __construct(
-        protected PayrollService $service
+        protected PayrollService $service,
     ) {}
 
     /**
@@ -121,13 +122,39 @@ class PayrollController extends Controller
      * @param int $month
      * @return JsonResponse
      */
-    public function monthPayrolls(int $year,int $month): JsonResponse
+    public function monthPayrolls(int $year, int $month): JsonResponse
     {
         $payrolls = $this->service->getByMonth($year, $month);
 
         return response()->json([
             'status' => 'success',
             'data' => PayrollResource::collection($payrolls),
+        ], 200);
+    }
+
+    /**
+     * Trigger payroll processing for a specific month
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function processPayroll(Request $request): JsonResponse
+    {
+        if ($request->has(['year', 'month'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You cannot manually set year or month. Payroll always runs for the current month.',
+            ], 400);
+        }
+
+        $year = now()->year;
+        $month = now()->month;
+
+        
+
+        ProcessPayrollJob::dispatch($year, $month);
+        return response()->json([
+            'status' => 'success',
+            'message'   => "Payroll processing for {$year}-{$month} has been initiated.",
         ], 200);
     }
 }

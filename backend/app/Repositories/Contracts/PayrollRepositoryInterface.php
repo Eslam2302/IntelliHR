@@ -22,7 +22,7 @@ interface PayrollRepositoryInterface
      * Update an existing payroll
      */
     public function update(Payroll $payroll, array $data): Payroll;
-    
+
     /**
      * Delete a payroll record
      */
@@ -37,6 +37,11 @@ interface PayrollRepositoryInterface
      * Get payrolls for a specific year + month
      */
     public function getByMonth(int $year, int $month): Collection;
+
+    /**
+     * Check if payrolls exist for a specific year + month
+     */
+    public function existForMonth(int $year, int $month): bool;
 
     /**
      * Check if payroll already exists for (employee_id + year + month)

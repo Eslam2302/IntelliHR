@@ -118,4 +118,12 @@ class PayrollService
     {
         return $this->repository->getByMonth($year, $month);
     }
+
+    /**
+     * Check if payrolls exist for specific year + month
+     */
+    public function existForMonth(int $year, int $month): bool
+    {
+        return $this->repository->existForMonth($year, $month);
+    }
 }
