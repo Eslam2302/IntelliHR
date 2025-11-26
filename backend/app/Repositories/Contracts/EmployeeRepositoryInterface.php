@@ -29,4 +29,24 @@ interface EmployeeRepositoryInterface
      * Delete existing employee
      */
     public function delete(Employee $employee): bool;
+
+    /**
+     *
+     * Chunk active employees by id to avoid memory exhaustion.
+     * The callback receives a Collection of Employee models.
+     *
+     * @param int $chunkSize
+     * @param callable $callback
+     * @return void
+     */
+    public function chunkActiveEmployees(int $chunkSize, callable $callback): void;
+
+    /**
+     *
+     * Return employee by id or null.
+     *
+     * @param int $employeeId
+     * @return \App\Models\Employee|null
+     */
+    public function findById(int $employeeId);
 }

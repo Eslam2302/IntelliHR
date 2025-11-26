@@ -4,6 +4,7 @@ namespace App\Repositories\Contracts;
 
 use App\Models\Benefit;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 interface BenefitRepositoryInterface
 {
@@ -16,4 +17,9 @@ interface BenefitRepositoryInterface
     public function update(Benefit $benefit, array $data): Benefit;
 
     public function delete(Benefit $benefit): bool;
+
+    /**
+     * Get all active benefits for employee in given month & year
+     */
+    public function getActiveForEmployeeMonth(int $employeeId): Collection;
 }

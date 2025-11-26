@@ -13,7 +13,7 @@ class ContractDTO
         public readonly ?string $terms,
         public readonly string $start_date,
         public readonly ?string $end_date,
-        public readonly int $probation_period_days,
+        public readonly ?int $probation_period_days,
 
     ) {}
 
@@ -39,7 +39,7 @@ class ContractDTO
             'terms' => $this->terms,
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
-            'probation_period_days' => $this->probation_period_days,
+            'probation_period_days' => $this->probation_period_days ? $this->probation_period_days : 90 ,
         ];
     }
 }

@@ -53,4 +53,29 @@ class AllowanceRepository implements AllowanceRepositoryInterface
     {
         return $allowance->delete();
     }
+
+    /**
+     *
+     * Get allowances where payroll_id IS NULL (pending)
+     *
+     */
+    public function getPendingForEmployeeMonth(int $employeeId)
+    {
+        return $this->model
+            ->where('employee_id', $employeeId)
+            ->whereNull('payroll_id')
+            ->get();
+    }
+
+    /**
+     *
+     * Mark allowances as processed by adding payroll_id
+     *
+     */
+    public function markAsProcessed(array $allowanceIds, int $payrollId)
+    {
+        return $this->model
+            ->whereIn('id', $allowanceIds)
+            ->update(['payroll_id' => $payrollId]);
+    }
 }

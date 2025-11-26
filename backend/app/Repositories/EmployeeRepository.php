@@ -34,4 +34,31 @@ class EmployeeRepository implements EmployeeRepositoryInterface
     {
         return $employee->delete();
     }
+
+    /**
+     *
+     * Chunk active employees by id to avoid memory exhaustion.
+     * The callback receives a Collection of Employee models.
+     *
+     * @param int $chunkSize
+     * @param callable $callback
+     * @return void
+     */
+    public function chunkActiveEmployees(int $chunkSize, callable $callback): void
+    {
+        Employee::whereIn('employee_status', ['active', 'probation'])
+            ->chunkById($chunkSize, $callback);
+    }
+
+    /**
+     *
+     * Return employee by id or null.
+     *
+     * @param int $employeeId
+     * @return Employee|null
+     */
+    public function findById(int $employeeId)
+    {
+        return Employee::find($employeeId);
+    }
 }

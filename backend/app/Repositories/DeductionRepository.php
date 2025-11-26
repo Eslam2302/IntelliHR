@@ -53,4 +53,29 @@ class DeductionRepository implements DeductionRepositoryInterface
     {
         return $deduction->delete();
     }
+
+    /**
+     *
+     * Get deductions where payroll_id IS NULL (pending)
+     *
+     */
+    public function getPendingForEmployeeMonth(int $employeeId)
+    {
+        return $this->model
+            ->where('employee_id', $employeeId)
+            ->whereNull('payroll_id')
+            ->get();
+    }
+
+    /**
+     *
+     * Mark deductions as processed by adding payroll_id
+     *
+     */
+    public function markAsProcessed(array $deductionsIds, int $payrollId)
+    {
+        return $this->model
+            ->whereIn('id', $deductionsIds)
+            ->update(['payroll_id' => $payrollId]);
+    }
 }

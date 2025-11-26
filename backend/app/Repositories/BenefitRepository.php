@@ -4,7 +4,9 @@ namespace App\Repositories;
 
 use App\Models\Benefit;
 use App\Repositories\Contracts\BenefitRepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class BenefitRepository implements BenefitRepositoryInterface
 {
@@ -41,5 +43,15 @@ class BenefitRepository implements BenefitRepositoryInterface
     public function delete(Benefit $benefit): bool
     {
         return $benefit->delete();
+    }
+
+    public function getActiveForEmployeeMonth(int $employeeId): Collection
+    {
+
+        return $this->model
+            ->where('employee_id', $employeeId)
+            ->where(function ($q) {
+                $q->whereNull('end_date');
+            })->get();
     }
 }

@@ -42,6 +42,8 @@ return new class extends Migration
             $table->text('terms')->nullable();
 
             $table->timestamps();
+
+            $table->index(['employee_id', 'start_date']);
         });
     }
 
