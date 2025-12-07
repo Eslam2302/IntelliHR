@@ -27,6 +27,11 @@ class DatabaseSeeder extends Seeder
             LeaveTypeSeeder::class,
             LeaveBalanceSeeder::class,
             JobPositionSeeder::class,
+            TrainerSeeder::class,
+            TrainingSessionSeeder::class,
+            EmployeeTrainingSeeder::class,
+            TrainingEvaluationSeeder::class,
+            TrainingCertificateSeeder::class,
         ]);
     }
 }

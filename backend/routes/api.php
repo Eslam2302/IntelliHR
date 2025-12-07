@@ -15,7 +15,14 @@ use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\BenefitController;
 use App\Http\Controllers\Api\DeductionController;
+use App\Http\Controllers\Api\EmployeeTrainingController;
 use App\Http\Controllers\Api\PayrollController;
+use App\Http\Controllers\Api\TrainerController;
+use App\Http\Controllers\Api\TrainingSessionController;
+use App\Http\Controllers\Api\TrainingCertificateController;
+use App\Http\Controllers\Api\TrainingEvaluationController;
+
+
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -115,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{deduction}', [DeductionController::class, 'destroy']); // Delete deduction
     });
 
+    // Payroll Routes
     Route::prefix('payrolls')->group(function () {
 
         // GET /api/payrolls → paginated list
@@ -142,5 +150,50 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // POST /api/payrolls/process → process payroll for current month
         Route::post('/process', [PayrollController::class, 'processPayroll']);
+    });
+
+    // Trainer Routes
+    Route::prefix('trainers')->group(function () {
+        Route::get('/', [TrainerController::class, 'index']);        // GET all trainers
+        Route::post('/', [TrainerController::class, 'store']);       // POST create trainer
+        Route::get('/{trainer}', [TrainerController::class, 'show']); // GET trainer by id
+        Route::put('/{trainer}', [TrainerController::class, 'update']); // PUT update trainer
+        Route::delete('/{trainer}', [TrainerController::class, 'destroy']); // DELETE trainer
+    });
+
+    // Training Session Routes
+    Route::prefix('training-sessions')->group(function () {
+        Route::get('/', [TrainingSessionController::class, 'index']);          // List all sessions (paginated)
+        Route::post('/', [TrainingSessionController::class, 'store']);         // Create a new session
+        Route::get('{trainingSession}', [TrainingSessionController::class, 'show']);   // Show single session
+        Route::put('{trainingSession}', [TrainingSessionController::class, 'update']); // Update session
+        Route::delete('{trainingSession}', [TrainingSessionController::class, 'destroy']); // Delete session
+    });
+
+    // Employee Training Routes
+    Route::prefix('employee-trainings')->group(function () {
+        Route::get('/', [EmployeeTrainingController::class, 'index']);
+        Route::post('/', [EmployeeTrainingController::class, 'store']);
+        Route::get('{employeeTraining}', [EmployeeTrainingController::class, 'show']);
+        Route::put('{employeeTraining}', [EmployeeTrainingController::class, 'update']);
+        Route::delete('{employeeTraining}', [EmployeeTrainingController::class, 'destroy']);
+    });
+
+    // Training Certificates
+    Route::prefix('training-certificates')->group(function () {
+        Route::get('/', [TrainingCertificateController::class, 'index']);
+        Route::post('/', [TrainingCertificateController::class, 'store']);
+        Route::get('{certificate}', [TrainingCertificateController::class, 'show']);
+        Route::put('{certificate}', [TrainingCertificateController::class, 'update']);
+        Route::delete('{certificate}', [TrainingCertificateController::class, 'destroy']);
+    });
+
+    // Training Evaluation
+    Route::prefix('training-evaluations')->group(function () {
+        Route::get('/', [TrainingEvaluationController::class, 'index'])->name('training-evaluations.index');
+        Route::post('/', [TrainingEvaluationController::class, 'store'])->name('training-evaluations.store');
+        Route::get('/{evaluation}', [TrainingEvaluationController::class, 'show'])->name('training-evaluations.show');
+        Route::put('/{evaluation}', [TrainingEvaluationController::class, 'update'])->name('training-evaluations.update');
+        Route::delete('/{evaluation}', [TrainingEvaluationController::class, 'destroy'])->name('training-evaluations.destroy');
     });
 });

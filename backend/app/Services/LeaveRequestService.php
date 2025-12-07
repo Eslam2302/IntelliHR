@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DataTransferObjects\LeaveRequestDTO;
 use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
+use App\Models\LeaveType;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\LeaveRequestCreated;
@@ -43,7 +44,7 @@ class LeaveRequestService
         }
 
         // Check leave balance if paid
-        $leaveType = \App\Models\LeaveType::find($dto->leave_type_id);
+        $leaveType = LeaveType::find($dto->leave_type_id);
         if ($leaveType->payment_type === 'paid') {
             $balance = LeaveBalance::where('employee_id', $employeeId)
                 ->where('leave_type_id', $leaveType->id)
@@ -95,7 +96,7 @@ class LeaveRequestService
     public function managerApprove(int $id, int $managerId): LeaveRequest
     {
 
-        
+
 
 
         $request = $this->repository->findById($id); // make sure with('employee.manager') loaded

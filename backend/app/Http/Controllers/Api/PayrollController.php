@@ -149,8 +149,6 @@ class PayrollController extends Controller
         $year = now()->year;
         $month = now()->month;
 
-        
-
         ProcessPayrollJob::dispatch($year, $month);
         return response()->json([
             'status' => 'success',

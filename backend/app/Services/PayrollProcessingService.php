@@ -132,7 +132,7 @@ class PayrollProcessingService
                         } elseif ($annualIncome > 55000.00 && $annualIncome <= 70000.00) {
                             $tax = ($basicSalary + $totalAllowances - $totalDeductions) * 0.15; // 15% monthly
                         } else {
-                            $tax = ($basicSalary + $totalAllowances - $totalDeductions) * 0.20; // لو أكبر من 70k مثلاً 20%
+                            $tax = ($basicSalary + $totalAllowances - $totalDeductions) * 0.20; // 20% monthly
                         }
 
                         if ($tax > 0) {
@@ -197,6 +197,4 @@ class PayrollProcessingService
             $lock->release();
         }
     }
-
-    
 }

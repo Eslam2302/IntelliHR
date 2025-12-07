@@ -14,18 +14,28 @@ use App\Repositories\Contracts\DeductionRepositoryInterface;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Repositories\Contracts\EmployeeTrainingRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
 use App\Repositories\Contracts\PayrollRepositoryInterface;
+use App\Repositories\Contracts\TrainerRepositoryInterface;
+use App\Repositories\Contracts\TrainingCertificateRepositoryInterface;
+use App\Repositories\Contracts\TrainingEvaluationRepositoryInterface;
+use App\Repositories\Contracts\TrainingSessionRepositoryInterface;
 use App\Repositories\DeductionRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\EmployeeRepository;
+use App\Repositories\EmployeeTrainingRepository;
 use App\Repositories\JobPositionRepository;
 use App\Repositories\LeaveRequestRepository;
 use App\Repositories\LeaveTypeRepository;
 use App\Repositories\PayrollRepository;
+use App\Repositories\TrainerRepository;
+use App\Repositories\TrainingCertificateRepository;
+use App\Repositories\TrainingEvaluationRepository;
+use App\Repositories\TrainingSessionRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -105,6 +115,36 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             PayrollRepositoryInterface::class,
             PayrollRepository::class
+        );
+
+        // Bind Trainer Repository
+        $this->app->bind(
+            TrainerRepositoryInterface::class,
+            TrainerRepository::class
+        );
+
+        // Bind TrainingSession Repository
+        $this->app->bind(
+            TrainingSessionRepositoryInterface::class,
+            TrainingSessionRepository::class
+        );
+
+        // bind Employee Training Repository
+        $this->app->bind(
+            EmployeeTrainingRepositoryInterface::class,
+            EmployeeTrainingRepository::class
+        );
+
+        // bind Training Certificate Repository
+        $this->app->bind(
+            TrainingCertificateRepositoryInterface::class,
+            TrainingCertificateRepository::class
+        );
+
+        // bind Training Evaluation Repository
+        $this->app->bind(
+            TrainingEvaluationRepositoryInterface::class,
+            TrainingEvaluationRepository::class
         );
     }
 
