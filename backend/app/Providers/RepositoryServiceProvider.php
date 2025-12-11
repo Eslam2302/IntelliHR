@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Repositories\AllowanceRepository;
+use App\Repositories\ApplicantRepository;
 use App\Repositories\AttendanceRepository;
 use App\Repositories\BenefitRepository;
 use App\Repositories\ContractRepository;
 use App\Repositories\Contracts\AllowanceRepositoryInterface;
+use App\Repositories\Contracts\ApplicantRepositoryInterface;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
 use App\Repositories\Contracts\BenefitRepositoryInterface;
 use App\Repositories\Contracts\ContractRepositoryInterface;
@@ -15,7 +17,10 @@ use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\EmployeeTrainingRepositoryInterface;
+use App\Repositories\Contracts\HiringStageRepositoryInterface;
+use App\Repositories\Contracts\InterviewRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
+use App\Repositories\Contracts\JobPostRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
 use App\Repositories\Contracts\PayrollRepositoryInterface;
@@ -28,7 +33,10 @@ use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\EmployeeRepository;
 use App\Repositories\EmployeeTrainingRepository;
+use App\Repositories\HiringStageRepository;
+use App\Repositories\InterviewRepository;
 use App\Repositories\JobPositionRepository;
+use App\Repositories\JobPostRepository;
 use App\Repositories\LeaveRequestRepository;
 use App\Repositories\LeaveTypeRepository;
 use App\Repositories\PayrollRepository;
@@ -145,6 +153,30 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             TrainingEvaluationRepositoryInterface::class,
             TrainingEvaluationRepository::class
+        );
+
+        // bind Job post Repository
+        $this->app->bind(
+            JobPostRepositoryInterface::class,
+            JobPostRepository::class
+        );
+
+        // bind Hiring stages Repository
+        $this->app->bind(
+            HiringStageRepositoryInterface::class,
+            HiringStageRepository::class
+        );
+
+        // bind Applicant Repository
+        $this->app->bind(
+            ApplicantRepositoryInterface::class,
+            ApplicantRepository::class
+        );
+
+        // bind Interview Repository
+        $this->app->bind(
+            InterviewRepositoryInterface::class,
+            InterviewRepository::class
         );
     }
 

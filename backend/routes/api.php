@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AllowanceController;
+use App\Http\Controllers\Api\ApplicantController;
 use App\Http\Controllers\Api\AttendanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,10 @@ use App\Http\Controllers\Api\TrainerController;
 use App\Http\Controllers\Api\TrainingSessionController;
 use App\Http\Controllers\Api\TrainingCertificateController;
 use App\Http\Controllers\Api\TrainingEvaluationController;
+use App\Http\Controllers\Api\JobPostController;
+use App\Http\Controllers\Api\HiringStageController;
+use App\Http\Controllers\Api\InterviewController;
+
 
 
 
@@ -195,5 +200,43 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{evaluation}', [TrainingEvaluationController::class, 'show'])->name('training-evaluations.show');
         Route::put('/{evaluation}', [TrainingEvaluationController::class, 'update'])->name('training-evaluations.update');
         Route::delete('/{evaluation}', [TrainingEvaluationController::class, 'destroy'])->name('training-evaluations.destroy');
+    });
+
+    // Job post
+    Route::prefix('job-posts')->group(function () {
+        Route::get('/', [JobPostController::class, 'index']);
+        Route::post('/', [JobPostController::class, 'store']);
+        Route::get('/{jobPost}', [JobPostController::class, 'show']);
+        Route::put('/{jobPost}', [JobPostController::class, 'update']);
+        Route::delete('/{jobPost}', [JobPostController::class, 'destroy']);
+    });
+
+    // Hiring Stages
+    Route::prefix('hiring-stages')->group(function () {
+        Route::get('/', [HiringStageController::class, 'index']);
+        Route::post('/', [HiringStageController::class, 'store']);
+        Route::get('/{hiringStage}', [HiringStageController::class, 'show']);
+        Route::put('/{hiringStage}', [HiringStageController::class, 'update']);
+        Route::delete('/{hiringStage}', [HiringStageController::class, 'destroy']);
+    });
+    Route::get('job-posts/{jobPostId}/hiring-stages', [HiringStageController::class, 'getByJobPost']);
+
+    // Applicant
+    Route::prefix('applicants')->group(function () {
+        Route::get('/', [ApplicantController::class, 'index']);
+        Route::post('/', [ApplicantController::class, 'store']);
+        Route::get('/{applicant}', [ApplicantController::class, 'show']);
+        Route::put('/{applicant}', [ApplicantController::class, 'update']);
+        Route::delete('/{applicant}', [ApplicantController::class, 'destroy']);
+    });
+    Route::get('job-posts/{jobPostId}/applicants', [ApplicantController::class, 'getByJobPost']);
+
+    // Interview
+    Route::prefix('interviews')->group(function () {
+        Route::get('/', [InterviewController::class, 'index']);
+        Route::post('/', [InterviewController::class, 'store']);
+        Route::get('/{interview}', [InterviewController::class, 'show']);
+        Route::put('/{interview}', [InterviewController::class, 'update']);
+        Route::delete('/{interview}', [InterviewController::class, 'destroy']);
     });
 });

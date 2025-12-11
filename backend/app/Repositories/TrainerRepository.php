@@ -45,7 +45,8 @@ class TrainerRepository implements TrainerRepositoryInterface
      */
     public function create(array $data): Trainer
     {
-        return $this->model->create($data)->load('employee');
+        return $this->model->create($data)
+            ->load('employee');
     }
 
     /**

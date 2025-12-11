@@ -98,4 +98,9 @@ class Employee extends Model
     {
         return $this->hasMany(Deduction::class);
     }
+
+    public function interviews()
+    {
+        return $this->hasMany(Interview::class, 'interviewer_id');
+    }
 }
