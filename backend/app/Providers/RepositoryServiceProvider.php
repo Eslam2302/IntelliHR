@@ -4,11 +4,15 @@ namespace App\Providers;
 
 use App\Repositories\AllowanceRepository;
 use App\Repositories\ApplicantRepository;
+use App\Repositories\AssetAssignmentRepository;
+use App\Repositories\AssetRepository;
 use App\Repositories\AttendanceRepository;
 use App\Repositories\BenefitRepository;
 use App\Repositories\ContractRepository;
 use App\Repositories\Contracts\AllowanceRepositoryInterface;
 use App\Repositories\Contracts\ApplicantRepositoryInterface;
+use App\Repositories\Contracts\AssetAssignmentRepositoryInterface;
+use App\Repositories\Contracts\AssetRepositoryInterface;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
 use App\Repositories\Contracts\BenefitRepositoryInterface;
 use App\Repositories\Contracts\ContractRepositoryInterface;
@@ -177,6 +181,18 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             InterviewRepositoryInterface::class,
             InterviewRepository::class
+        );
+
+        // bind Asset Repository
+        $this->app->bind(
+            AssetRepositoryInterface::class,
+            AssetRepository::class
+        );
+
+        // bind Asset assignment Repository
+        $this->app->bind(
+            AssetAssignmentRepositoryInterface::class,
+            AssetAssignmentRepository::class
         );
     }
 

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AssetAssignment;
 use App\Models\LeaveType;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -32,6 +33,8 @@ class DatabaseSeeder extends Seeder
             EmployeeTrainingSeeder::class,
             TrainingEvaluationSeeder::class,
             TrainingCertificateSeeder::class,
+            AssetsSeeder::class,
+            AssetAssignmentsSeeder::class,
         ]);
     }
 }

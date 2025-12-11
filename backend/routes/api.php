@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\TrainingEvaluationController;
 use App\Http\Controllers\Api\JobPostController;
 use App\Http\Controllers\Api\HiringStageController;
 use App\Http\Controllers\Api\InterviewController;
+use App\Http\Controllers\Api\AssetController;
+use App\Http\Controllers\Api\AssetAssignmentController;
 
 
 
@@ -238,5 +240,23 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{interview}', [InterviewController::class, 'show']);
         Route::put('/{interview}', [InterviewController::class, 'update']);
         Route::delete('/{interview}', [InterviewController::class, 'destroy']);
+    });
+
+    // Asset
+    Route::prefix('assets')->group(function () {
+        Route::get('/', [AssetController::class, 'index']);
+        Route::post('/', [AssetController::class, 'store']);
+        Route::get('/{asset}', [AssetController::class, 'show']);
+        Route::put('/{asset}', [AssetController::class, 'update']);
+        Route::delete('/{asset}', [AssetController::class, 'destroy']);
+    });
+
+    // Asset Assignments
+    Route::prefix('asset-assignments')->group(function () {
+        Route::get('/', [AssetAssignmentController::class, 'index']);
+        Route::post('/', [AssetAssignmentController::class, 'store']);
+        Route::get('/{asset_assignment}', [AssetAssignmentController::class, 'show']);
+        Route::put('/{asset_assignment}', [AssetAssignmentController::class, 'update']);
+        Route::delete('/{asset_assignment}', [AssetAssignmentController::class, 'destroy']);
     });
 });

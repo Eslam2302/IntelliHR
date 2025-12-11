@@ -103,4 +103,14 @@ class Employee extends Model
     {
         return $this->hasMany(Interview::class, 'interviewer_id');
     }
+
+    public function assetAssignments()
+    {
+        return $this->hasMany(AssetAssignment::class);
+    }
+
+    public function assets()
+    {
+        return $this->hasManyThrough(Asset::class, AssetAssignment::class, 'employee_id', 'id', 'id', 'asset_id');
+    }
 }
