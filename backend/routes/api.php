@@ -29,7 +29,7 @@ use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\AssetAssignmentController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
-
+use App\Http\Controllers\Api\PayrollPaymentController;
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -159,6 +159,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/process', [PayrollController::class, 'processPayroll']);
     });
 
+    Route::post('payrolls/{payroll}/pay', [PayrollPaymentController::class, 'processPayment']);
+
+
     // Trainer Routes
     Route::prefix('trainers')->group(function () {
         Route::get('/', [TrainerController::class, 'index']);        // GET all trainers
@@ -278,5 +281,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{expense}', [ExpenseController::class, 'destroy']);
     });
     Route::get('employees/{employee}/expenses', [ExpenseController::class, 'employeeExpenses']);
-
 });

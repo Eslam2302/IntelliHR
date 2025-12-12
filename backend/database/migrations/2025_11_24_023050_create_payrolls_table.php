@@ -29,6 +29,11 @@ return new class extends Migration
             $table->decimal('net_pay', 12, 2);
 
             $table->timestamp('processed_at');
+
+            $table->string('payment_status')->default('pending');
+            $table->string('stripe_charge_id')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            
             $table->timestamps();
 
             $table->unique(['employee_id', 'year', 'month']);

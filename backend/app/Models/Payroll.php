@@ -16,10 +16,14 @@ class Payroll extends Model
         'deductions',
         'net_pay',
         'processed_at',
+        'payment_status',
+        'stripe_charge_id',
+        'paid_at',
     ];
 
     protected $casts = [
         'processed_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     public function employee()
