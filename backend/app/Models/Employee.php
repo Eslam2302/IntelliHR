@@ -113,4 +113,9 @@ class Employee extends Model
     {
         return $this->hasManyThrough(Asset::class, AssetAssignment::class, 'employee_id', 'id', 'id', 'asset_id');
     }
+
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class, 'employee_id');
+    }
 }

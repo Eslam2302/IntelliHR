@@ -35,6 +35,8 @@ class DatabaseSeeder extends Seeder
             TrainingCertificateSeeder::class,
             AssetsSeeder::class,
             AssetAssignmentsSeeder::class,
+            ExpenseCategorySeeder::class,
+            ExpenseSeeder::class,
         ]);
     }
 }

@@ -21,6 +21,8 @@ use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
 use App\Repositories\Contracts\EmployeeTrainingRepositoryInterface;
+use App\Repositories\Contracts\ExpenseCategoryRepositoryInterface;
+use App\Repositories\Contracts\ExpenseRepositoryInterface;
 use App\Repositories\Contracts\HiringStageRepositoryInterface;
 use App\Repositories\Contracts\InterviewRepositoryInterface;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
@@ -37,6 +39,8 @@ use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\EmployeeRepository;
 use App\Repositories\EmployeeTrainingRepository;
+use App\Repositories\ExpenseCategoryRepository;
+use App\Repositories\ExpenseRepository;
 use App\Repositories\HiringStageRepository;
 use App\Repositories\InterviewRepository;
 use App\Repositories\JobPositionRepository;
@@ -193,6 +197,18 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             AssetAssignmentRepositoryInterface::class,
             AssetAssignmentRepository::class
+        );
+
+        // bind Expense Category Repository
+        $this->app->bind(
+            ExpenseCategoryRepositoryInterface::class,
+            ExpenseCategoryRepository::class
+        );
+
+        // bind Expense Repository
+        $this->app->bind(
+            ExpenseRepositoryInterface::class,
+            ExpenseRepository::class
         );
     }
 

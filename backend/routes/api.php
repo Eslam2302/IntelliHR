@@ -27,8 +27,8 @@ use App\Http\Controllers\Api\HiringStageController;
 use App\Http\Controllers\Api\InterviewController;
 use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\AssetAssignmentController;
-
-
+use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\ExpenseCategoryController;
 
 
 Route::get('home', [HomeController::class, 'index']);
@@ -259,4 +259,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{asset_assignment}', [AssetAssignmentController::class, 'update']);
         Route::delete('/{asset_assignment}', [AssetAssignmentController::class, 'destroy']);
     });
+
+    // Expense Categories Routes
+    Route::prefix('expense-categories')->group(function () {
+        Route::get('/', [ExpenseCategoryController::class, 'index']);
+        Route::post('/', [ExpenseCategoryController::class, 'store']);
+        Route::get('{category}', [ExpenseCategoryController::class, 'show']);
+        Route::put('{category}', [ExpenseCategoryController::class, 'update']);
+        Route::delete('{category}', [ExpenseCategoryController::class, 'destroy']);
+    });
+
+    // Expenses Routes
+    Route::prefix('expenses')->group(function () {
+        Route::get('/', [ExpenseController::class, 'index']);
+        Route::post('/', [ExpenseController::class, 'store']);
+        Route::get('{expense}', [ExpenseController::class, 'show']);
+        Route::put('{expense}', [ExpenseController::class, 'update']);
+        Route::delete('{expense}', [ExpenseController::class, 'destroy']);
+    });
+    Route::get('employees/{employee}/expenses', [ExpenseController::class, 'employeeExpenses']);
+
 });
