@@ -9,13 +9,27 @@ use App\Http\Resources\ContractResource;
 use App\Models\Contract;
 use App\Services\ContractService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ContractController extends Controller
+class ContractController extends Controller implements HasMiddleware
 {
 
     public function __construct(
         protected ContractService $contractService
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-contracts', only: ['index']),
+            new Middleware('permission:view-contract', only: ['show']),
+            new Middleware('permission:create-contract', only: ['store']),
+            new Middleware('permission:edit-contract', only: ['update']),
+            new Middleware('permission:delete-contract', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a listing of the resource.

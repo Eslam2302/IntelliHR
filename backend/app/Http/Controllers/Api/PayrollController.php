@@ -11,13 +11,27 @@ use App\Models\Payroll;
 use App\Services\PayrollService;
 use Illuminate\Http\JsonResponse;
 use App\Jobs\ProcessPayrollJob;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PayrollController extends Controller
+class PayrollController extends Controller implements HasMiddleware
 {
 
     public function __construct(
         protected PayrollService $service,
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-payrolls', only: ['index','employeePayrolls','monthPayrolls']),
+            new Middleware('permission:view-payroll', only: ['show']),
+            new Middleware('permission:create-payroll', only: ['store','processPayroll']),
+            new Middleware('permission:edit-payroll', only: ['update']),
+            new Middleware('permission:delete-payroll', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a paginated list of all allowances.

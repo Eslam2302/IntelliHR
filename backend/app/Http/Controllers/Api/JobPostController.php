@@ -10,8 +10,10 @@ use App\DataTransferObjects\JobPostDto;
 use App\Http\Resources\JobPostResource;
 use App\Http\Requests\JobPostRequest;
 use App\Models\JobPost;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class JobPostController extends Controller
+class JobPostController extends Controller implements HasMiddleware
 {
     /**
      * JobPostController constructor.
@@ -21,6 +23,18 @@ class JobPostController extends Controller
     public function __construct(
         protected JobPostService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-job-posts', only: ['index']),
+            new Middleware('permission:view-job-post', only: ['show']),
+            new Middleware('permission:create-job-post', only: ['store']),
+            new Middleware('permission:edit-job-post', only: ['update']),
+            new Middleware('permission:delete-job-post', only: ['destroy']),
+        ];
+    }
 
     /**
      * Get paginated list of job posts.

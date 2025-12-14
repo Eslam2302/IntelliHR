@@ -9,10 +9,24 @@ use App\DataTransferObjects\TrainingEvaluationDTO;
 use App\Http\Resources\TrainingEvaluationResource;
 use App\Models\TrainingEvaluation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class TrainingEvaluationController extends Controller
+class TrainingEvaluationController extends Controller implements HasMiddleware
 {
     public function __construct(protected TrainingEvaluationService $service) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-training-evaluations', only: ['index']),
+            new Middleware('permission:view-training-evaluation', only: ['show']),
+            new Middleware('permission:create-training-evaluation', only: ['store']),
+            new Middleware('permission:edit-training-evaluation', only: ['update']),
+            new Middleware('permission:delete-training-evaluation', only: ['destroy']),
+        ];
+    }
 
     /**
      * List paginated training evaluations

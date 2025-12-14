@@ -18,6 +18,7 @@ class JobPositionResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'grade' => $this->grade,
+            'department_id' => $this->department_id,
             'min_salary' => $this->min_salary,
             'max_salary' => $this->max_salary,
             'responsibilities' => $this->responsibilities,

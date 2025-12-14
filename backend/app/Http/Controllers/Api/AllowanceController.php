@@ -10,14 +10,29 @@ use App\Models\Allowance;
 use App\Services\AllowanceService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
-class AllowanceController extends Controller
+class AllowanceController extends Controller implements HasMiddleware
 {
 
     public function __construct(
         protected AllowanceService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-allowances', only: ['index','EmployeeAllowances','PayrollAllowances']),
+            new Middleware('permission:view-allowance', only: ['show']),
+            new Middleware('permission:create-allowance', only: ['store']),
+            new Middleware('permission:edit-allowance', only: ['update']),
+            new Middleware('permission:delete-allowance', only: ['destroy']),
+        ];
+    }
+
 
     /**
      * Display a paginated list of all allowances.

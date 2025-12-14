@@ -10,8 +10,10 @@ use App\DataTransferObjects\AssetDTO;
 use App\Http\Resources\AssetResource;
 use App\Http\Requests\AssetRequest;
 use App\Models\Asset;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AssetController extends Controller
+class AssetController extends Controller implements HasMiddleware
 {
     /**
      * AssetController constructor.
@@ -21,6 +23,18 @@ class AssetController extends Controller
     public function __construct(
         protected AssetService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-assets', only: ['index']),
+            new Middleware('permission:view-asset', only: ['show']),
+            new Middleware('permission:create-asset', only: ['store']),
+            new Middleware('permission:edit-asset', only: ['update']),
+            new Middleware('permission:delete-asset', only: ['destroy']),
+        ];
+    }
 
     /**
      * Get paginated list of assets.

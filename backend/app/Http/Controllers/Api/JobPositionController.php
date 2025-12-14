@@ -10,13 +10,27 @@ use App\Models\JobPosition;
 use App\Services\JobPositionService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class JobPositionController extends Controller
+class JobPositionController extends Controller implements HasMiddleware
 {
 
     public function __construct(
         protected JobPositionService $jobPositionService
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-job-positions', only: ['index']),
+            new Middleware('permission:view-job-position', only: ['show']),
+            new Middleware('permission:create-job-position', only: ['store']),
+            new Middleware('permission:edit-job-position', only: ['update']),
+            new Middleware('permission:delete-job-position', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a listing of the resource.

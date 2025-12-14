@@ -9,13 +9,27 @@ use App\DataTransferObjects\TrainingCertificateDTO;
 use App\Http\Resources\TrainingCertificateResource;
 use App\Models\TrainingCertificate;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class TrainingCertificateController extends Controller
+class TrainingCertificateController extends Controller implements HasMiddleware
 {
     /**
      * Constructor to inject service.
      */
     public function __construct(protected TrainingCertificateService $service) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-training-certificates', only: ['index']),
+            new Middleware('permission:view-training-certificate', only: ['show']),
+            new Middleware('permission:create-training-certificate', only: ['store']),
+            new Middleware('permission:edit-training-certificate', only: ['update']),
+            new Middleware('permission:delete-training-certificate', only: ['destroy']),
+        ];
+    }
 
     /**
      * List all certificates with pagination.

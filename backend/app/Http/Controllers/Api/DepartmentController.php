@@ -24,11 +24,11 @@ class DepartmentController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-departments|Super Admin', only: ['index']),
-            new Middleware('permission:view-department|Super Admin', only: ['show']),
-            new Middleware('permission:create-department|Super Admin', only: ['store']),
-            new Middleware('permission:edit-department|Super Admin', only: ['update']),
-            new Middleware('permission:delete-department|Super Admin', only: ['destroy']),
+            new Middleware('permission:view-all-departments', only: ['index']),
+            new Middleware('permission:view-department', only: ['show']),
+            new Middleware('permission:create-department', only: ['store']),
+            new Middleware('permission:edit-department', only: ['update']),
+            new Middleware('permission:delete-department', only: ['destroy']),
         ];
     }
 

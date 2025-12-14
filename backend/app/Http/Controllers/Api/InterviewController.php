@@ -9,10 +9,24 @@ use App\DataTransferObjects\InterviewDTO;
 use App\Http\Resources\InterviewResource;
 use App\Models\Interview;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class InterviewController extends Controller
+class InterviewController extends Controller implements HasMiddleware
 {
     public function __construct(protected InterviewService $service) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-interviews', only: ['index']),
+            new Middleware('permission:view-interview', only: ['show']),
+            new Middleware('permission:create-interview', only: ['store']),
+            new Middleware('permission:edit-interview', only: ['update']),
+            new Middleware('permission:delete-interview', only: ['destroy']),
+        ];
+    }
 
     /**
      * Get paginated list of interviews.

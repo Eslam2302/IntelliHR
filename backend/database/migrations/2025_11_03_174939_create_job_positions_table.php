@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title')->unique();
             $table->string('grade');
+            $table->foreignId('department_id')->constrained();
             $table->decimal('min_salary', 10, 2);
             $table->decimal('max_salary', 10, 2);
             $table->text('responsibilities')->nullable();

@@ -9,10 +9,22 @@ use App\Services\LeaveRequestService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class LeaveRequestController extends Controller
+class LeaveRequestController extends Controller implements HasMiddleware
 {
     public function __construct(protected LeaveRequestService $service) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:manager-approve-leave-request', only: ['managerApprove']),
+            new Middleware('permission:hr-approve-leave-request', only: ['hrApprove']),
+            new Middleware('permission:view-employees-leave-request', only: ['managerDashboard']),
+        ];
+    }
 
     /**
      * Create a new leave request.

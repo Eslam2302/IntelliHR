@@ -17,7 +17,6 @@ class AssetsSeeder extends Seeder
         $statuses = ['available', 'assigned', 'maintenance', 'retired'];
         $conditions = ['new', 'used', 'worn'];
 
-        // إنشاء 20 أصل وهمي
         for ($i = 1; $i <= 20; $i++) {
             Asset::create([
                 'name' => fake()->word() . ' ' . fake()->randomElement(['Laptop', 'Monitor', 'Phone', 'Keyboard']),

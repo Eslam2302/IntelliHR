@@ -9,12 +9,26 @@ use App\Http\Resources\ExpenseResource;
 use App\Models\Expense;
 use App\Services\ExpenseService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ExpenseController extends Controller
+class ExpenseController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected ExpenseService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-expenses', only: ['index']),
+            new Middleware('permission:view-expense', only: ['show']),
+            new Middleware('permission:create-expense', only: ['store']),
+            new Middleware('permission:edit-expense', only: ['update']),
+            new Middleware('permission:delete-expense', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a paginated list of all expenses.

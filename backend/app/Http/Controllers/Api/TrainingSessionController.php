@@ -9,12 +9,26 @@ use App\Http\Resources\TrainingSessionResource;
 use App\DataTransferObjects\TrainingSessionDTO;
 use App\Models\TrainingSession;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class TrainingSessionController extends Controller
+class TrainingSessionController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected TrainingSessionService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-training-sessions', only: ['index']),
+            new Middleware('permission:view-training-session', only: ['show']),
+            new Middleware('permission:create-training-session', only: ['store']),
+            new Middleware('permission:edit-training-session', only: ['update']),
+            new Middleware('permission:delete-training-session', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a paginated list of training sessions.

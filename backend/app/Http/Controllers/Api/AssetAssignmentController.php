@@ -10,8 +10,10 @@ use App\DataTransferObjects\AssetAssignmentDTO;
 use App\Http\Resources\AssetAssignmentResource;
 use App\Http\Requests\AssetAssignmentRequest;
 use App\Models\AssetAssignment;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AssetAssignmentController extends Controller
+class AssetAssignmentController extends Controller implements HasMiddleware
 {
     /**
      * AssetAssignmentController constructor.
@@ -21,7 +23,17 @@ class AssetAssignmentController extends Controller
     public function __construct(
         protected AssetAssignmentService $service
     ) {}
-
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-asset-assignments', only: ['index']),
+            new Middleware('permission:view-asset-assignment', only: ['show']),
+            new Middleware('permission:create-asset-assignment', only: ['store']),
+            new Middleware('permission:edit-asset-assignment', only: ['update']),
+            new Middleware('permission:delete-asset-assignment', only: ['destroy']),
+        ];
+    }
     /**
      * Get paginated list of asset assignments.
      *

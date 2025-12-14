@@ -9,12 +9,26 @@ use App\Http\Resources\ExpenseCategoryResource;
 use App\Models\ExpenseCategory;
 use App\Services\ExpenseCategoryService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ExpenseCategoryController extends Controller
+class ExpenseCategoryController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected ExpenseCategoryService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-expense-categories', only: ['index']),
+            new Middleware('permission:view-expense-category', only: ['show']),
+            new Middleware('permission:create-expense-category', only: ['store']),
+            new Middleware('permission:edit-expense-category', only: ['update']),
+            new Middleware('permission:delete-expense-category', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a paginated list of all expense categories.

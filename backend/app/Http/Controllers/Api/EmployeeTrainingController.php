@@ -9,8 +9,10 @@ use App\Http\Resources\EmployeeTrainingResource;
 use App\DataTransferObjects\EmployeeTrainingDTO;
 use App\Models\EmployeeTraining;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class EmployeeTrainingController extends Controller
+class EmployeeTrainingController extends Controller implements HasMiddleware
 {
     /**
      * Constructor.
@@ -18,6 +20,18 @@ class EmployeeTrainingController extends Controller
      * @param EmployeeTrainingService $service
      */
     public function __construct(protected EmployeeTrainingService $service) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-employee-trainings', only: ['index']),
+            new Middleware('permission:view-employee-training', only: ['show']),
+            new Middleware('permission:create-employee-training', only: ['store']),
+            new Middleware('permission:edit-employee-training', only: ['update']),
+            new Middleware('permission:delete-employee-training', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display paginated list of employee trainings.

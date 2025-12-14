@@ -10,14 +10,28 @@ use App\Models\Deduction;
 use App\Services\DeductionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
 
-class DeductionController extends Controller
+class DeductionController extends Controller implements HasMiddleware
 {
 
     public function __construct(
         protected DeductionService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-deductions', only: ['index','EmployeeDeductions','PayrollDeductions']),
+            new Middleware('permission:view-deduction', only: ['show']),
+            new Middleware('permission:create-deduction', only: ['store']),
+            new Middleware('permission:edit-deduction', only: ['update']),
+            new Middleware('permission:delete-deduction', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a paginated list of all Deductions.

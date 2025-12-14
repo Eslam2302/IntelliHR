@@ -42,6 +42,9 @@ class JobPositionRequest extends FormRequest
                 'required',
                 'string',
             ],
+            'department_id' => [
+                'required',
+            ],
             'min_salary' => [
                 'required',
                 'numeric',

@@ -9,8 +9,10 @@ use App\DataTransferObjects\HiringStageDTO;
 use App\Http\Resources\HiringStageResource;
 use App\Http\Requests\HiringStageRequest;
 use App\Models\HiringStage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class HiringStageController extends Controller
+class HiringStageController extends Controller implements HasMiddleware
 {
     /**
      * HiringStageController constructor.
@@ -20,6 +22,18 @@ class HiringStageController extends Controller
     public function __construct(
         protected HiringStageService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-hiring-stages', only: ['index','getByJobPost']),
+            new Middleware('permission:view-hiring-stage', only: ['show']),
+            new Middleware('permission:create-hiring-stage', only: ['store']),
+            new Middleware('permission:edit-hiring-stage', only: ['update']),
+            new Middleware('permission:delete-hiring-stage', only: ['destroy']),
+        ];
+    }
 
     /**
      * Get paginated list of hiring stages.

@@ -26,9 +26,11 @@ class LeaveTypeController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:create-leave-type|Super Admin', only: ['store']),
-            new Middleware('permission:edit-leave-type|Super Admin', only: ['update']),
-            new Middleware('permission:delete-leave-type|Super Admin', only: ['destroy']),
+            new Middleware('permission:view-all-leave-types', only: ['index']),
+            new Middleware('permission:view-leave-type', only: ['show']),
+            new Middleware('permission:create-leave-type', only: ['store']),
+            new Middleware('permission:edit-leave-type', only: ['update']),
+            new Middleware('permission:delete-leave-type', only: ['destroy']),
         ];
     }
 

@@ -7,10 +7,12 @@ use App\Models\User;
 use App\Models\Department;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 
-class Employee extends Model
+class Employee extends Model implements AuthorizableContract
 {
-    use HasFactory, HasRoles;
+    use HasFactory, HasRoles, Authorizable;
     protected $guard_name = 'web';
 
     protected $fillable = [

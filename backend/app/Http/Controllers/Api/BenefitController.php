@@ -10,12 +10,26 @@ use App\Models\Benefit;
 use App\Services\BenefitService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class BenefitController extends Controller
+class BenefitController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected BenefitService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-benefits', only: ['index','employeeBenefits']),
+            new Middleware('permission:view-benefit', only: ['show']),
+            new Middleware('permission:create-benefit', only: ['store']),
+            new Middleware('permission:edit-benefit', only: ['update']),
+            new Middleware('permission:delete-benefit', only: ['destroy']),
+        ];
+    }
 
     /**
      * Display a paginated list of all benefits.

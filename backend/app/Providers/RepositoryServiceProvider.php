@@ -20,6 +20,7 @@ use App\Repositories\Contracts\DeductionRepositoryInterface;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Repositories\Contracts\EmployeeRoleRepositoryInterface;
 use App\Repositories\Contracts\EmployeeTrainingRepositoryInterface;
 use App\Repositories\Contracts\ExpenseCategoryRepositoryInterface;
 use App\Repositories\Contracts\ExpenseRepositoryInterface;
@@ -30,6 +31,8 @@ use App\Repositories\Contracts\JobPostRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
 use App\Repositories\Contracts\PayrollRepositoryInterface;
+use App\Repositories\Contracts\RolePermissionRepositoryInterface;
+use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\TrainerRepositoryInterface;
 use App\Repositories\Contracts\TrainingCertificateRepositoryInterface;
 use App\Repositories\Contracts\TrainingEvaluationRepositoryInterface;
@@ -38,6 +41,7 @@ use App\Repositories\DeductionRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
 use App\Repositories\EmployeeRepository;
+use App\Repositories\EmployeeRoleRepository;
 use App\Repositories\EmployeeTrainingRepository;
 use App\Repositories\ExpenseCategoryRepository;
 use App\Repositories\ExpenseRepository;
@@ -48,6 +52,8 @@ use App\Repositories\JobPostRepository;
 use App\Repositories\LeaveRequestRepository;
 use App\Repositories\LeaveTypeRepository;
 use App\Repositories\PayrollRepository;
+use App\Repositories\RolePermissionRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\TrainerRepository;
 use App\Repositories\TrainingCertificateRepository;
 use App\Repositories\TrainingEvaluationRepository;
@@ -209,6 +215,24 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             ExpenseRepositoryInterface::class,
             ExpenseRepository::class
+        );
+
+        // bind Role Repository
+        $this->app->bind(
+            RoleRepositoryInterface::class,
+            RoleRepository::class
+        );
+
+        // bind Role permission Repository
+        $this->app->bind(
+            RolePermissionRepositoryInterface::class,
+            RolePermissionRepository::class
+        );
+
+        // bind Employee Role Repository
+        $this->app->bind(
+            EmployeeRoleRepositoryInterface::class,
+            EmployeeRoleRepository::class
         );
     }
 

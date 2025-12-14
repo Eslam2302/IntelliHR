@@ -21,6 +21,8 @@ class AdminUserSeeder extends Seeder
         $adminEmployee = Employee::create([
             'first_name' => 'Admin',
             'last_name' => 'User',
+            'personal_email' => 'super-admin@intlihr.com',
+            'phone' => '01111111111',
             'gender' => 'Male',
             'national_id' => '3000230162951',
             'employee_status' => 'Active',
@@ -40,8 +42,11 @@ class AdminUserSeeder extends Seeder
         $testEmployee = Employee::create([
             'first_name' => 'Test',
             'last_name' => 'Employee',
+            'personal_email' => 'test-employee@intlihr.com',
+            'phone' => '01111111111',
             'gender' => 'Female',
             'national_id' => '3010230162951',
+            'manager_id'    => '1',
             'employee_status' => 'active',
             'department_id' => $hrDepartment->id,
             'hire_date' => now()->subYears(1)->format('Y-m-d'),
@@ -55,7 +60,6 @@ class AdminUserSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        $adminUser->assignRole('Super Admin');
-        $testUser->assignRole('Employee');
+        $adminEmployee->assignRole('Super Admin');
     }
 }

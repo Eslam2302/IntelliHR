@@ -9,10 +9,24 @@ use App\DataTransferObjects\ApplicantDTO;
 use App\Http\Requests\ApplicantRequest;
 use App\Http\Resources\ApplicantResource;
 use App\Models\Applicant;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ApplicantController extends Controller
+class ApplicantController extends Controller implements HasMiddleware
 {
     public function __construct(protected ApplicantService $service) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-applicants', only: ['index','getByJobPost']),
+            new Middleware('permission:view-applicant', only: ['show']),
+            new Middleware('permission:create-applicant', only: ['store']),
+            new Middleware('permission:edit-applicant', only: ['update']),
+            new Middleware('permission:delete-applicant', only: ['destroy']),
+        ];
+    }
 
     public function index(): JsonResponse
     {

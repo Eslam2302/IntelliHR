@@ -9,9 +9,9 @@ use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
 use App\Services\EmployeeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Http\JsonResponse;
 
 class EmployeeController extends Controller implements HasMiddleware
 {
@@ -21,11 +21,11 @@ class EmployeeController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-employees|Super Admin', only: ['index']),
-            new Middleware('permission:view-employee|Super Admin', only: ['show']),
-            new Middleware('permission:create-employee|Super Admin', only: ['store']),
-            new Middleware('permission:edit-employee|Super Admin', only: ['update']),
-            new Middleware('permission:delete-employee|Super Admin', only: ['destroy']),
+            new Middleware('permission:view-all-employees', only: ['index']),
+            new Middleware('permission:view-employee', only: ['show']),
+            new Middleware('permission:create-employee', only: ['store']),
+            new Middleware('permission:edit-employee', only: ['update']),
+            new Middleware('permission:delete-employee', only: ['destroy']),
         ];
     }
 

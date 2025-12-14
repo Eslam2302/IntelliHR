@@ -10,12 +10,26 @@ use App\Models\Document;
 use App\Services\DocumentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class DocumentController extends Controller
+class DocumentController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected DocumentService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-documents', only: ['index']),
+            new Middleware('permission:view-document', only: ['show']),
+            new Middleware('permission:create-document', only: ['store']),
+            new Middleware('permission:edit-document', only: ['update']),
+            new Middleware('permission:delete-document', only: ['destroy']),
+        ];
+    }
 
     public function index(): JsonResponse
     {

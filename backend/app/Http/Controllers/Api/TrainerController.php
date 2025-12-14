@@ -10,8 +10,10 @@ use App\DataTransferObjects\TrainerDTO;
 use App\Http\Resources\TrainerResource;
 use App\Http\Requests\TrainerRequest;
 use App\Models\Trainer;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class TrainerController extends Controller
+class TrainerController extends Controller implements HasMiddleware
 {
     /**
      * TrainerController constructor.
@@ -21,6 +23,18 @@ class TrainerController extends Controller
     public function __construct(
         protected TrainerService $service
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:view-all-trainers', only: ['index']),
+            new Middleware('permission:view-trainer', only: ['show']),
+            new Middleware('permission:create-trainer', only: ['store']),
+            new Middleware('permission:edit-trainer', only: ['update']),
+            new Middleware('permission:delete-trainer', only: ['destroy']),
+        ];
+    }
 
     /**
      * Get paginated list of trainers.

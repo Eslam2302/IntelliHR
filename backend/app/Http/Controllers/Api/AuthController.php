@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
@@ -24,12 +25,14 @@ class AuthController extends Controller
         }
 
         $user = User::where('employee_id', $request->employee_id)->first();
-        
+
+        $employee = $user->employee;
+
         $token = $user->createToken('access_token')->plainTextToken;
 
-        $roleName = $user->getRoleNames()->first();
+        $roleName = $employee->getRoleNames()->first();
 
-        $permissions = $user->getAllPermissions()->pluck('name');
+        $permissions = $employee->getAllPermissions()->pluck('name');
 
         return response()->json([
             'status' => 'success',

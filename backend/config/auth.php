@@ -41,7 +41,7 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-        'driver' => 'sanctum', // استخدم نفس درايفر Sanctum
+        'driver' => 'sanctum', 
         'provider' => 'users',
     ],
         'sanctum' => [

@@ -8,12 +8,22 @@ use App\Services\StripePaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class PayrollPaymentController extends Controller
+class PayrollPaymentController extends Controller implements HasMiddleware
 {
     public function __construct(
         protected StripePaymentService $stripeService
     ) {}
+
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum'),
+            new Middleware('permission:create-payroll-payment', only: ['processPayment']),
+        ];
+    }
 
     public function processPayment(Request $request, Payroll $payroll): JsonResponse
     {
@@ -67,7 +77,6 @@ class PayrollPaymentController extends Controller
                 'status' => 'error',
                 'message' => $result['error'],
             ], 400);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

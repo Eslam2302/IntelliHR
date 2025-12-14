@@ -17,6 +17,7 @@ class JobPositionSeeder extends Seeder
         JobPosition::create([
             'title' => 'HR Manager',
             'grade' => '12',
+            'department_id' => '1',
             'min_salary' => 50000,
             'max_salary' => 80000,
             'responsibilities' => 'Responsible for Human resource.',
@@ -24,6 +25,7 @@ class JobPositionSeeder extends Seeder
         JobPosition::create([
             'title' => 'Software Engineer',
             'grade' => '10',
+            'department_id' => '2',
             'min_salary' => 20000,
             'max_salary' => 80000,
             'responsibilities' => 'Responsible for developing and maintaining software applications.',

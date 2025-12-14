@@ -27,9 +27,12 @@ use App\Http\Controllers\Api\HiringStageController;
 use App\Http\Controllers\Api\InterviewController;
 use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\AssetAssignmentController;
+use App\Http\Controllers\Api\EmployeeRoleController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
 use App\Http\Controllers\Api\PayrollPaymentController;
+use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\RoleController;
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -281,4 +284,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{expense}', [ExpenseController::class, 'destroy']);
     });
     Route::get('employees/{employee}/expenses', [ExpenseController::class, 'employeeExpenses']);
+
+    // Roles And Permissions
+    Route::prefix('roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+        Route::post('/', [RoleController::class, 'store']);
+        Route::get('{role}', [RoleController::class, 'show']);
+        Route::put('{role}', [RoleController::class, 'update']);
+        Route::delete('{role}', [RoleController::class, 'destroy']);
+    });
+
+    Route::prefix('role-permissions')->group(function () {
+        Route::get('{role}', [PermissionController::class, 'index']);
+        Route::post('{role}/sync', [PermissionController::class, 'sync']);
+    });
+
+    Route::prefix('employees')->group(function () {
+        Route::post('{employee}/assign-role', [EmployeeRoleController::class, 'assign']);
+    });
 });
