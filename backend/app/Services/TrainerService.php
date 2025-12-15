@@ -7,11 +7,13 @@ use App\Models\Trainer;
 use App\Repositories\Contracts\TrainerRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class TrainerService
 {
     public function __construct(
-        protected TrainerRepositoryInterface $repository
+        protected TrainerRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -19,13 +21,13 @@ class TrainerService
      *
      * @param int $perpage
      * @return LengthAwarePaginator
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
     {
         try {
             return $this->repository->getAllPaginated($perpage);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error fetching Trainers: ' . $e->getMessage());
             throw $e;
         }
@@ -36,13 +38,13 @@ class TrainerService
      *
      * @param int $trainerId
      * @return Trainer
-     * @throws \Exception
+     * @throws Exception
      */
     public function show(int $trainerId): Trainer
     {
         try {
             return $this->repository->show($trainerId);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error fetching Trainer ID {$trainerId}: " . $e->getMessage());
             throw $e;
         }
@@ -60,6 +62,20 @@ class TrainerService
         try {
             $trainer = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'trainer',
+                description: 'trainer_created',
+                subject: $trainer,
+                properties: [
+                    'type' => $trainer->type,
+                    'employee_id' => $trainer->employee_id,
+                    'name' => $trainer->name,
+                    'email' => $trainer->email,
+                    'phone' => $trainer->phone,
+                    'company' => $trainer->company,
+                ]
+            );
+
             Log::info("Trainer created successfully", [
                 'id' => $trainer->id,
                 'type' => $trainer->type,
@@ -69,7 +85,7 @@ class TrainerService
             ]);
 
             return $trainer;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error creating Trainer: ' . $e->getMessage());
             throw $e;
         }
@@ -86,7 +102,33 @@ class TrainerService
     public function update(Trainer $trainer, TrainerDTO $dto): Trainer
     {
         try {
+            $oldData = $trainer->only([
+                'type',
+                'employee_id',
+                'name',
+                'email',
+                'phone',
+                'company',
+            ]);
+
             $updatedTrainer = $this->repository->update($trainer, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'trainer',
+                description: 'trainer_updated',
+                subject: $updatedTrainer,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedTrainer->only([
+                        'type',
+                        'employee_id',
+                        'name',
+                        'email',
+                        'phone',
+                        'company',
+                    ]),
+                ]
+            );
 
             Log::info("Trainer updated successfully", [
                 'id' => $updatedTrainer->id,
@@ -97,7 +139,7 @@ class TrainerService
             ]);
 
             return $updatedTrainer;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error updating Trainer ID {$trainer->id}: " . $e->getMessage());
             throw $e;
         }
@@ -108,12 +150,28 @@ class TrainerService
      *
      * @param Trainer $trainer
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Trainer $trainer): bool
     {
         try {
+            $data = $trainer->only([
+                'type',
+                'employee_id',
+                'name',
+                'email',
+                'phone',
+                'company',
+            ]);
+
             $deleted = $this->repository->delete($trainer);
+
+            $this->activityLogger->log(
+                logName: 'trainer',
+                description: 'trainer_deleted',
+                subject: $trainer,
+                properties: $data
+            );
 
             Log::info("Trainer deleted successfully", [
                 'id' => $trainer->id,
@@ -124,7 +182,7 @@ class TrainerService
             ]);
 
             return $deleted;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error deleting Trainer ID {$trainer->id}: " . $e->getMessage());
             throw $e;
         }

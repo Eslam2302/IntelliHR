@@ -7,10 +7,14 @@ use App\Models\Interview;
 use App\Repositories\Contracts\InterviewRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class InterviewService
 {
-    public function __construct(protected InterviewRepositoryInterface $repository) {}
+    public function __construct(
+        protected InterviewRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
+    ) {}
 
     /**
      * Get paginated list of interviews.
@@ -22,7 +26,7 @@ class InterviewService
     {
         try {
             return $this->repository->getAllPaginated($perPage);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error fetching interviews: ' . $e->getMessage());
             throw $e;
         }
@@ -38,7 +42,7 @@ class InterviewService
     {
         try {
             return $this->repository->show($interviewId);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error fetching interview ID {$interviewId}: " . $e->getMessage());
             throw $e;
         }
@@ -54,9 +58,22 @@ class InterviewService
     {
         try {
             $interview = $this->repository->create($dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'interview',
+                description: 'interview_created',
+                subject: $interview,
+                properties: [
+                    'applicant_id' => $interview->applicant_id,
+                    'interviewer_id' => $interview->interviewer_id,
+                    'scheduled_at' => $interview->scheduled_at,
+                    'status' => $interview->status,
+                ]
+            );
+
             Log::info("Interview created successfully", ['id' => $interview->id]);
             return $interview;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error creating interview: ' . $e->getMessage());
             throw $e;
         }
@@ -72,10 +89,37 @@ class InterviewService
     public function update(Interview $interview, InterviewDTO $dto): Interview
     {
         try {
+            $oldData = $interview->only([
+                'applicant_id',
+                'interviewer_id',
+                'scheduled_at',
+                'score',
+                'notes',
+                'status',
+            ]);
+
             $updated = $this->repository->update($interview, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'interview',
+                description: 'interview_updated',
+                subject: $updated,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updated->only([
+                        'applicant_id',
+                        'interviewer_id',
+                        'scheduled_at',
+                        'score',
+                        'notes',
+                        'status',
+                    ]),
+                ]
+            );
+
             Log::info("Interview updated successfully", ['id' => $updated->id]);
             return $updated;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error updating interview ID {$interview->id}: " . $e->getMessage());
             throw $e;
         }
@@ -90,10 +134,27 @@ class InterviewService
     public function delete(Interview $interview): bool
     {
         try {
+            $data = $interview->only([
+                'applicant_id',
+                'interviewer_id',
+                'scheduled_at',
+                'score',
+                'notes',
+                'status',
+            ]);
+
             $deleted = $this->repository->delete($interview);
+
+            $this->activityLogger->log(
+                logName: 'interview',
+                description: 'interview_deleted',
+                subject: $interview,
+                properties: $data
+            );
+
             Log::info("Interview deleted successfully", ['id' => $interview->id]);
             return $deleted;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error deleting interview ID {$interview->id}: " . $e->getMessage());
             throw $e;
         }

@@ -56,7 +56,7 @@ class AllowanceController extends Controller implements HasMiddleware
      * @param int $employeeId
      * @return JsonResponse
      */
-    public function EmployeeAllowances(int $employeeId): JsonResponse
+    public function employeeAllowances(int $employeeId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $allowances = $this->service->showEmployeeAllowances($employeeId, $perpage);
@@ -72,7 +72,7 @@ class AllowanceController extends Controller implements HasMiddleware
      * @param int $payrollId
      * @return JsonResponse
      */
-    public function PayrollAllowances(int $payrollId): JsonResponse
+    public function payrollAllowances(int $payrollId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $allowances = $this->service->showPayrollAllowances($payrollId, $perpage);

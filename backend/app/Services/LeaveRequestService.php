@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\LeaveRequestCreated;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class LeaveRequestService
 {
     public function __construct(
-        protected LeaveRequestRepositoryInterface $repository
+        protected LeaveRequestRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -75,6 +77,26 @@ class LeaveRequestService
 
         $leaveRequest = $this->repository->create($data);
 
+        $this->activityLogger->log(
+            logName: 'leaveRequest',
+            description: 'leave_request_created',
+            subject: $leaveRequest,
+            properties: [
+                'employee_id' => $leaveRequest->employee_id,
+                'leave_type_id' => $leaveRequest->leave_type_id,
+                'start_date' => $leaveRequest->start_date,
+                'end_date' => $leaveRequest->end_date,
+                'days' => $leaveRequest->days,
+                'reason' => $leaveRequest->reason,
+                'status' => $leaveRequest->status,
+            ]
+        );
+
+        Log::info("Leave request created successfully", [
+            'id' => $leaveRequest->id,
+            'employee_id' => $leaveRequest->employee_id,
+        ]);
+
         // Send notification to manager
         /* $manager = $leaveRequest->employee->manager;
         if ($manager) {
@@ -95,14 +117,10 @@ class LeaveRequestService
      */
     public function managerApprove(int $id, int $managerId): LeaveRequest
     {
-
-
-
-
         $request = $this->repository->findById($id); // make sure with('employee.manager') loaded
 
         // Prevent employee from approving own leave
-        if ($managerId === $request->employee->id) {
+        if ($managerId == $request->employee_id) {
             throw new Exception("You cannot approve your own leave.");
         }
 
@@ -110,12 +128,34 @@ class LeaveRequestService
         if (!$request->employee->manager || $request->employee->manager->id !== $managerId) {
             throw new Exception("You are not authorized to approve this leave.");
         }
+
+        $oldStatus = $request->status;
+
         if ($request->type->requires_hr_approval) {
-            return $this->repository->updateStatus($request, [
+            $updatedRequest = $this->repository->updateStatus($request, [
                 'status' => 'manager_approved',
                 'manager_id' => $managerId,
                 'manager_approved_at' => now(),
             ]);
+
+            $this->activityLogger->log(
+                logName: 'leaveRequest',
+                description: 'leave_request_manager_approved',
+                subject: $updatedRequest,
+                properties: [
+                    'before_status' => $oldStatus,
+                    'after_status' => $updatedRequest->status,
+                    'approved_by_manager_id' => $managerId,
+                    'approved_at' => $updatedRequest->manager_approved_at,
+                ]
+            );
+
+            Log::info("Leave request manager approved", [
+                'id' => $updatedRequest->id,
+                'manager_id' => $managerId,
+            ]);
+
+            return $updatedRequest;
         }
 
         // Otherwise, direct approval + balance deduction
@@ -133,7 +173,28 @@ class LeaveRequestService
     public function hrApprove(int $id, int $hrId): LeaveRequest
     {
         $request = $this->repository->findById($id);
-        return $this->approveAndDeduct($request, 'hr', $hrId);
+        $oldStatus = $request->status;
+
+        $approvedRequest = $this->approveAndDeduct($request, 'hr', $hrId);
+
+        $this->activityLogger->log(
+            logName: 'leaveRequest',
+            description: 'leave_request_hr_approved',
+            subject: $approvedRequest,
+            properties: [
+                'before_status' => $oldStatus,
+                'after_status' => $approvedRequest->status,
+                'approved_by_hr_id' => $hrId,
+                'approved_at' => $approvedRequest->hr_approved_at,
+            ]
+        );
+
+        Log::info("Leave request HR approved", [
+            'id' => $approvedRequest->id,
+            'hr_id' => $hrId,
+        ]);
+
+        return $approvedRequest;
     }
 
     /**

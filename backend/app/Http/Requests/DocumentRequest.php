@@ -39,7 +39,8 @@ class DocumentRequest extends FormRequest
             'attachment' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'file',
-                'max:5120'
+                'max:5120',
+                'mimes:pdf,jpg,jpeg,png,doc,docx'
             ],
 
         ];

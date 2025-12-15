@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Log;
 class AssetService
 {
     public function __construct(
-        protected AssetRepositoryInterface $repository
+        protected AssetRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -60,6 +61,18 @@ class AssetService
         try {
             $asset = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'asset',
+                description: 'asset_created',
+                subject: $asset,
+                properties: [
+                    'name'              => $asset->name,
+                    'serial_number'     => $asset->serial_number,
+                    'condition'         => $asset->condition,
+                    'status'            => $asset->status
+                ]
+            );
+
             Log::info("Asset created successfully", [
                 'id' => $asset->id,
                 'name' => $asset->name,
@@ -84,7 +97,30 @@ class AssetService
     public function update(Asset $asset, AssetDTO $dto): Asset
     {
         try {
+            $oldData = $asset->only([
+                'name',
+                'serial_number',
+                'condition',
+                'status'
+            ]);
+
             $updatedAsset = $this->repository->update($asset, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'asset',
+                description: 'asset_updated',
+                subject: $updatedAsset,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedAsset
+                        ->only([
+                            'name',
+                            'serial_number',
+                            'condition',
+                            'status'
+                        ]),
+                ]
+            );
 
             Log::info("Asset updated successfully", [
                 'id' => $updatedAsset->id,
@@ -109,7 +145,21 @@ class AssetService
     public function delete(Asset $asset): bool
     {
         try {
+            $data = $asset->only([
+                'name',
+                'serial_number',
+                'condition',
+                'status'
+            ]);
+
             $deleted = $this->repository->delete($asset);
+
+            $this->activityLogger->log(
+                logName: 'asset',
+                description: 'asset_deleted',
+                subject: $asset,
+                properties: $data
+            );
 
             Log::info("Asset deleted successfully", [
                 'id' => $asset->id,

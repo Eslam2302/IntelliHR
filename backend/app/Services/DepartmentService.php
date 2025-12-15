@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Log;
 class DepartmentService
 {
     public function __construct(
-        protected DepartmentRepositoryInterface $repository
+        protected DepartmentRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -78,6 +79,16 @@ class DepartmentService
 
             $department = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'department',
+                description: 'department_created',
+                subject: $department,
+                properties: [
+                    'name' => $department->name,
+                    'description'        => $department->description,
+                ]
+            );
+
             Log::info("Department created successfully", [
                 'id' => $department->id,
                 'name' => $department->name
@@ -99,8 +110,19 @@ class DepartmentService
     public function update(Department $department, DepartmentDTO $dto): Department
     {
         try {
+            $oldData = $department->only(['name', 'description']);
 
             $updatedDepartment = $this->repository->update($department, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'department',
+                description: 'department_updated',
+                subject: $updatedDepartment,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedDepartment->only(['name', 'description']),
+                ]
+            );
 
             Log::info("Department updated successfully", [
                 'id' => $updatedDepartment->id,
@@ -131,8 +153,16 @@ class DepartmentService
                     "Cannot delete department '{$department->name}'. Employees are still assigned to this department."
                 );
             }
+            $data = $department->only(['name', 'description']);
 
             $deleted = $this->repository->delete($department);
+
+            $this->activityLogger->log(
+                logName: 'department',
+                description: 'department_deleted',
+                subject: $department,
+                properties: $data
+            );
 
             Log::info("Department deleted successfully", [
                 'id' => $department->id,

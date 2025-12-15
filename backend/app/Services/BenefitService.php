@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Log;
 class BenefitService
 {
     public function __construct(
-        protected BenefitRepositoryInterface $repository
+        protected BenefitRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
+
     ) {}
 
     public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
@@ -39,6 +41,18 @@ class BenefitService
         try {
             $benefit = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'benefit_created',
+                subject: $benefit,
+                properties: [
+                    'employee_id' => $benefit->employee_id,
+                    'type'        => $benefit->benefit_type,
+                    'amount'      => $benefit->amount,
+                    'is_deduction'=> $benefit->is_deduction,
+                ]
+            );
+
             Log::info("Benefit created successfully", [
                 'id' => $benefit->id,
                 'employee_id' => $benefit->employee_id,
@@ -54,7 +68,19 @@ class BenefitService
     public function update(Benefit $benefit, BenefitDTO $dto): Benefit
     {
         try {
+            $oldData = $benefit->only(['benefit_type', 'amount', 'is_deduction']);
+
             $updatedBenefit = $this->repository->update($benefit, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'benefit_updated',
+                subject: $updatedBenefit,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedBenefit->only(['benefit_type', 'amount', 'is_deduction']),
+                ]
+            );
 
             Log::info("Benefit updated successfully", [
                 'id' => $updatedBenefit->id,
@@ -71,7 +97,16 @@ class BenefitService
     public function delete(Benefit $benefit): bool
     {
         try {
+            $data = $benefit->only(['employee_id', 'benefit_type', 'amount', 'is_deduction']);
+
             $deleted = $this->repository->delete($benefit);
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'benefit_deleted',
+                subject: $benefit,
+                properties: $data
+            );
 
             Log::info("Benefit deleted successfully", [
                 'id' => $benefit->id,

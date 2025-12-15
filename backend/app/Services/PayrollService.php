@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Log;
 class PayrollService
 {
     public function __construct(
-        protected PayrollRepositoryInterface $repository
+        protected PayrollRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     public function getAllPaginated(int $perpage = 10)
@@ -45,6 +46,22 @@ class PayrollService
 
             $payroll = $this->repository->create($data);
 
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'payroll_created',
+                subject: $payroll,
+                properties: [
+                    'employee_id' => $payroll->employee_id,
+                    'year'        => $payroll->year,
+                    'month'      => $payroll->month,
+                    'basic_salary'      => $payroll->basic_salary,
+                    'allowances'      => $payroll->allowances,
+                    'deductions'      => $payroll->deductions,
+                    'net_pay'      => $payroll->net_pay,
+                    'processed_at'      => $payroll->processed_at,
+                ]
+            );
+
             Log::info("Payroll created successfully", [
                 'id' => $payroll->id,
                 'employee_id' => $payroll->employee_id,
@@ -64,6 +81,8 @@ class PayrollService
     public function update(Payroll $payroll, PayrollDTO $dto): Payroll
     {
         try {
+            $oldData = $payroll;
+
             // Recalculate net pay
             $data = $dto->toArray();
             $data['net_pay'] = $this->repository->calculateNetPay(
@@ -73,6 +92,16 @@ class PayrollService
             );
 
             $updatedPayroll = $this->repository->update($payroll, $data);
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'payroll_updated',
+                subject: $updatedPayroll,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedPayroll,
+                ]
+            );
 
             Log::info("Payroll updated successfully", [
                 'id' => $updatedPayroll->id,
@@ -94,7 +123,16 @@ class PayrollService
     public function delete(Payroll $payroll): bool
     {
         try {
+            $data = $payroll;
+
             $result = $this->repository->delete($payroll);
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'payroll_deleted',
+                subject: $payroll,
+                properties: [$data],
+            );
 
             Log::info("Payroll deleted", [
                 'id' => $payroll->id

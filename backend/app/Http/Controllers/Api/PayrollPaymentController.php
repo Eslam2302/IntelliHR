@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payroll;
+use App\Services\ActivityLoggerService;
 use App\Services\StripePaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -14,7 +15,9 @@ use Illuminate\Routing\Controllers\Middleware;
 class PayrollPaymentController extends Controller implements HasMiddleware
 {
     public function __construct(
-        protected StripePaymentService $stripeService
+        protected StripePaymentService $stripeService,
+        protected ActivityLoggerService $activityLogger
+
     ) {}
 
     public static function middleware(): array
@@ -57,6 +60,17 @@ class PayrollPaymentController extends Controller implements HasMiddleware
                     'stripe_charge_id' => $result['charge_id'],
                     'paid_at' => now(),
                 ]);
+
+                $this->activityLogger->log(
+                    logName: 'payroll',
+                    description: 'payroll_payment',
+                    subject: $payroll,
+                    properties: [
+                        'payment_status'        => $payroll->payment_status,
+                        'stripe_charge_id'      => $payroll->stripe_charge_id,
+                        'paid_at'               => $payroll->paid_at,
+                    ]
+                );
 
                 DB::commit();
 

@@ -14,7 +14,8 @@ use PhpParser\Node\Expr;
 class JobPositionService
 {
     public function __construct(
-        protected JobPositionRepositoryInterface $repository
+        protected JobPositionRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /*
@@ -38,6 +39,20 @@ class JobPositionService
         try {
             $jobPosition = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'jobPosition',
+                description: 'job_position_created',
+                subject: $jobPosition,
+                properties: [
+                    'title' => $jobPosition->title,
+                    'grade' => $jobPosition->grade,
+                    'department_id' => $jobPosition->department_id,
+                    'min_salary' => $jobPosition->min_salary,
+                    'max_salary' => $jobPosition->max_salary,
+                    'responsibilities' => $jobPosition->responsibilities,
+                ]
+            );
+
             Log::info("Job position created successfully", [
                 'id' => $jobPosition->id,
                 'title' => $jobPosition->title,
@@ -56,7 +71,34 @@ class JobPositionService
     public function update(JobPosition $jobPosition, JobPositionsDTO $dto): JobPosition
     {
         try {
+            $oldData = $jobPosition->only([
+                'title',
+                'grade',
+                'department_id',
+                'min_salary',
+                'max_salary',
+                'responsibilities'
+            ]);
+
             $updatedJobPosition = $this->repository->update($jobPosition, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'jobPosition',
+                description: 'job_position_updated',
+                subject: $updatedJobPosition,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedJobPosition->only([
+                        'title',
+                        'grade',
+                        'department_id',
+                        'min_salary',
+                        'max_salary',
+                        'responsibilities'
+                    ]),
+                ]
+            );
+
             Log::info("Job position updated successfully:", [
                 'id' => $jobPosition->id,
                 'title' => $jobPosition->title,
@@ -75,7 +117,24 @@ class JobPositionService
     public function delete(JobPosition $jobPosition): bool
     {
         try {
+            $data = $jobPosition->only([
+                'title',
+                'grade',
+                'department_id',
+                'min_salary',
+                'max_salary',
+                'responsibilities'
+            ]);
+
             $deletedJobPosition = $this->repository->delete($jobPosition);
+
+            $this->activityLogger->log(
+                logName: 'jobPosition',
+                description: 'job_position_deleted',
+                subject: $jobPosition,
+                properties: $data
+            );
+
             Log::info("Job position deleted successfully", [
                 'id' => $jobPosition->id,
                 'title' => $jobPosition->title,

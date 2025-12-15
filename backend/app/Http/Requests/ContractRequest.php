@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
 
 class ContractRequest extends FormRequest
 {
@@ -21,10 +23,15 @@ class ContractRequest extends FormRequest
      */
     public function rules(): array
     {
-        $contractId = $this->route('contract')?->id;
+        $contract = $this->route('contract'); // Model binding
 
         return [
-            'employee_id' => ['required', 'unique:contracts,employee_id,' . $contractId, 'exists:employees,id'],
+            'employee_id' => [
+                'required',
+                'exists:employees,id',
+                Rule::unique('contracts', 'employee_id')
+                    ->ignore($contract?->id),
+            ],
             'start_date' => ['required', 'date'],
             'end_date'  => ['nullable', 'date', 'after_or_equal:start_date'],
             'contract_type' => [
@@ -32,7 +39,7 @@ class ContractRequest extends FormRequest
                 'in:permanent,full_time,part_time,fixed_term,temporary,project_based,seasonal,probation,internship,consultant,contractor,freelance,hourly,commission_based,on_call'
             ],
             'salary' => ['required', 'numeric', 'min:0'],
-            'terms'          => ['nullable', 'string'],
+            'terms' => ['nullable', 'string'],
         ];
     }
 }

@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Log;
 class ExpenseCategoryService
 {
     public function __construct(
-        protected ExpenseCategoryRepositoryInterface $repository
+        protected ExpenseCategoryRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -60,6 +61,15 @@ class ExpenseCategoryService
         try {
             $category = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'expenseCategory',
+                description: 'expense_category_created',
+                subject: $category,
+                properties: [
+                    'name' => $category->name,
+                ]
+            );
+
             Log::info("Expense Category created successfully", [
                 'id' => $category->id,
                 'name' => $category->name,
@@ -83,7 +93,19 @@ class ExpenseCategoryService
     public function update(ExpenseCategory $category, ExpenseCategoryDTO $dto): ExpenseCategory
     {
         try {
+            $oldData = $category->only(['name']);
+
             $updated = $this->repository->update($category, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'expenseCategory',
+                description: 'expense_category_updated',
+                subject: $updated,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updated->only(['name']),
+                ]
+            );
 
             Log::info("Expense Category updated successfully", [
                 'id' => $updated->id,
@@ -107,7 +129,16 @@ class ExpenseCategoryService
     public function delete(ExpenseCategory $category): bool
     {
         try {
+            $data = $category->only(['name']);
+
             $deleted = $this->repository->delete($category);
+
+            $this->activityLogger->log(
+                logName: 'expenseCategory',
+                description: 'expense_category_deleted',
+                subject: $category,
+                properties: $data
+            );
 
             Log::info("Expense Category deleted successfully", [
                 'id' => $category->id,

@@ -26,7 +26,8 @@ class PayrollProcessingService
         protected DeductionRepositoryInterface $deductionRepository,
         protected EmployeeRepositoryInterface $employeeRepository,
         protected ContractRepositoryInterface $contractRepository,
-        protected BenefitRepositoryInterface $benefitRepository
+        protected BenefitRepositoryInterface $benefitRepository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -166,6 +167,21 @@ class PayrollProcessingService
                             'processed_at' => now(),
                         ]);
 
+                        $this->activityLogger->log(
+                            logName: 'payroll',
+                            description: 'payroll_created',
+                            subject: $payroll,
+                            properties: [
+                                'employee_id' => $employee->id,
+                                'year'        => $year,
+                                'month'       => $month,
+                                'basic_salary' => $basicSalary,
+                                'allowances'  => $totalAllowances,
+                                'deductions'  => $totalDeductions,
+                                'net_pay'     => $netPay,
+                            ]
+                        );
+
                         // -------------------------------------------
                         // 5) Mark allowances & deductions as processed
                         // -------------------------------------------
@@ -176,6 +192,15 @@ class PayrollProcessingService
                             );
                         }
 
+                        $this->activityLogger->log(
+                            logName: 'payroll',
+                            description: 'allowances_processed',
+                            subject: $payroll,
+                            properties: [
+                                'allowance_ids' => $pendingAllowances->pluck('id')->toArray(),
+                            ]
+                        );
+
                         if ($pendingDeductions->isNotEmpty()) {
                             $this->deductionRepository->markAsProcessed(
                                 $pendingDeductions->pluck('id')->toArray(),
@@ -183,11 +208,30 @@ class PayrollProcessingService
                             );
                         }
 
+                        $this->activityLogger->log(
+                            logName: 'payroll',
+                            description: 'deductions_processed',
+                            subject: $payroll,
+                            properties: [
+                                'deduction_ids' => $pendingDeductions->pluck('id')->toArray(),
+                            ]
+                        );
+
                         DB::commit();
                     } catch (Throwable $e) {
 
                         DB::rollBack();
                         Log::error("Payroll error for employee {$employee->id}: " . $e->getMessage());
+
+                        $this->activityLogger->log(
+                            logName: 'payroll',
+                            description: 'payroll_error',
+                            subject: $employee,
+                            properties: [
+                                'employee_id' => $employee->id,
+                                'message' => $e->getMessage()
+                            ]
+                        );
                     }
                 } // end foreach
 

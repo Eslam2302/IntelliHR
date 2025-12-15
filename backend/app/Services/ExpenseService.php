@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Storage;
 class ExpenseService
 {
     public function __construct(
-        protected ExpenseRepositoryInterface $repository
+        protected ExpenseRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     /**
@@ -72,6 +73,19 @@ class ExpenseService
 
             $expense = $this->repository->create($data);
 
+            $this->activityLogger->log(
+                logName: 'expense',
+                description: 'expense_created',
+                subject: $expense,
+                properties: [
+                    'employee_id' => $expense->employee_id,
+                    'amount' => $expense->amount,
+                    'category_id' => $expense->category_id,
+                    'expense_date' => $expense->expense_date,
+                    'status' => $expense->status,
+                ]
+            );
+
             Log::info("Expense created successfully", [
                 'id' => $expense->id,
                 'amount' => $expense->amount,
@@ -96,6 +110,14 @@ class ExpenseService
     public function update(Expense $expense, ExpenseDTO $dto): Expense
     {
         try {
+            $oldData = $expense->only([
+                'amount',
+                'expense_date',
+                'category_id',
+                'status',
+                'notes'
+            ]);
+
             $data = $dto->toArray();
 
             // Handle receipt file upload if provided
@@ -108,6 +130,22 @@ class ExpenseService
             }
 
             $updated = $this->repository->update($expense, $data);
+
+            $this->activityLogger->log(
+                logName: 'expense',
+                description: 'expense_updated',
+                subject: $updated,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updated->only([
+                        'amount',
+                        'expense_date',
+                        'category_id',
+                        'status',
+                        'notes'
+                    ]),
+                ]
+            );
 
             Log::info("Expense updated successfully", [
                 'id' => $updated->id,
@@ -132,12 +170,35 @@ class ExpenseService
     public function delete(Expense $expense): bool
     {
         try {
+            $data = $expense->only([
+                'employee_id',
+                'amount',
+                'expense_date',
+                'category_id',
+                'status',
+                'notes'
+            ]);
+
             // Delete receipt file if exists
             if ($expense->receipt_path) {
                 Storage::disk('public')->delete($expense->receipt_path);
             }
 
-            return $this->repository->delete($expense);
+            $deleted = $this->repository->delete($expense);
+
+            $this->activityLogger->log(
+                logName: 'expense',
+                description: 'expense_deleted',
+                subject: $expense,
+                properties: $data
+            );
+
+            Log::info("Expense deleted successfully", [
+                'id' => $expense->id,
+                'amount' => $expense->amount,
+            ]);
+
+            return $deleted;
         } catch (\Exception $e) {
             Log::error("Error deleting Expense ID {$expense->id}: " . $e->getMessage());
             throw $e;

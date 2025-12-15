@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AllowanceController;
 use App\Http\Controllers\Api\ApplicantController;
 use App\Http\Controllers\Api\AttendanceController;
@@ -302,4 +303,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('employees')->group(function () {
         Route::post('{employee}/assign-role', [EmployeeRoleController::class, 'assign']);
     });
+
+    Route::get('/activity-log', [ActivityLogController::class, 'index']);
 });

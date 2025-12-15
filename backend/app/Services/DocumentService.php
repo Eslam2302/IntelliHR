@@ -13,7 +13,8 @@ class DocumentService
 
 {
     public function __construct(
-        protected DocumentRepositoryInterface $repository
+        protected DocumentRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
@@ -62,7 +63,20 @@ class DocumentService
                 'uploaded_at' => now(),
             ];
 
-            return $this->repository->store($data);
+            $document = $this->repository->create($data);
+
+            $this->activityLogger->log(
+                logName: 'document',
+                description: 'document_created',
+                subject: $document,
+                properties: [
+                    'employee_id' => $document->employee_id,
+                    'doc_type'        => $document->doc_type,
+                    'file_path'      => $document->file_path,
+                ]
+            );
+
+            return $document;
         } catch (\Exception $e) {
             Log::error('Error creating document: ' . $e->getMessage());
             throw $e;
@@ -72,6 +86,8 @@ class DocumentService
     public function update(Document $document, DocumentDTO $dto): Document
     {
         try {
+
+            $oldData = $document->only(['doc_type', 'file_path']);
 
             // 1. If a new file is uploaded → store it
             if ($dto->attachment) {
@@ -92,6 +108,17 @@ class DocumentService
 
             // 3. Update using repository
             $updated = $this->repository->update($document, $data);
+
+            $this->activityLogger->log(
+                logName: 'document',
+                description: 'document_updated',
+                subject: $updated,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updated->only(['doc_type', 'file_path']),
+                ]
+            );
+
             Log::info("Document updated successfully", [
                 'id' => $updated->id,
                 'employee_id' => $updated->employee_id,
@@ -109,7 +136,18 @@ class DocumentService
     public function delete(Document $document): bool
     {
         try {
-            return $this->repository->delete($document);
+            $data = $document->only(['employee_id', 'doc_type', 'file_path']);
+
+            $deleted = $this->repository->delete($document);
+
+            $this->activityLogger->log(
+                logName: 'document',
+                description: 'document_deleted',
+                subject: $document,
+                properties: $data
+            );
+
+            return $deleted;
         } catch (\Exception $e) {
             Log::error("Error deleting document " . $e->getMessage());
             throw $e;

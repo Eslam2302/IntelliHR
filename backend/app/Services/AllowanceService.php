@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Log;
 class AllowanceService
 {
     public function __construct(
-        protected AllowanceRepositoryInterface $repository
+        protected AllowanceRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
@@ -49,6 +50,17 @@ class AllowanceService
         try {
             $allowance = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'allowance_created',
+                subject: $allowance,
+                properties: [
+                    'employee_id' => $allowance->employee_id,
+                    'type'        => $allowance->type,
+                    'amount'      => $allowance->amount,
+                ]
+            );
+
             Log::info("Allowance created successfully", [
                 'id' => $allowance->id,
                 'employee_id' => $allowance->employee_id,
@@ -66,7 +78,19 @@ class AllowanceService
     public function update(Allowance $allowance, AllowanceDTO $dto): Allowance
     {
         try {
+            $oldData = $allowance->only(['type', 'amount']);
+
             $updatedAllowance = $this->repository->update($allowance, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'allowance_updated',
+                subject: $updatedAllowance,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedAllowance->only(['type', 'amount']),
+                ]
+            );
 
             Log::info("Allowance updated successfully", [
                 'id' => $updatedAllowance->id,
@@ -85,7 +109,16 @@ class AllowanceService
     public function delete(Allowance $allowance): bool
     {
         try {
+            $data = $allowance->only(['employee_id', 'type', 'amount']);
+
             $deleted = $this->repository->delete($allowance);
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'allowance_deleted',
+                subject: $allowance,
+                properties: $data
+            );
 
             Log::info("Allowance deleted successfully", [
                 'id' => $allowance->id,

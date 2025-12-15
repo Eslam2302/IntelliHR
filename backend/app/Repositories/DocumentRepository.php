@@ -32,7 +32,7 @@ class DocumentRepository implements DocumentRepositoryInterface
         return $this->model->find($id);
     }
 
-    public function store(array $data): Document
+    public function create(array $data): Document
     {
         return $this->model->create($data);
     }

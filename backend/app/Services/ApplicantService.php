@@ -8,16 +8,20 @@ use App\Repositories\Contracts\ApplicantRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
+use Exception;
 
 class ApplicantService
 {
-    public function __construct(protected ApplicantRepositoryInterface $repository) {}
+    public function __construct(
+        protected ApplicantRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
+    ) {}
 
     public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
     {
         try {
             return $this->repository->getAllPaginated($perPage);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error fetching Applicants: ' . $e->getMessage());
             throw $e;
         }
@@ -27,7 +31,7 @@ class ApplicantService
     {
         try {
             return $this->repository->show($applicantId);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error fetching Applicant ID {$applicantId}: " . $e->getMessage());
             throw $e;
         }
@@ -48,15 +52,34 @@ class ApplicantService
             }
 
             $applicant = $this->repository->create($data);
+
+            $this->activityLogger->log(
+                logName: 'applicant',
+                description: 'applicant_created',
+                subject: $applicant,
+                properties: [
+                    'first_name' => $applicant->first_name,
+                    'last_name' => $applicant->last_name,
+                    'email' => $applicant->email,
+                    'phone' => $applicant->phone,
+                    'job_id' => $applicant->job_id,
+                    'status' => $applicant->status,
+                    'is_employee' => $applicant->is_employee,
+                    'source' => $applicant->source,
+                    'experience_years' => $applicant->experience_years,
+                    'current_stage_id' => $applicant->current_stage_id,
+                ]
+            );
+
             Log::info("Applicant created successfully", [
                 'id' => $applicant->id,
                 'name' => $applicant->first_name . ' ' . $applicant->last_name,
                 'job_id' => $applicant->job_id,
                 'current_stage_id' => $applicant->current_stage_id,
             ]);
-            
+
             return $applicant;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error creating Applicant: " . $e->getMessage());
             throw $e;
         }
@@ -65,10 +88,45 @@ class ApplicantService
     public function update(Applicant $applicant, ApplicantDTO $dto): Applicant
     {
         try {
+            $oldData = $applicant->only([
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+                'job_id',
+                'status',
+                'is_employee',
+                'source',
+                'experience_years',
+                'current_stage_id',
+            ]);
+
             $updated = $this->repository->update($applicant, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'applicant',
+                description: 'applicant_updated',
+                subject: $updated,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updated->only([
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'phone',
+                        'job_id',
+                        'status',
+                        'is_employee',
+                        'source',
+                        'experience_years',
+                        'current_stage_id',
+                    ]),
+                ]
+            );
+
             Log::info("Applicant updated successfully", ['id' => $updated->id]);
             return $updated;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error updating Applicant ID {$applicant->id}: " . $e->getMessage());
             throw $e;
         }
@@ -77,10 +135,31 @@ class ApplicantService
     public function delete(Applicant $applicant): bool
     {
         try {
+            $data = $applicant->only([
+                'first_name',
+                'last_name',
+                'email',
+                'phone',
+                'job_id',
+                'status',
+                'is_employee',
+                'source',
+                'experience_years',
+                'current_stage_id',
+            ]);
+
             $deleted = $this->repository->delete($applicant);
+
+            $this->activityLogger->log(
+                logName: 'applicant',
+                description: 'applicant_deleted',
+                subject: $applicant,
+                properties: $data
+            );
+
             Log::info("Applicant deleted successfully", ['id' => $applicant->id]);
             return $deleted;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error deleting Applicant ID {$applicant->id}: " . $e->getMessage());
             throw $e;
         }

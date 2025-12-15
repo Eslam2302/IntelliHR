@@ -13,7 +13,10 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class EmployeeService
 {
-    public function __construct(protected EmployeeRepositoryInterface $repository) {}
+    public function __construct(
+        protected EmployeeRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
+    ) {}
 
     public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
     {
@@ -42,6 +45,20 @@ class EmployeeService
                 'password' => Hash::make($dto->password),
             ]);
 
+            $this->activityLogger->log(
+                logName: 'employee',
+                description: 'employee_created',
+                subject: $employee,
+                properties: [
+                    'name'              => $employee->first_name . $employee->last_name,
+                    'personal_email'    => $employee->personal_email,
+                    'phone'             => $employee->phone,
+                    'department_id'     => $employee->department_id,
+                    'job_id'            => $employee->job_id,
+                    'manager_id'        => $employee->manager_id
+                ]
+            );
+
             DB::commit();
 
             Log::info('Employee created successfully', ['id' => $employee->id, 'name' => $employee->name]);
@@ -59,6 +76,16 @@ class EmployeeService
         try {
             DB::beginTransaction();
 
+            $oldData = $employee->only([
+                'first_name',
+                'last_name',
+                'phone',
+                'employee_status',
+                'department_id',
+                'manager_id',
+                'job_id'
+            ]);
+
             // Update Employee
             $employeeData = $dto->toArray();
             unset($employeeData['email'], $employeeData['password']);
@@ -70,6 +97,25 @@ class EmployeeService
                 $userData['password'] = Hash::make($dto->password);
             }
             $employee->user->update($userData);
+
+            $this->activityLogger->log(
+                logName: 'employee',
+                description: 'employee_updated',
+                subject: $updatedEmployee,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedEmployee
+                        ->only([
+                            'first_name',
+                            'last_name',
+                            'phone',
+                            'employee_status',
+                            'department_id',
+                            'manager_id',
+                            'job_id'
+                        ]),
+                ]
+            );
 
             DB::commit();
 
@@ -88,11 +134,20 @@ class EmployeeService
         try {
             DB::beginTransaction();
 
+            $data = $employee;
+
             if ($employee->user) {
                 $employee->user->delete();
             }
 
             $deleted = $this->repository->delete($employee);
+
+            $this->activityLogger->log(
+                logName: 'employee',
+                description: 'employee_deleted',
+                subject: $employee,
+                properties: [$data]
+            );
 
             DB::commit();
 

@@ -38,7 +38,7 @@ interface DocumentRepositoryInterface
      * @param array $data Validated document data.
      * @return Document
      */
-    public function store(array $data): Document;
+    public function create(array $data): Document;
 
     /**
      * Update an existing document record.

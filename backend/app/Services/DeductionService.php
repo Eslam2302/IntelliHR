@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Log;
 class DeductionService
 {
     public function __construct(
-        protected DeductionRepositoryInterface $repository
+        protected DeductionRepositoryInterface $repository,
+        protected ActivityLoggerService $activityLogger
     ) {}
 
     public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
@@ -49,6 +50,17 @@ class DeductionService
         try {
             $deduction = $this->repository->create($dto->toArray());
 
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'deduction_created',
+                subject: $deduction,
+                properties: [
+                    'employee_id' => $deduction->employee_id,
+                    'type'        => $deduction->type,
+                    'amount'      => $deduction->amount,
+                ]
+            );
+
             Log::info("Deduction created successfully", [
                 'id' => $deduction->id,
                 'employee_id' => $deduction->employee_id,
@@ -66,7 +78,19 @@ class DeductionService
     public function update(Deduction $deduction, DeductionDTO $dto): Deduction
     {
         try {
+            $oldData = $deduction->only(['type', 'amount']);
+
             $updatedDeduction = $this->repository->update($deduction, $dto->toArray());
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'deduction_updated',
+                subject: $updatedDeduction,
+                properties: [
+                    'before' => $oldData,
+                    'after'  => $updatedDeduction->only(['type', 'amount']),
+                ]
+            );
 
             Log::info("Deduction updated successfully", [
                 'id' => $updatedDeduction->id,
@@ -85,7 +109,17 @@ class DeductionService
     public function delete(Deduction $deduction): bool
     {
         try {
+            $data = $deduction->only(['employee_id', 'type', 'amount']);
+
             $deleted = $this->repository->delete($deduction);
+
+            $this->activityLogger->log(
+                logName: 'payroll',
+                description: 'deduction_deleted',
+                subject: $deduction,
+                properties: $data
+            );
+
 
             Log::info("Deduction deleted successfully", [
                 'id' => $deduction->id,
