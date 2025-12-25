@@ -4,21 +4,32 @@ namespace App\Repositories;
 
 use App\Models\TrainingCertificate;
 use App\Repositories\Contracts\TrainingCertificateRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class TrainingCertificateRepository implements TrainingCertificateRepositoryInterface
 {
+    use FilterQueryTrait;
+
     /**
      * Constructor to inject model.
      */
     public function __construct(protected TrainingCertificate $model) {}
 
-    /**
-     * Get paginated list of certificates.
-     */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model->with('employeeTraining')->latest()->paginate($perPage);
+        $query = $this->model->with('employeeTraining');
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_training_id', 'employeeTraining.employee.first_name', 'employeeTraining.employee.last_name', 'employeeTraining.employee.personal_email', 'employeeTraining.training.title'],
+            ['id', 'employee_training_id', 'issued_at', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
@@ -43,6 +54,7 @@ class TrainingCertificateRepository implements TrainingCertificateRepositoryInte
     public function update(TrainingCertificate $certificate, array $data): TrainingCertificate
     {
         $certificate->update($data);
+
         return $certificate->fresh();
     }
 

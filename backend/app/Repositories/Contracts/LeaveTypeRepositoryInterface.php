@@ -10,7 +10,7 @@ interface LeaveTypeRepositoryInterface
     /**
      * Get all leave type with pagination
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Create a new leave type
@@ -20,13 +20,10 @@ interface LeaveTypeRepositoryInterface
     /*
      * Update existing leave type
     */
-    public function update(LeaveType $leaveType,array $data): LeaveType;
+    public function update(LeaveType $leaveType, array $data): LeaveType;
 
     /*
      * Delete existing leave type
     */
     public function delete(LeaveType $leaveType): bool;
-
-
-
 }

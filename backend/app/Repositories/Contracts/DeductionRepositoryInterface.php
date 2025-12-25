@@ -7,11 +7,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface DeductionRepositoryInterface
 {
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
-    public function showEmployeeDeductions(int $employeeId, int $perpage = 10) : LengthAwarePaginator;
+    public function showEmployeeDeductions(int $employeeId, int $perpage = 10): LengthAwarePaginator;
 
-    public function showPayrollDeductions(int $payrollId, int $perpage = 10) : LengthAwarePaginator;
+    public function showPayrollDeductions(int $payrollId, int $perpage = 10): LengthAwarePaginator;
 
     public function create(array $data): Deduction;
 

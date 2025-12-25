@@ -15,12 +15,12 @@ class DeductionService
         protected ActivityLoggerService $activityLogger
     ) {}
 
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Deductions: ' . $e->getMessage());
+            Log::error('Error fetching Deductions: '.$e->getMessage());
             throw $e;
         }
     }
@@ -30,7 +30,7 @@ class DeductionService
         try {
             return $this->repository->showEmployeeDeductions($employeeId, $perpage);
         } catch (\Exception $e) {
-            Log::error("Error fetching Deductions for Employee ID {$employeeId}: " . $e->getMessage());
+            Log::error("Error fetching Deductions for Employee ID {$employeeId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -40,7 +40,7 @@ class DeductionService
         try {
             return $this->repository->showPayrollDeductions($payrollId, $perpage);
         } catch (\Exception $e) {
-            Log::error("Error fetching Deductions for Payroll ID {$payrollId}: " . $e->getMessage());
+            Log::error("Error fetching Deductions for Payroll ID {$payrollId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -56,12 +56,12 @@ class DeductionService
                 subject: $deduction,
                 properties: [
                     'employee_id' => $deduction->employee_id,
-                    'type'        => $deduction->type,
-                    'amount'      => $deduction->amount,
+                    'type' => $deduction->type,
+                    'amount' => $deduction->amount,
                 ]
             );
 
-            Log::info("Deduction created successfully", [
+            Log::info('Deduction created successfully', [
                 'id' => $deduction->id,
                 'employee_id' => $deduction->employee_id,
                 'type' => $deduction->type,
@@ -70,7 +70,7 @@ class DeductionService
 
             return $deduction;
         } catch (\Exception $e) {
-            Log::error('Error creating Deduction: ' . $e->getMessage());
+            Log::error('Error creating Deduction: '.$e->getMessage());
             throw $e;
         }
     }
@@ -88,11 +88,11 @@ class DeductionService
                 subject: $updatedDeduction,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedDeduction->only(['type', 'amount']),
+                    'after' => $updatedDeduction->only(['type', 'amount']),
                 ]
             );
 
-            Log::info("Deduction updated successfully", [
+            Log::info('Deduction updated successfully', [
                 'id' => $updatedDeduction->id,
                 'employee_id' => $updatedDeduction->employee_id,
                 'type' => $updatedDeduction->type,
@@ -101,7 +101,7 @@ class DeductionService
 
             return $updatedDeduction;
         } catch (\Exception $e) {
-            Log::error('Error updating Deduction: ' . $e->getMessage());
+            Log::error('Error updating Deduction: '.$e->getMessage());
             throw $e;
         }
     }
@@ -120,8 +120,7 @@ class DeductionService
                 properties: $data
             );
 
-
-            Log::info("Deduction deleted successfully", [
+            Log::info('Deduction deleted successfully', [
                 'id' => $deduction->id,
                 'employee_id' => $deduction->employee_id,
                 'type' => $deduction->type,
@@ -130,7 +129,7 @@ class DeductionService
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error('Error deleting Deduction: ' . $e->getMessage());
+            Log::error('Error deleting Deduction: '.$e->getMessage());
             throw $e;
         }
     }

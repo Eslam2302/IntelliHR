@@ -2,21 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\DataTransferObjects\PayrollDTO;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\PayrollRequest;
 use App\Http\Resources\PayrollResource;
+use App\Jobs\ProcessPayrollJob;
 use App\Models\Payroll;
 use App\Services\PayrollService;
 use Illuminate\Http\JsonResponse;
-use App\Jobs\ProcessPayrollJob;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 class PayrollController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected PayrollService $service,
     ) {}
@@ -25,9 +24,9 @@ class PayrollController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-payrolls', only: ['index','employeePayrolls','monthPayrolls']),
+            new Middleware('permission:view-all-payrolls', only: ['index', 'employeePayrolls', 'monthPayrolls']),
             new Middleware('permission:view-payroll', only: ['show']),
-            new Middleware('permission:create-payroll', only: ['store','processPayroll']),
+            new Middleware('permission:create-payroll', only: ['store', 'processPayroll']),
             new Middleware('permission:edit-payroll', only: ['update']),
             new Middleware('permission:delete-payroll', only: ['destroy']),
         ];
@@ -35,43 +34,42 @@ class PayrollController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of all allowances.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
 
-        $payrolls = $this->service->getAllPaginated($perpage);
+        $payrolls = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => PayrollResource::collection($payrolls),
+            'meta' => [
+                'current_page' => $payrolls->currentPage(),
+                'per_page' => $payrolls->perPage(),
+                'total' => $payrolls->total(),
+                'last_page' => $payrolls->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Store a newly created allowance in the database.
-     *
-     * @param PayrollRequest $request
-     * @return JsonResponse
      */
     public function store(PayrollRequest $request): JsonResponse
     {
         $dto = PayrollDTO::fromRequest($request);
         $payroll = $this->service->create($dto);
+
         return response()->json([
             'status' => 'success',
-            'message'   => 'Payroll created successfully',
+            'message' => 'Payroll created successfully',
             'data' => new PayrollResource($payroll),
         ], 201);
     }
 
     /**
      * Display the specified allowance.
-     *
-     * @param Payroll $payroll
-     * @return JsonResponse
      */
     public function show(Payroll $payroll): JsonResponse
     {
@@ -83,42 +81,34 @@ class PayrollController extends Controller implements HasMiddleware
 
     /**
      * Update the specified allowance in storage.
-     *
-     * @param PayrollRequest $request
-     * @param Payroll $payroll
-     * @return JsonResponse
      */
     public function update(PayrollRequest $request, Payroll $payroll): JsonResponse
     {
         $dto = PayrollDTO::fromRequest($request);
         $updatedPayroll = $this->service->update($payroll, $dto);
+
         return response()->json([
             'status' => 'success',
-            'message'   => 'Payroll updated successfully',
+            'message' => 'Payroll updated successfully',
             'data' => new PayrollResource($updatedPayroll),
         ], 200);
     }
 
     /**
      * Remove the specified allowance from storage.
-     *
-     * @param Payroll $payroll
-     * @return JsonResponse
      */
     public function destroy(Payroll $payroll): JsonResponse
     {
         $this->service->delete($payroll);
+
         return response()->json([
             'status' => 'success',
-            'message'   => 'Payroll deleted successfully',
+            'message' => 'Payroll deleted successfully',
         ], 200);
     }
 
-
     /**
      * Payrolls for one employee
-     * @param int $employeeId
-     * @return JsonResponse
      */
     public function employeePayrolls(int $employeeId): JsonResponse
     {
@@ -132,9 +122,6 @@ class PayrollController extends Controller implements HasMiddleware
 
     /**
      * Payrolls for specific year & month
-     * @param int $year
-     * @param int $month
-     * @return JsonResponse
      */
     public function monthPayrolls(int $year, int $month): JsonResponse
     {
@@ -148,8 +135,6 @@ class PayrollController extends Controller implements HasMiddleware
 
     /**
      * Trigger payroll processing for a specific month
-     * @param Request $request
-     * @return JsonResponse
      */
     public function processPayroll(Request $request): JsonResponse
     {
@@ -164,9 +149,10 @@ class PayrollController extends Controller implements HasMiddleware
         $month = now()->month;
 
         ProcessPayrollJob::dispatch($year, $month);
+
         return response()->json([
             'status' => 'success',
-            'message'   => "Payroll processing for {$year}-{$month} has been initiated.",
+            'message' => "Payroll processing for {$year}-{$month} has been initiated.",
         ], 200);
     }
 }

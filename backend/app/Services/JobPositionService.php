@@ -6,10 +6,7 @@ use App\DataTransferObjects\JobPositionsDTO;
 use App\Models\JobPosition;
 use App\Repositories\Contracts\JobPositionRepositoryInterface;
 use Exception;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Expr;
 
 class JobPositionService
 {
@@ -19,14 +16,14 @@ class JobPositionService
     ) {}
 
     /*
-     * Get all paginated Job Poitions 10 per page
+     * Get all Job Positions with optional filters
     */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching Job Poitions: ' . $e->getMessage());
+            Log::error('Error fetching Job Poitions: '.$e->getMessage());
             throw $e;
         }
     }
@@ -53,14 +50,15 @@ class JobPositionService
                 ]
             );
 
-            Log::info("Job position created successfully", [
+            Log::info('Job position created successfully', [
                 'id' => $jobPosition->id,
                 'title' => $jobPosition->title,
                 'grade' => $jobPosition->grade,
             ]);
+
             return $jobPosition;
         } catch (Exception $e) {
-            Log::error('Error creating Job postion: ' . $e->getMessage(), ['data' => $dto->toArray()]);
+            Log::error('Error creating Job postion: '.$e->getMessage(), ['data' => $dto->toArray()]);
             throw $e;
         }
     }
@@ -77,7 +75,7 @@ class JobPositionService
                 'department_id',
                 'min_salary',
                 'max_salary',
-                'responsibilities'
+                'responsibilities',
             ]);
 
             $updatedJobPosition = $this->repository->update($jobPosition, $dto->toArray());
@@ -88,25 +86,26 @@ class JobPositionService
                 subject: $updatedJobPosition,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedJobPosition->only([
+                    'after' => $updatedJobPosition->only([
                         'title',
                         'grade',
                         'department_id',
                         'min_salary',
                         'max_salary',
-                        'responsibilities'
+                        'responsibilities',
                     ]),
                 ]
             );
 
-            Log::info("Job position updated successfully:", [
+            Log::info('Job position updated successfully:', [
                 'id' => $jobPosition->id,
                 'title' => $jobPosition->title,
                 'grade' => $jobPosition->grade,
             ]);
+
             return $updatedJobPosition;
         } catch (Exception $e) {
-            Log::error('Error updating job postion: ' . $e->getMessage(), ['data' => $dto->toArray()]);
+            Log::error('Error updating job postion: '.$e->getMessage(), ['data' => $dto->toArray()]);
             throw $e;
         }
     }
@@ -123,7 +122,7 @@ class JobPositionService
                 'department_id',
                 'min_salary',
                 'max_salary',
-                'responsibilities'
+                'responsibilities',
             ]);
 
             $deletedJobPosition = $this->repository->delete($jobPosition);
@@ -135,14 +134,15 @@ class JobPositionService
                 properties: $data
             );
 
-            Log::info("Job position deleted successfully", [
+            Log::info('Job position deleted successfully', [
                 'id' => $jobPosition->id,
                 'title' => $jobPosition->title,
                 'grade' => $jobPosition->grade,
             ]);
+
             return $deletedJobPosition;
         } catch (Exception $e) {
-            Log::error('Error deleting job postion: ' . $e->getMessage());
+            Log::error('Error deleting job postion: '.$e->getMessage());
             throw $e;
         }
     }

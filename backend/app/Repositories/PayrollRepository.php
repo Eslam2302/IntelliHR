@@ -4,24 +4,32 @@ namespace App\Repositories;
 
 use App\Models\Payroll;
 use App\Repositories\Contracts\PayrollRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class PayrollRepository implements PayrollRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected Payroll $model
     ) {}
 
-    /**
-     * Paginated list
-     */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with(['employee'])
-            ->latest()
-            ->paginate($perpage);
+        $query = $this->model->with('employee');
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_id', 'payment_status', 'month', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'employee.employee_status'],
+            ['id', 'employee_id', 'payment_status', 'month', 'year', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
@@ -38,6 +46,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function update(Payroll $payroll, array $data): Payroll
     {
         $payroll->update($data);
+
         return $payroll->fresh();
     }
 

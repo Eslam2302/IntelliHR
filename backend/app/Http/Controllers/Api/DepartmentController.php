@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\DataTransferObjects\DepartmentDTO;
-use App\Exceptions\DepartmentHasEmployeesException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreDepartmentRequest;
 use App\Http\Requests\UpdateDepartmentRequest;
@@ -37,13 +36,19 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $departments = $this->departmentService->getAllPaginated((int) $perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $departments = $this->departmentService->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => DepartmentResource::collection($departments),
-        ], 200);
+            'meta' => [
+                'current_page' => $departments->currentPage(),
+                'per_page' => $departments->perPage(),
+                'total' => $departments->total(),
+                'last_page' => $departments->lastPage(),
+            ],
+        ]);
     }
 
     /**
@@ -96,7 +101,7 @@ class DepartmentController extends Controller implements HasMiddleware
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Department deleted successfully.'
+            'message' => 'Department deleted successfully.',
         ], 200);
     }
 }

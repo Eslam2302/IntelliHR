@@ -4,31 +4,36 @@ namespace App\Repositories;
 
 use App\Models\Interview;
 use App\Repositories\Contracts\InterviewRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class InterviewRepository implements InterviewRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(protected Interview $model) {}
 
     /**
      * Get paginated list of interviews.
-     *
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with(['applicant', 'interviewer'])
-            ->latest()
-            ->paginate($perPage);
+        $query = $this->model->with(['applicant', 'interviewer']);
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['status', 'applicant.first_name', 'applicant.last_name', 'applicant.email', 'applicant.phone', 'applicant.status', 'interviewer.first_name', 'interviewer.last_name', 'interviewer.personal_email', 'interviewer.phone'],
+            ['id', 'status', 'scheduled_at', 'created_at'],
+            'scheduled_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
      * Get a single interview by ID.
-     *
-     * @param int $interviewId
-     * @return Interview
      */
     public function show(int $interviewId): Interview
     {
@@ -39,9 +44,6 @@ class InterviewRepository implements InterviewRepositoryInterface
 
     /**
      * Create a new interview.
-     *
-     * @param array $data
-     * @return Interview
      */
     public function create(array $data): Interview
     {
@@ -50,22 +52,16 @@ class InterviewRepository implements InterviewRepositoryInterface
 
     /**
      * Update an existing interview.
-     *
-     * @param Interview $interview
-     * @param array $data
-     * @return Interview
      */
     public function update(Interview $interview, array $data): Interview
     {
         $interview->update($data);
+
         return $interview->fresh()->load(['applicant', 'interviewer']);
     }
 
     /**
      * Delete an interview.
-     *
-     * @param Interview $interview
-     * @return bool
      */
     public function delete(Interview $interview): bool
     {

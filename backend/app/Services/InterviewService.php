@@ -5,9 +5,8 @@ namespace App\Services;
 use App\DataTransferObjects\InterviewDTO;
 use App\Models\Interview;
 use App\Repositories\Contracts\InterviewRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class InterviewService
 {
@@ -17,42 +16,35 @@ class InterviewService
     ) {}
 
     /**
-     * Get paginated list of interviews.
+     * Get all interviews with optional filters.
      *
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @return mixed
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching interviews: ' . $e->getMessage());
+            Log::error('Error fetching interviews: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Get a single interview by ID.
-     *
-     * @param int $interviewId
-     * @return Interview
      */
     public function show(int $interviewId): Interview
     {
         try {
             return $this->repository->show($interviewId);
         } catch (Exception $e) {
-            Log::error("Error fetching interview ID {$interviewId}: " . $e->getMessage());
+            Log::error("Error fetching interview ID {$interviewId}: ".$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Create a new interview using DTO.
-     *
-     * @param InterviewDTO $dto
-     * @return Interview
      */
     public function create(InterviewDTO $dto): Interview
     {
@@ -71,20 +63,17 @@ class InterviewService
                 ]
             );
 
-            Log::info("Interview created successfully", ['id' => $interview->id]);
+            Log::info('Interview created successfully', ['id' => $interview->id]);
+
             return $interview;
         } catch (Exception $e) {
-            Log::error('Error creating interview: ' . $e->getMessage());
+            Log::error('Error creating interview: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Update an interview using DTO.
-     *
-     * @param Interview $interview
-     * @param InterviewDTO $dto
-     * @return Interview
      */
     public function update(Interview $interview, InterviewDTO $dto): Interview
     {
@@ -106,7 +95,7 @@ class InterviewService
                 subject: $updated,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updated->only([
+                    'after' => $updated->only([
                         'applicant_id',
                         'interviewer_id',
                         'scheduled_at',
@@ -117,19 +106,17 @@ class InterviewService
                 ]
             );
 
-            Log::info("Interview updated successfully", ['id' => $updated->id]);
+            Log::info('Interview updated successfully', ['id' => $updated->id]);
+
             return $updated;
         } catch (Exception $e) {
-            Log::error("Error updating interview ID {$interview->id}: " . $e->getMessage());
+            Log::error("Error updating interview ID {$interview->id}: ".$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Delete an interview.
-     *
-     * @param Interview $interview
-     * @return bool
      */
     public function delete(Interview $interview): bool
     {
@@ -152,10 +139,11 @@ class InterviewService
                 properties: $data
             );
 
-            Log::info("Interview deleted successfully", ['id' => $interview->id]);
+            Log::info('Interview deleted successfully', ['id' => $interview->id]);
+
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting interview ID {$interview->id}: " . $e->getMessage());
+            Log::error("Error deleting interview ID {$interview->id}: ".$e->getMessage());
             throw $e;
         }
     }

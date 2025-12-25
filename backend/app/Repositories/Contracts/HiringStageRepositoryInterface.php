@@ -7,7 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface HiringStageRepositoryInterface
 {
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     public function show(int $hiringStageId): HiringStage;
 

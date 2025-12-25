@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\RoleDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RoleRequest;
+use App\Http\Resources\RoleResource;
 use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\RoleRequest;
-use App\DataTransferObjects\RoleDTO;
-use App\Http\Resources\RoleResource;
-use Spatie\Permission\Models\Role;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller implements HasMiddleware
 {
     /**
      * RoleController constructor.
-     *
-     * @param RoleService $service
      */
     public function __construct(
         protected RoleService $service
@@ -33,25 +31,26 @@ class RoleController extends Controller implements HasMiddleware
 
     /**
      * Get paginated list of roles.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $roles = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $roles = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => RoleResource::collection($roles),
+            'meta' => [
+                'current_page' => $roles->currentPage(),
+                'per_page' => $roles->perPage(),
+                'total' => $roles->total(),
+                'last_page' => $roles->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new role.
-     *
-     * @param RoleRequest $request
-     * @return JsonResponse
      */
     public function store(RoleRequest $request): JsonResponse
     {
@@ -67,9 +66,6 @@ class RoleController extends Controller implements HasMiddleware
 
     /**
      * Display a specific role.
-     *
-     * @param Role $role
-     * @return JsonResponse
      */
     public function show(Role $role): JsonResponse
     {
@@ -81,10 +77,6 @@ class RoleController extends Controller implements HasMiddleware
 
     /**
      * Update a specific role.
-     *
-     * @param RoleRequest $request
-     * @param Role $role
-     * @return JsonResponse
      */
     public function update(RoleRequest $request, Role $role): JsonResponse
     {
@@ -100,9 +92,6 @@ class RoleController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific role.
-     *
-     * @param Role $role
-     * @return JsonResponse
      */
     public function destroy(Role $role): JsonResponse
     {

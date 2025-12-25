@@ -15,12 +15,12 @@ class AllowanceService
         protected ActivityLoggerService $activityLogger
     ) {}
 
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Allowances: ' . $e->getMessage());
+            Log::error('Error fetching Allowances: '.$e->getMessage());
             throw $e;
         }
     }
@@ -30,7 +30,7 @@ class AllowanceService
         try {
             return $this->repository->showEmployeeAllowances($employeeId, $perpage);
         } catch (\Exception $e) {
-            Log::error("Error fetching Allowances for Employee ID {$employeeId}: " . $e->getMessage());
+            Log::error("Error fetching Allowances for Employee ID {$employeeId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -40,7 +40,7 @@ class AllowanceService
         try {
             return $this->repository->showPayrollAllowances($payrollId, $perpage);
         } catch (\Exception $e) {
-            Log::error("Error fetching Allowances for Payroll ID {$payrollId}: " . $e->getMessage());
+            Log::error("Error fetching Allowances for Payroll ID {$payrollId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -56,12 +56,12 @@ class AllowanceService
                 subject: $allowance,
                 properties: [
                     'employee_id' => $allowance->employee_id,
-                    'type'        => $allowance->type,
-                    'amount'      => $allowance->amount,
+                    'type' => $allowance->type,
+                    'amount' => $allowance->amount,
                 ]
             );
 
-            Log::info("Allowance created successfully", [
+            Log::info('Allowance created successfully', [
                 'id' => $allowance->id,
                 'employee_id' => $allowance->employee_id,
                 'type' => $allowance->type,
@@ -70,7 +70,7 @@ class AllowanceService
 
             return $allowance;
         } catch (\Exception $e) {
-            Log::error('Error creating Allowance: ' . $e->getMessage());
+            Log::error('Error creating Allowance: '.$e->getMessage());
             throw $e;
         }
     }
@@ -88,11 +88,11 @@ class AllowanceService
                 subject: $updatedAllowance,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedAllowance->only(['type', 'amount']),
+                    'after' => $updatedAllowance->only(['type', 'amount']),
                 ]
             );
 
-            Log::info("Allowance updated successfully", [
+            Log::info('Allowance updated successfully', [
                 'id' => $updatedAllowance->id,
                 'employee_id' => $updatedAllowance->employee_id,
                 'type' => $updatedAllowance->type,
@@ -101,7 +101,7 @@ class AllowanceService
 
             return $updatedAllowance;
         } catch (\Exception $e) {
-            Log::error('Error updating Allowance: ' . $e->getMessage());
+            Log::error('Error updating Allowance: '.$e->getMessage());
             throw $e;
         }
     }
@@ -120,7 +120,7 @@ class AllowanceService
                 properties: $data
             );
 
-            Log::info("Allowance deleted successfully", [
+            Log::info('Allowance deleted successfully', [
                 'id' => $allowance->id,
                 'employee_id' => $allowance->employee_id,
                 'type' => $allowance->type,
@@ -129,7 +129,7 @@ class AllowanceService
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error('Error deleting Allowance: ' . $e->getMessage());
+            Log::error('Error deleting Allowance: '.$e->getMessage());
             throw $e;
         }
     }

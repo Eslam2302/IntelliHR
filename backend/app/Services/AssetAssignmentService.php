@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DataTransferObjects\AssetAssignmentDTO;
 use App\Models\AssetAssignment;
 use App\Repositories\Contracts\AssetAssignmentRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class AssetAssignmentService
@@ -16,18 +15,18 @@ class AssetAssignmentService
     ) {}
 
     /**
-     * Retrieve paginated list of asset assignments.
+     * Retrieve all asset assignments with optional filters.
      *
-     * @param int $perpage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws \Exception
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Asset Assignments: ' . $e->getMessage());
+            Log::error('Error fetching Asset Assignments: '.$e->getMessage());
             throw $e;
         }
     }
@@ -35,8 +34,6 @@ class AssetAssignmentService
     /**
      * Retrieve an asset assignment by ID.
      *
-     * @param int $assignmentId
-     * @return AssetAssignment
      * @throws \Exception
      */
     public function show(int $assignmentId): AssetAssignment
@@ -44,7 +41,7 @@ class AssetAssignmentService
         try {
             return $this->repository->show($assignmentId);
         } catch (\Exception $e) {
-            Log::error("Error fetching Asset Assignment ID {$assignmentId}: " . $e->getMessage());
+            Log::error("Error fetching Asset Assignment ID {$assignmentId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -52,8 +49,6 @@ class AssetAssignmentService
     /**
      * Create a new asset assignment using the provided DTO.
      *
-     * @param AssetAssignmentDTO $dto
-     * @return AssetAssignment
      * @throws \Exception
      */
     public function create(AssetAssignmentDTO $dto): AssetAssignment
@@ -67,12 +62,12 @@ class AssetAssignmentService
                 subject: $assignment,
                 properties: [
                     'employee_id' => $assignment->employee_id,
-                    'asset_id'        => $assignment->asset_id,
-                    'assined_date'      => $assignment->assined_date,
+                    'asset_id' => $assignment->asset_id,
+                    'assined_date' => $assignment->assined_date,
                 ]
             );
 
-            Log::info("Asset Assignment created successfully", [
+            Log::info('Asset Assignment created successfully', [
                 'id' => $assignment->id,
                 'asset_id' => $assignment->asset_id,
                 'employee_id' => $assignment->employee_id,
@@ -80,7 +75,7 @@ class AssetAssignmentService
 
             return $assignment;
         } catch (\Exception $e) {
-            Log::error('Error creating Asset Assignment: ' . $e->getMessage());
+            Log::error('Error creating Asset Assignment: '.$e->getMessage());
             throw $e;
         }
     }
@@ -88,9 +83,6 @@ class AssetAssignmentService
     /**
      * Update the given asset assignment using the provided DTO.
      *
-     * @param AssetAssignment $assignment
-     * @param AssetAssignmentDTO $dto
-     * @return AssetAssignment
      * @throws \Exception
      */
     public function update(AssetAssignment $assignment, AssetAssignmentDTO $dto): AssetAssignment
@@ -100,7 +92,7 @@ class AssetAssignmentService
                 'asset_id',
                 'employee_id',
                 'assignd_date',
-                'return_date'
+                'return_date',
             ]);
 
             $updatedAssignment = $this->repository->update($assignment, $dto->toArray());
@@ -111,16 +103,16 @@ class AssetAssignmentService
                 subject: $updatedAssignment,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedAssignment->only([
+                    'after' => $updatedAssignment->only([
                         'asset_id',
                         'employee_id',
                         'assignd_date',
-                        'return_date'
+                        'return_date',
                     ]),
                 ]
             );
 
-            Log::info("Asset Assignment updated successfully", [
+            Log::info('Asset Assignment updated successfully', [
                 'id' => $updatedAssignment->id,
                 'asset_id' => $updatedAssignment->asset_id,
                 'employee_id' => $updatedAssignment->employee_id,
@@ -128,7 +120,7 @@ class AssetAssignmentService
 
             return $updatedAssignment;
         } catch (\Exception $e) {
-            Log::error("Error updating Asset Assignment ID {$assignment->id}: " . $e->getMessage());
+            Log::error("Error updating Asset Assignment ID {$assignment->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -136,8 +128,6 @@ class AssetAssignmentService
     /**
      * Delete the given asset assignment instance.
      *
-     * @param AssetAssignment $assignment
-     * @return bool
      * @throws \Exception
      */
     public function delete(AssetAssignment $assignment): bool
@@ -147,7 +137,7 @@ class AssetAssignmentService
                 'asset_id',
                 'employee_id',
                 'assignd_date',
-                'return_date'
+                'return_date',
             ]);
 
             $deleted = $this->repository->delete($assignment);
@@ -159,7 +149,7 @@ class AssetAssignmentService
                 properties: $data
             );
 
-            Log::info("Asset Assignment deleted successfully", [
+            Log::info('Asset Assignment deleted successfully', [
                 'id' => $assignment->id,
                 'asset_id' => $assignment->asset_id,
                 'employee_id' => $assignment->employee_id,
@@ -167,7 +157,7 @@ class AssetAssignmentService
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error("Error deleting Asset Assignment ID {$assignment->id}: " . $e->getMessage());
+            Log::error("Error deleting Asset Assignment ID {$assignment->id}: ".$e->getMessage());
             throw $e;
         }
     }

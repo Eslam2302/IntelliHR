@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\TrainingCertificateService;
-use App\Http\Requests\TrainingCertificateRequest;
 use App\DataTransferObjects\TrainingCertificateDTO;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TrainingCertificateRequest;
 use App\Http\Resources\TrainingCertificateResource;
 use App\Models\TrainingCertificate;
+use App\Services\TrainingCertificateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -36,12 +36,18 @@ class TrainingCertificateController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $certificates = $this->service->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $certificates = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => TrainingCertificateResource::collection($certificates),
+            'meta' => [
+                'current_page' => $certificates->currentPage(),
+                'per_page' => $certificates->perPage(),
+                'total' => $certificates->total(),
+                'last_page' => $certificates->lastPage(),
+            ],
         ]);
     }
 
@@ -67,6 +73,7 @@ class TrainingCertificateController extends Controller implements HasMiddleware
     public function show(TrainingCertificate $certificate): JsonResponse
     {
         $certificate->load('employeeTraining');
+
         return response()->json([
             'status' => 'success',
             'data' => new TrainingCertificateResource($certificate),

@@ -4,19 +4,31 @@ namespace App\Repositories;
 
 use App\Models\Document;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DocumentRepository implements DocumentRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected Document $model
     ) {}
 
-    public function all(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->latest()
-            ->paginate($perPage);
+        $query = $this->model->query();
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['doc_type'],
+            ['id', 'doc_type', 'created_at', 'updated_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     public function getByEmployee(int $employeeId, int $perPage = 10): LengthAwarePaginator
@@ -40,6 +52,7 @@ class DocumentRepository implements DocumentRepositoryInterface
     public function update(Document $document, array $data): Document
     {
         $document->update($data);
+
         return $document->fresh();
     }
 

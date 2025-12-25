@@ -9,7 +9,6 @@ use App\Http\Resources\BenefitResource;
 use App\Models\Benefit;
 use App\Services\BenefitService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -23,7 +22,7 @@ class BenefitController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-benefits', only: ['index','employeeBenefits']),
+            new Middleware('permission:view-all-benefits', only: ['index', 'employeeBenefits']),
             new Middleware('permission:view-benefit', only: ['show']),
             new Middleware('permission:create-benefit', only: ['store']),
             new Middleware('permission:edit-benefit', only: ['update']),
@@ -33,30 +32,32 @@ class BenefitController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of all benefits.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage =  request('per_page', 10);
-        $benefits = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $benefits = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => BenefitResource::collection($benefits),
+            'meta' => [
+                'current_page' => $benefits->currentPage(),
+                'per_page' => $benefits->perPage(),
+                'total' => $benefits->total(),
+                'last_page' => $benefits->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Display a paginated list of benefits for a specific employee.
-     *
-     * @param int $employeeId
-     * @return JsonResponse
      */
     public function employeeBenefits(int $employeeId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $benefits = $this->service->showEmployeeBenefits($employeeId, $perpage);
+
         return response()->json([
             'status' => 'success',
             'data' => BenefitResource::collection($benefits),
@@ -65,14 +66,12 @@ class BenefitController extends Controller implements HasMiddleware
 
     /**
      * Store a newly created benefit in the database.
-     *
-     * @param BenefitRequest $request
-     * @return JsonResponse
      */
     public function store(BenefitRequest $request): JsonResponse
     {
         $dto = BenefitDTO::fromRequest($request);
         $benefit = $this->service->create($dto);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Benefit created successfully.',
@@ -82,9 +81,6 @@ class BenefitController extends Controller implements HasMiddleware
 
     /**
      * Display the specified benefit.
-     *
-     * @param Benefit $benefit
-     * @return JsonResponse
      */
     public function show(Benefit $benefit): JsonResponse
     {
@@ -96,15 +92,12 @@ class BenefitController extends Controller implements HasMiddleware
 
     /**
      * Update the specified benefit in the database.
-     *
-     * @param BenefitRequest $request
-     * @param Benefit $benefit
-     * @return JsonResponse
      */
     public function update(BenefitRequest $request, Benefit $benefit): JsonResponse
     {
         $dto = BenefitDTO::fromRequest($request);
         $updatedBenefit = $this->service->update($benefit, $dto);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Benefit updated successfully.',
@@ -114,13 +107,11 @@ class BenefitController extends Controller implements HasMiddleware
 
     /**
      * Remove the specified benefit from the database.
-     *
-     * @param Benefit $benefit
-     * @return JsonResponse
      */
     public function destroy(Benefit $benefit): JsonResponse
     {
         $this->service->delete($benefit);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Benefit deleted successfully.',

@@ -11,7 +11,7 @@ interface EmployeeRepositoryInterface
     /**
      * Get all employees with pagination
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
 
     /**

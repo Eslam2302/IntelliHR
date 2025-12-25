@@ -5,16 +5,13 @@ namespace App\Services;
 use App\DataTransferObjects\EmployeeTrainingDTO;
 use App\Models\EmployeeTraining;
 use App\Repositories\Contracts\EmployeeTrainingRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeTrainingService
 {
     /**
      * Constructor.
-     *
-     * @param EmployeeTrainingRepositoryInterface $repository
      */
     public function __construct(
         protected EmployeeTrainingRepositoryInterface $repository,
@@ -22,42 +19,35 @@ class EmployeeTrainingService
     ) {}
 
     /**
-     * Get paginated employee trainings.
+     * Get all employee trainings with optional filters.
      *
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @return mixed
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching employee trainings: ' . $e->getMessage());
+            Log::error('Error fetching employee trainings: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Show single employee training.
-     *
-     * @param int $id
-     * @return EmployeeTraining
      */
     public function show(int $id): EmployeeTraining
     {
         try {
             return $this->repository->show($id);
         } catch (Exception $e) {
-            Log::error("Error fetching employee training ID {$id}: " . $e->getMessage());
+            Log::error("Error fetching employee training ID {$id}: ".$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Create a new employee training.
-     *
-     * @param EmployeeTrainingDTO $dto
-     * @return EmployeeTraining
      */
     public function create(EmployeeTrainingDTO $dto): EmployeeTraining
     {
@@ -76,7 +66,7 @@ class EmployeeTrainingService
                 ]
             );
 
-            Log::info("Employee Training created successfully", [
+            Log::info('Employee Training created successfully', [
                 'id' => $employeeTraining->id,
                 'employee_id' => $employeeTraining->employee_id,
                 'training_id' => $employeeTraining->training_id,
@@ -84,17 +74,13 @@ class EmployeeTrainingService
 
             return $employeeTraining;
         } catch (Exception $e) {
-            Log::error('Error creating employee training: ' . $e->getMessage());
+            Log::error('Error creating employee training: '.$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Update an existing employee training.
-     *
-     * @param EmployeeTraining $employeeTraining
-     * @param EmployeeTrainingDTO $dto
-     * @return EmployeeTraining
      */
     public function update(EmployeeTraining $employeeTraining, EmployeeTrainingDTO $dto): EmployeeTraining
     {
@@ -114,7 +100,7 @@ class EmployeeTrainingService
                 subject: $updatedTraining,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedTraining->only([
+                    'after' => $updatedTraining->only([
                         'employee_id',
                         'training_id',
                         'status',
@@ -123,23 +109,20 @@ class EmployeeTrainingService
                 ]
             );
 
-            Log::info("Employee Training updated successfully", [
+            Log::info('Employee Training updated successfully', [
                 'id' => $updatedTraining->id,
                 'employee_id' => $updatedTraining->employee_id,
             ]);
 
             return $updatedTraining;
         } catch (Exception $e) {
-            Log::error("Error updating employee training ID {$employeeTraining->id}: " . $e->getMessage());
+            Log::error("Error updating employee training ID {$employeeTraining->id}: ".$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Delete an employee training.
-     *
-     * @param EmployeeTraining $employeeTraining
-     * @return bool
      */
     public function delete(EmployeeTraining $employeeTraining): bool
     {
@@ -160,14 +143,14 @@ class EmployeeTrainingService
                 properties: $data
             );
 
-            Log::info("Employee Training deleted successfully", [
+            Log::info('Employee Training deleted successfully', [
                 'id' => $employeeTraining->id,
                 'employee_id' => $employeeTraining->employee_id,
             ]);
 
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting employee training ID {$employeeTraining->id}: " . $e->getMessage());
+            Log::error("Error deleting employee training ID {$employeeTraining->id}: ".$e->getMessage());
             throw $e;
         }
     }

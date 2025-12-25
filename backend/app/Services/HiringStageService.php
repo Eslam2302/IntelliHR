@@ -5,9 +5,8 @@ namespace App\Services;
 use App\DataTransferObjects\HiringStageDTO;
 use App\Models\HiringStage;
 use App\Repositories\Contracts\HiringStageRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class HiringStageService
 {
@@ -17,18 +16,18 @@ class HiringStageService
     ) {}
 
     /**
-     * Retrieve paginated list of hiring stages.
+     * Retrieve all hiring stages with optional filters.
      *
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws Exception
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching Hiring Stages: ' . $e->getMessage());
+            Log::error('Error fetching Hiring Stages: '.$e->getMessage());
             throw $e;
         }
     }
@@ -36,8 +35,6 @@ class HiringStageService
     /**
      * Retrieve a hiring stage by ID.
      *
-     * @param int $hiringStageId
-     * @return HiringStage
      * @throws Exception
      */
     public function show(int $hiringStageId): HiringStage
@@ -45,7 +42,7 @@ class HiringStageService
         try {
             return $this->repository->show($hiringStageId);
         } catch (Exception $e) {
-            Log::error("Error fetching Hiring Stage ID {$hiringStageId}: " . $e->getMessage());
+            Log::error("Error fetching Hiring Stage ID {$hiringStageId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -53,7 +50,6 @@ class HiringStageService
     /**
      * Get all hiring stages for a specific job post.
      *
-     * @param int $jobPostId
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getByJobPost(int $jobPostId)
@@ -61,12 +57,9 @@ class HiringStageService
         return $this->repository->getByJobPost($jobPostId);
     }
 
-
     /**
      * Create a new hiring stage using the provided DTO.
      *
-     * @param HiringStageDTO $dto
-     * @return HiringStage
      * @throws Exception
      */
     public function create(HiringStageDTO $dto): HiringStage
@@ -85,7 +78,7 @@ class HiringStageService
                 ]
             );
 
-            Log::info("Hiring Stage created successfully", [
+            Log::info('Hiring Stage created successfully', [
                 'id' => $hiringStage->id,
                 'job_id' => $hiringStage->job_id,
                 'stage_name' => $hiringStage->stage_name,
@@ -94,7 +87,7 @@ class HiringStageService
 
             return $hiringStage;
         } catch (Exception $e) {
-            Log::error('Error creating Hiring Stage: ' . $e->getMessage());
+            Log::error('Error creating Hiring Stage: '.$e->getMessage());
             throw $e;
         }
     }
@@ -102,9 +95,6 @@ class HiringStageService
     /**
      * Update the given hiring stage using the provided DTO.
      *
-     * @param HiringStage $hiringStage
-     * @param HiringStageDTO $dto
-     * @return HiringStage
      * @throws Exception
      */
     public function update(HiringStage $hiringStage, HiringStageDTO $dto): HiringStage
@@ -124,7 +114,7 @@ class HiringStageService
                 subject: $updatedStage,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedStage->only([
+                    'after' => $updatedStage->only([
                         'job_id',
                         'stage_name',
                         'order',
@@ -132,7 +122,7 @@ class HiringStageService
                 ]
             );
 
-            Log::info("Hiring Stage updated successfully", [
+            Log::info('Hiring Stage updated successfully', [
                 'id' => $updatedStage->id,
                 'job_id' => $updatedStage->job_id,
                 'stage_name' => $updatedStage->stage_name,
@@ -141,7 +131,7 @@ class HiringStageService
 
             return $updatedStage;
         } catch (Exception $e) {
-            Log::error("Error updating Hiring Stage ID {$hiringStage->id}: " . $e->getMessage());
+            Log::error("Error updating Hiring Stage ID {$hiringStage->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -149,8 +139,6 @@ class HiringStageService
     /**
      * Delete the given hiring stage instance.
      *
-     * @param HiringStage $hiringStage
-     * @return bool
      * @throws Exception
      */
     public function delete(HiringStage $hiringStage): bool
@@ -171,7 +159,7 @@ class HiringStageService
                 properties: $data
             );
 
-            Log::info("Hiring Stage deleted successfully", [
+            Log::info('Hiring Stage deleted successfully', [
                 'id' => $hiringStage->id,
                 'job_id' => $hiringStage->job_id,
                 'stage_name' => $hiringStage->stage_name,
@@ -180,7 +168,7 @@ class HiringStageService
 
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting Hiring Stage ID {$hiringStage->id}: " . $e->getMessage());
+            Log::error("Error deleting Hiring Stage ID {$hiringStage->id}: ".$e->getMessage());
             throw $e;
         }
     }

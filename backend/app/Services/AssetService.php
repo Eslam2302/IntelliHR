@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DataTransferObjects\AssetDTO;
 use App\Models\Asset;
 use App\Repositories\Contracts\AssetRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class AssetService
@@ -16,18 +15,18 @@ class AssetService
     ) {}
 
     /**
-     * Retrieve paginated list of assets.
+     * Retrieve all assets with optional filters.
      *
-     * @param int $perpage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws \Exception
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Assets: ' . $e->getMessage());
+            Log::error('Error fetching Assets: '.$e->getMessage());
             throw $e;
         }
     }
@@ -35,8 +34,6 @@ class AssetService
     /**
      * Retrieve an asset by ID.
      *
-     * @param int $assetId
-     * @return Asset
      * @throws \Exception
      */
     public function show(int $assetId): Asset
@@ -44,7 +41,7 @@ class AssetService
         try {
             return $this->repository->show($assetId);
         } catch (\Exception $e) {
-            Log::error("Error fetching Asset ID {$assetId}: " . $e->getMessage());
+            Log::error("Error fetching Asset ID {$assetId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -52,8 +49,6 @@ class AssetService
     /**
      * Create a new asset using the provided DTO.
      *
-     * @param AssetDTO $dto
-     * @return Asset
      * @throws \Exception
      */
     public function create(AssetDTO $dto): Asset
@@ -66,14 +61,14 @@ class AssetService
                 description: 'asset_created',
                 subject: $asset,
                 properties: [
-                    'name'              => $asset->name,
-                    'serial_number'     => $asset->serial_number,
-                    'condition'         => $asset->condition,
-                    'status'            => $asset->status
+                    'name' => $asset->name,
+                    'serial_number' => $asset->serial_number,
+                    'condition' => $asset->condition,
+                    'status' => $asset->status,
                 ]
             );
 
-            Log::info("Asset created successfully", [
+            Log::info('Asset created successfully', [
                 'id' => $asset->id,
                 'name' => $asset->name,
                 'serial_number' => $asset->serial_number,
@@ -81,7 +76,7 @@ class AssetService
 
             return $asset;
         } catch (\Exception $e) {
-            Log::error('Error creating Asset: ' . $e->getMessage());
+            Log::error('Error creating Asset: '.$e->getMessage());
             throw $e;
         }
     }
@@ -89,9 +84,6 @@ class AssetService
     /**
      * Update the given asset using the provided DTO.
      *
-     * @param Asset $asset
-     * @param AssetDTO $dto
-     * @return Asset
      * @throws \Exception
      */
     public function update(Asset $asset, AssetDTO $dto): Asset
@@ -101,7 +93,7 @@ class AssetService
                 'name',
                 'serial_number',
                 'condition',
-                'status'
+                'status',
             ]);
 
             $updatedAsset = $this->repository->update($asset, $dto->toArray());
@@ -112,17 +104,17 @@ class AssetService
                 subject: $updatedAsset,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedAsset
+                    'after' => $updatedAsset
                         ->only([
                             'name',
                             'serial_number',
                             'condition',
-                            'status'
+                            'status',
                         ]),
                 ]
             );
 
-            Log::info("Asset updated successfully", [
+            Log::info('Asset updated successfully', [
                 'id' => $updatedAsset->id,
                 'name' => $updatedAsset->name,
                 'serial_number' => $updatedAsset->serial_number,
@@ -130,7 +122,7 @@ class AssetService
 
             return $updatedAsset;
         } catch (\Exception $e) {
-            Log::error("Error updating Asset ID {$asset->id}: " . $e->getMessage());
+            Log::error("Error updating Asset ID {$asset->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -138,8 +130,6 @@ class AssetService
     /**
      * Delete the given asset instance.
      *
-     * @param Asset $asset
-     * @return bool
      * @throws \Exception
      */
     public function delete(Asset $asset): bool
@@ -149,7 +139,7 @@ class AssetService
                 'name',
                 'serial_number',
                 'condition',
-                'status'
+                'status',
             ]);
 
             $deleted = $this->repository->delete($asset);
@@ -161,7 +151,7 @@ class AssetService
                 properties: $data
             );
 
-            Log::info("Asset deleted successfully", [
+            Log::info('Asset deleted successfully', [
                 'id' => $asset->id,
                 'name' => $asset->name,
                 'serial_number' => $asset->serial_number,
@@ -169,7 +159,7 @@ class AssetService
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error("Error deleting Asset ID {$asset->id}: " . $e->getMessage());
+            Log::error("Error deleting Asset ID {$asset->id}: ".$e->getMessage());
             throw $e;
         }
     }

@@ -32,25 +32,26 @@ class ExpenseController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of all expenses.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $expenses = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $expenses = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => ExpenseResource::collection($expenses),
+            'meta' => [
+                'current_page' => $expenses->currentPage(),
+                'per_page' => $expenses->perPage(),
+                'total' => $expenses->total(),
+                'last_page' => $expenses->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Store a newly created expense in the database.
-     *
-     * @param ExpenseRequest $request
-     * @return JsonResponse
      */
     public function store(ExpenseRequest $request): JsonResponse
     {
@@ -67,8 +68,7 @@ class ExpenseController extends Controller implements HasMiddleware
     /**
      * Display the specified expense.
      *
-     * @param Expense $expense
-     * @return JsonResponse
+     * @param  Expense  $expense
      */
     public function show(int $expenseId): JsonResponse
     {
@@ -82,10 +82,6 @@ class ExpenseController extends Controller implements HasMiddleware
 
     /**
      * Update the specified expense in storage.
-     *
-     * @param ExpenseRequest $request
-     * @param Expense $expense
-     * @return JsonResponse
      */
     public function update(ExpenseRequest $request, Expense $expense): JsonResponse
     {
@@ -101,9 +97,6 @@ class ExpenseController extends Controller implements HasMiddleware
 
     /**
      * Remove the specified expense from storage.
-     *
-     * @param Expense $expense
-     * @return JsonResponse
      */
     public function destroy(Expense $expense): JsonResponse
     {
@@ -117,9 +110,6 @@ class ExpenseController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of expenses for a specific employee.
-     *
-     * @param int $employeeId
-     * @return JsonResponse
      */
     public function employeeExpenses(int $employeeId): JsonResponse
     {

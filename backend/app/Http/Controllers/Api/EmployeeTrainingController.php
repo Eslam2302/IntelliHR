@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\EmployeeTrainingDTO;
 use App\Http\Controllers\Controller;
-use App\Services\EmployeeTrainingService;
 use App\Http\Requests\EmployeeTrainingRequest;
 use App\Http\Resources\EmployeeTrainingResource;
-use App\DataTransferObjects\EmployeeTrainingDTO;
 use App\Models\EmployeeTraining;
+use App\Services\EmployeeTrainingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -16,8 +16,6 @@ class EmployeeTrainingController extends Controller implements HasMiddleware
 {
     /**
      * Constructor.
-     *
-     * @param EmployeeTrainingService $service
      */
     public function __construct(protected EmployeeTrainingService $service) {}
 
@@ -35,25 +33,26 @@ class EmployeeTrainingController extends Controller implements HasMiddleware
 
     /**
      * Display paginated list of employee trainings.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $trainings = $this->service->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $trainings = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => EmployeeTrainingResource::collection($trainings),
+            'meta' => [
+                'current_page' => $trainings->currentPage(),
+                'per_page' => $trainings->perPage(),
+                'total' => $trainings->total(),
+                'last_page' => $trainings->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Store a newly created employee training.
-     *
-     * @param EmployeeTrainingRequest $request
-     * @return JsonResponse
      */
     public function store(EmployeeTrainingRequest $request): JsonResponse
     {
@@ -69,9 +68,6 @@ class EmployeeTrainingController extends Controller implements HasMiddleware
 
     /**
      * Display a single employee training.
-     *
-     * @param EmployeeTraining $employeeTraining
-     * @return JsonResponse
      */
     public function show(EmployeeTraining $employeeTraining): JsonResponse
     {
@@ -83,10 +79,6 @@ class EmployeeTrainingController extends Controller implements HasMiddleware
 
     /**
      * Update an existing employee training.
-     *
-     * @param EmployeeTrainingRequest $request
-     * @param EmployeeTraining $employeeTraining
-     * @return JsonResponse
      */
     public function update(EmployeeTrainingRequest $request, EmployeeTraining $employeeTraining): JsonResponse
     {
@@ -102,9 +94,6 @@ class EmployeeTrainingController extends Controller implements HasMiddleware
 
     /**
      * Delete an employee training.
-     *
-     * @param EmployeeTraining $employeeTraining
-     * @return JsonResponse
      */
     public function destroy(EmployeeTraining $employeeTraining): JsonResponse
     {

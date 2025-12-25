@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\HiringStageDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\HiringStageRequest;
+use App\Http\Resources\HiringStageResource;
+use App\Models\HiringStage;
 use App\Services\HiringStageService;
 use Illuminate\Http\JsonResponse;
-use App\DataTransferObjects\HiringStageDTO;
-use App\Http\Resources\HiringStageResource;
-use App\Http\Requests\HiringStageRequest;
-use App\Models\HiringStage;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -16,8 +16,6 @@ class HiringStageController extends Controller implements HasMiddleware
 {
     /**
      * HiringStageController constructor.
-     *
-     * @param HiringStageService $service
      */
     public function __construct(
         protected HiringStageService $service
@@ -27,7 +25,7 @@ class HiringStageController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-hiring-stages', only: ['index','getByJobPost']),
+            new Middleware('permission:view-all-hiring-stages', only: ['index', 'getByJobPost']),
             new Middleware('permission:view-hiring-stage', only: ['show']),
             new Middleware('permission:create-hiring-stage', only: ['store']),
             new Middleware('permission:edit-hiring-stage', only: ['update']),
@@ -37,25 +35,26 @@ class HiringStageController extends Controller implements HasMiddleware
 
     /**
      * Get paginated list of hiring stages.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $stages = $this->service->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $stages = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => HiringStageResource::collection($stages),
+            'meta' => [
+                'current_page' => $stages->currentPage(),
+                'per_page' => $stages->perPage(),
+                'total' => $stages->total(),
+                'last_page' => $stages->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new hiring stage.
-     *
-     * @param HiringStageRequest $request
-     * @return JsonResponse
      */
     public function store(HiringStageRequest $request): JsonResponse
     {
@@ -71,9 +70,6 @@ class HiringStageController extends Controller implements HasMiddleware
 
     /**
      * Get all hiring stages for a specific job post.
-     *
-     * @param int $jobPostId
-     * @return JsonResponse
      */
     public function getByJobPost(int $jobPostId): JsonResponse
     {
@@ -85,12 +81,8 @@ class HiringStageController extends Controller implements HasMiddleware
         ], 200);
     }
 
-
     /**
      * Display a specific hiring stage.
-     *
-     * @param HiringStage $hiringStage
-     * @return JsonResponse
      */
     public function show(HiringStage $hiringStage): JsonResponse
     {
@@ -102,10 +94,6 @@ class HiringStageController extends Controller implements HasMiddleware
 
     /**
      * Update a specific hiring stage.
-     *
-     * @param HiringStageRequest $request
-     * @param HiringStage $hiringStage
-     * @return JsonResponse
      */
     public function update(HiringStageRequest $request, HiringStage $hiringStage): JsonResponse
     {
@@ -121,9 +109,6 @@ class HiringStageController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific hiring stage.
-     *
-     * @param HiringStage $hiringStage
-     * @return JsonResponse
      */
     public function destroy(HiringStage $hiringStage): JsonResponse
     {

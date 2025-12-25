@@ -5,9 +5,8 @@ namespace App\Services;
 use App\DataTransferObjects\JobPostDTO;
 use App\Models\JobPost;
 use App\Repositories\Contracts\JobPostRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class JobPostService
 {
@@ -17,18 +16,18 @@ class JobPostService
     ) {}
 
     /**
-     * Retrieve paginated list of job posts.
+     * Retrieve all job posts with optional filters.
      *
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws Exception
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching Job Posts: ' . $e->getMessage());
+            Log::error('Error fetching Job Posts: '.$e->getMessage());
             throw $e;
         }
     }
@@ -36,8 +35,6 @@ class JobPostService
     /**
      * Retrieve a job post by ID.
      *
-     * @param int $jobPostId
-     * @return JobPost
      * @throws Exception
      */
     public function show(int $jobPostId): JobPost
@@ -45,7 +42,7 @@ class JobPostService
         try {
             return $this->repository->show($jobPostId);
         } catch (Exception $e) {
-            Log::error("Error fetching JobPost ID {$jobPostId}: " . $e->getMessage());
+            Log::error("Error fetching JobPost ID {$jobPostId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -53,8 +50,6 @@ class JobPostService
     /**
      * Create a new job post using the provided DTO.
      *
-     * @param JobPostDTO $dto
-     * @return JobPost
      * @throws Exception
      */
     public function create(JobPostDTO $dto): JobPost
@@ -78,7 +73,7 @@ class JobPostService
                 ]
             );
 
-            Log::info("Job Post created successfully", [
+            Log::info('Job Post created successfully', [
                 'id' => $jobPost->id,
                 'title' => $jobPost->title,
                 'department_id' => $jobPost->department_id,
@@ -86,7 +81,7 @@ class JobPostService
 
             return $jobPost;
         } catch (Exception $e) {
-            Log::error('Error creating Job Post: ' . $e->getMessage());
+            Log::error('Error creating Job Post: '.$e->getMessage());
             throw $e;
         }
     }
@@ -94,9 +89,6 @@ class JobPostService
     /**
      * Update the given job post using the provided DTO.
      *
-     * @param JobPost $jobPost
-     * @param JobPostDTO $dto
-     * @return JobPost
      * @throws Exception
      */
     public function update(JobPost $jobPost, JobPostDTO $dto): JobPost
@@ -121,7 +113,7 @@ class JobPostService
                 subject: $updatedJobPost,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedJobPost->only([
+                    'after' => $updatedJobPost->only([
                         'title',
                         'description',
                         'requirements',
@@ -134,7 +126,7 @@ class JobPostService
                 ]
             );
 
-            Log::info("Job Post updated successfully", [
+            Log::info('Job Post updated successfully', [
                 'id' => $updatedJobPost->id,
                 'title' => $updatedJobPost->title,
                 'department_id' => $updatedJobPost->department_id,
@@ -142,7 +134,7 @@ class JobPostService
 
             return $updatedJobPost;
         } catch (Exception $e) {
-            Log::error("Error updating JobPost ID {$jobPost->id}: " . $e->getMessage());
+            Log::error("Error updating JobPost ID {$jobPost->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -150,8 +142,6 @@ class JobPostService
     /**
      * Delete the given job post instance.
      *
-     * @param JobPost $jobPost
-     * @return bool
      * @throws Exception
      */
     public function delete(JobPost $jobPost): bool
@@ -177,7 +167,7 @@ class JobPostService
                 properties: $data
             );
 
-            Log::info("Job Post deleted successfully", [
+            Log::info('Job Post deleted successfully', [
                 'id' => $jobPost->id,
                 'title' => $jobPost->title,
                 'department_id' => $jobPost->department_id,
@@ -185,7 +175,7 @@ class JobPostService
 
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting JobPost ID {$jobPost->id}: " . $e->getMessage());
+            Log::error("Error deleting JobPost ID {$jobPost->id}: ".$e->getMessage());
             throw $e;
         }
     }

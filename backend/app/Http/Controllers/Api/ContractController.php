@@ -8,13 +8,11 @@ use App\Http\Requests\ContractRequest;
 use App\Http\Resources\ContractResource;
 use App\Models\Contract;
 use App\Services\ContractService;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
 class ContractController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected ContractService $contractService
     ) {}
@@ -36,12 +34,18 @@ class ContractController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $perpage = request('per_page', 10);
-        $contract = $this->contractService->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $contract = $this->contractService->getAll($filters);
 
         return response()->json([
             'status' => 'success',
-            'data' => ContractResource::collection($contract)
+            'data' => ContractResource::collection($contract),
+            'meta' => [
+                'current_page' => $contract->currentPage(),
+                'per_page' => $contract->perPage(),
+                'total' => $contract->total(),
+                'last_page' => $contract->lastPage(),
+            ],
         ], 200);
     }
 
@@ -67,7 +71,7 @@ class ContractController extends Controller implements HasMiddleware
     {
         return response()->json([
             'status' => 'success',
-            'data' => new ContractResource($contract)
+            'data' => new ContractResource($contract),
         ], 200);
     }
 

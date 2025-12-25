@@ -2,24 +2,33 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Contracts\JobPositionRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\JobPosition;
+use App\Repositories\Contracts\JobPositionRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class JobPositionRepository implements JobPositionRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected JobPosition $model
     ) {}
 
-    /**
-     * Get all jobs with pagination
-     */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->latest()
-            ->paginate($perpage);
+        $query = $this->model->query();
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['title', 'grade'],
+            ['id', 'title', 'grade', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
@@ -30,12 +39,13 @@ class JobPositionRepository implements JobPositionRepositoryInterface
         return $this->model->create($data);
     }
 
-     /**
+    /**
      * Update the existing position
      */
-    public function update(JobPosition $jobPosition,array $data): JobPosition
+    public function update(JobPosition $jobPosition, array $data): JobPosition
     {
         $jobPosition->update($data);
+
         return $jobPosition->fresh();
     }
 

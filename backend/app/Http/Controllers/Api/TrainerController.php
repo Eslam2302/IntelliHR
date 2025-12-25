@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\TrainerService;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\DataTransferObjects\TrainerDTO;
-use App\Http\Resources\TrainerResource;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\TrainerRequest;
+use App\Http\Resources\TrainerResource;
 use App\Models\Trainer;
+use App\Services\TrainerService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -17,8 +16,6 @@ class TrainerController extends Controller implements HasMiddleware
 {
     /**
      * TrainerController constructor.
-     *
-     * @param TrainerService $service
      */
     public function __construct(
         protected TrainerService $service
@@ -38,25 +35,26 @@ class TrainerController extends Controller implements HasMiddleware
 
     /**
      * Get paginated list of trainers.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $trainers = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $trainers = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => TrainerResource::collection($trainers),
+            'meta' => [
+                'current_page' => $trainers->currentPage(),
+                'per_page' => $trainers->perPage(),
+                'total' => $trainers->total(),
+                'last_page' => $trainers->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new trainer.
-     *
-     * @param TrainerRequest $request
-     * @return JsonResponse
      */
     public function store(TrainerRequest $request): JsonResponse
     {
@@ -72,9 +70,6 @@ class TrainerController extends Controller implements HasMiddleware
 
     /**
      * Display a specific trainer.
-     *
-     * @param Trainer $trainer
-     * @return JsonResponse
      */
     public function show(Trainer $trainer): JsonResponse
     {
@@ -86,10 +81,6 @@ class TrainerController extends Controller implements HasMiddleware
 
     /**
      * Update a specific trainer.
-     *
-     * @param TrainerRequest $request
-     * @param Trainer $trainer
-     * @return JsonResponse
      */
     public function update(TrainerRequest $request, Trainer $trainer): JsonResponse
     {
@@ -105,9 +96,6 @@ class TrainerController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific trainer.
-     *
-     * @param Trainer $trainer
-     * @return JsonResponse
      */
     public function destroy(Trainer $trainer): JsonResponse
     {

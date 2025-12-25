@@ -4,33 +4,35 @@ namespace App\Repositories;
 
 use App\Models\Trainer;
 use App\Repositories\Contracts\TrainerRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class TrainerRepository implements TrainerRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected Trainer $model
     ) {}
 
-    /**
-     * Get paginated list of trainers.
-     *
-     * @param int $perpage
-     * @return LengthAwarePaginator
-     */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with('employee')
-            ->latest()
-            ->paginate($perpage);
+        $query = $this->model->with('employee');
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_id', 'name', 'email', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'employee.employee_status'],
+            ['id', 'name', 'email', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
      * Get a trainer by ID.
-     *
-     * @param int $trainerId
-     * @return Trainer
      */
     public function show(int $trainerId): Trainer
     {
@@ -39,9 +41,6 @@ class TrainerRepository implements TrainerRepositoryInterface
 
     /**
      * Create a new trainer.
-     *
-     * @param array $data
-     * @return Trainer
      */
     public function create(array $data): Trainer
     {
@@ -51,22 +50,16 @@ class TrainerRepository implements TrainerRepositoryInterface
 
     /**
      * Update an existing trainer.
-     *
-     * @param Trainer $trainer
-     * @param array $data
-     * @return Trainer
      */
     public function update(Trainer $trainer, array $data): Trainer
     {
         $trainer->update($data);
+
         return $trainer->fresh();
     }
 
     /**
      * Delete a trainer.
-     *
-     * @param Trainer $trainer
-     * @return bool
      */
     public function delete(Trainer $trainer): bool
     {

@@ -5,9 +5,8 @@ namespace App\Services;
 use App\DataTransferObjects\TrainerDTO;
 use App\Models\Trainer;
 use App\Repositories\Contracts\TrainerRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class TrainerService
 {
@@ -17,18 +16,18 @@ class TrainerService
     ) {}
 
     /**
-     * Retrieve paginated list of trainers.
+     * Retrieve all trainers with optional filters.
      *
-     * @param int $perpage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws Exception
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching Trainers: ' . $e->getMessage());
+            Log::error('Error fetching Trainers: '.$e->getMessage());
             throw $e;
         }
     }
@@ -36,8 +35,6 @@ class TrainerService
     /**
      * Retrieve a trainer by ID.
      *
-     * @param int $trainerId
-     * @return Trainer
      * @throws Exception
      */
     public function show(int $trainerId): Trainer
@@ -45,7 +42,7 @@ class TrainerService
         try {
             return $this->repository->show($trainerId);
         } catch (Exception $e) {
-            Log::error("Error fetching Trainer ID {$trainerId}: " . $e->getMessage());
+            Log::error("Error fetching Trainer ID {$trainerId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -53,8 +50,6 @@ class TrainerService
     /**
      * Create a new trainer using the provided DTO.
      *
-     * @param TrainerDTO $dto
-     * @return Trainer
      * @throws \Exception
      */
     public function create(TrainerDTO $dto): Trainer
@@ -76,7 +71,7 @@ class TrainerService
                 ]
             );
 
-            Log::info("Trainer created successfully", [
+            Log::info('Trainer created successfully', [
                 'id' => $trainer->id,
                 'type' => $trainer->type,
                 'employee_id' => $trainer->employee_id,
@@ -86,7 +81,7 @@ class TrainerService
 
             return $trainer;
         } catch (Exception $e) {
-            Log::error('Error creating Trainer: ' . $e->getMessage());
+            Log::error('Error creating Trainer: '.$e->getMessage());
             throw $e;
         }
     }
@@ -94,9 +89,6 @@ class TrainerService
     /**
      * Update the given trainer using the provided DTO.
      *
-     * @param Trainer $trainer
-     * @param TrainerDTO $dto
-     * @return Trainer
      * @throws \Exception
      */
     public function update(Trainer $trainer, TrainerDTO $dto): Trainer
@@ -119,7 +111,7 @@ class TrainerService
                 subject: $updatedTrainer,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedTrainer->only([
+                    'after' => $updatedTrainer->only([
                         'type',
                         'employee_id',
                         'name',
@@ -130,7 +122,7 @@ class TrainerService
                 ]
             );
 
-            Log::info("Trainer updated successfully", [
+            Log::info('Trainer updated successfully', [
                 'id' => $updatedTrainer->id,
                 'type' => $trainer->type,
                 'employee_id' => $updatedTrainer->employee_id,
@@ -140,7 +132,7 @@ class TrainerService
 
             return $updatedTrainer;
         } catch (Exception $e) {
-            Log::error("Error updating Trainer ID {$trainer->id}: " . $e->getMessage());
+            Log::error("Error updating Trainer ID {$trainer->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -148,8 +140,6 @@ class TrainerService
     /**
      * Delete the given trainer instance.
      *
-     * @param Trainer $trainer
-     * @return bool
      * @throws Exception
      */
     public function delete(Trainer $trainer): bool
@@ -173,7 +163,7 @@ class TrainerService
                 properties: $data
             );
 
-            Log::info("Trainer deleted successfully", [
+            Log::info('Trainer deleted successfully', [
                 'id' => $trainer->id,
                 'type' => $trainer->type,
                 'employee_id' => $trainer->employee_id,
@@ -183,7 +173,7 @@ class TrainerService
 
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting Trainer ID {$trainer->id}: " . $e->getMessage());
+            Log::error("Error deleting Trainer ID {$trainer->id}: ".$e->getMessage());
             throw $e;
         }
     }

@@ -14,12 +14,12 @@ class PayrollService
         protected ActivityLoggerService $activityLogger
     ) {}
 
-    public function getAllPaginated(int $perpage = 10)
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Payrolls: ' . $e->getMessage());
+            Log::error('Error fetching Payrolls: '.$e->getMessage());
             throw $e;
         }
     }
@@ -33,7 +33,7 @@ class PayrollService
                 $dto->year,
                 $dto->month
             )) {
-                throw new \Exception("Payroll for this employee and period already exists.");
+                throw new \Exception('Payroll for this employee and period already exists.');
             }
 
             // Calculate net pay
@@ -52,17 +52,17 @@ class PayrollService
                 subject: $payroll,
                 properties: [
                     'employee_id' => $payroll->employee_id,
-                    'year'        => $payroll->year,
-                    'month'      => $payroll->month,
-                    'basic_salary'      => $payroll->basic_salary,
-                    'allowances'      => $payroll->allowances,
-                    'deductions'      => $payroll->deductions,
-                    'net_pay'      => $payroll->net_pay,
-                    'processed_at'      => $payroll->processed_at,
+                    'year' => $payroll->year,
+                    'month' => $payroll->month,
+                    'basic_salary' => $payroll->basic_salary,
+                    'allowances' => $payroll->allowances,
+                    'deductions' => $payroll->deductions,
+                    'net_pay' => $payroll->net_pay,
+                    'processed_at' => $payroll->processed_at,
                 ]
             );
 
-            Log::info("Payroll created successfully", [
+            Log::info('Payroll created successfully', [
                 'id' => $payroll->id,
                 'employee_id' => $payroll->employee_id,
                 'year' => $payroll->year,
@@ -71,8 +71,8 @@ class PayrollService
 
             return $payroll;
         } catch (\Exception $e) {
-            Log::error("Error creating payroll: " . $e->getMessage(), [
-                'payload' => $dto->toArray()
+            Log::error('Error creating payroll: '.$e->getMessage(), [
+                'payload' => $dto->toArray(),
             ]);
             throw $e;
         }
@@ -99,11 +99,11 @@ class PayrollService
                 subject: $updatedPayroll,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedPayroll,
+                    'after' => $updatedPayroll,
                 ]
             );
 
-            Log::info("Payroll updated successfully", [
+            Log::info('Payroll updated successfully', [
                 'id' => $updatedPayroll->id,
                 'employee_id' => $updatedPayroll->employee_id,
                 'year' => $updatedPayroll->year,
@@ -112,7 +112,7 @@ class PayrollService
 
             return $updatedPayroll;
         } catch (\Exception $e) {
-            Log::error("Error updating payroll: " . $e->getMessage(), [
+            Log::error('Error updating payroll: '.$e->getMessage(), [
                 'payroll_id' => $payroll->id,
                 'payload' => $dto->toArray(),
             ]);
@@ -134,14 +134,14 @@ class PayrollService
                 properties: [$data],
             );
 
-            Log::info("Payroll deleted", [
-                'id' => $payroll->id
+            Log::info('Payroll deleted', [
+                'id' => $payroll->id,
             ]);
 
             return $result;
         } catch (\Exception $e) {
-            Log::error("Error deleting payroll: " . $e->getMessage(), [
-                'id' => $payroll->id
+            Log::error('Error deleting payroll: '.$e->getMessage(), [
+                'id' => $payroll->id,
             ]);
             throw $e;
         }

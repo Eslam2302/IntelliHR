@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DataTransferObjects\ExpenseCategoryDTO;
 use App\Models\ExpenseCategory;
 use App\Repositories\Contracts\ExpenseCategoryRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class ExpenseCategoryService
@@ -16,18 +15,18 @@ class ExpenseCategoryService
     ) {}
 
     /**
-     * Retrieve paginated list of expense categories.
+     * Retrieve all expense categories with optional filters.
      *
-     * @param int $perpage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws \Exception
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error("Error fetching Expense Categories: " . $e->getMessage());
+            Log::error('Error fetching Expense Categories: '.$e->getMessage());
             throw $e;
         }
     }
@@ -35,8 +34,6 @@ class ExpenseCategoryService
     /**
      * Retrieve an expense category by ID.
      *
-     * @param int $id
-     * @return ExpenseCategory
      * @throws \Exception
      */
     public function show(int $id): ExpenseCategory
@@ -44,7 +41,7 @@ class ExpenseCategoryService
         try {
             return $this->repository->show($id);
         } catch (\Exception $e) {
-            Log::error("Error fetching Expense Category ID {$id}: " . $e->getMessage());
+            Log::error("Error fetching Expense Category ID {$id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -52,8 +49,6 @@ class ExpenseCategoryService
     /**
      * Create a new expense category using the provided DTO.
      *
-     * @param ExpenseCategoryDTO $dto
-     * @return ExpenseCategory
      * @throws \Exception
      */
     public function create(ExpenseCategoryDTO $dto): ExpenseCategory
@@ -70,14 +65,14 @@ class ExpenseCategoryService
                 ]
             );
 
-            Log::info("Expense Category created successfully", [
+            Log::info('Expense Category created successfully', [
                 'id' => $category->id,
                 'name' => $category->name,
             ]);
 
             return $category;
         } catch (\Exception $e) {
-            Log::error("Error creating Expense Category: " . $e->getMessage());
+            Log::error('Error creating Expense Category: '.$e->getMessage());
             throw $e;
         }
     }
@@ -85,9 +80,6 @@ class ExpenseCategoryService
     /**
      * Update the given expense category using the provided DTO.
      *
-     * @param ExpenseCategory $category
-     * @param ExpenseCategoryDTO $dto
-     * @return ExpenseCategory
      * @throws \Exception
      */
     public function update(ExpenseCategory $category, ExpenseCategoryDTO $dto): ExpenseCategory
@@ -103,18 +95,18 @@ class ExpenseCategoryService
                 subject: $updated,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updated->only(['name']),
+                    'after' => $updated->only(['name']),
                 ]
             );
 
-            Log::info("Expense Category updated successfully", [
+            Log::info('Expense Category updated successfully', [
                 'id' => $updated->id,
                 'name' => $updated->name,
             ]);
 
             return $updated;
         } catch (\Exception $e) {
-            Log::error("Error updating Expense Category ID {$category->id}: " . $e->getMessage());
+            Log::error("Error updating Expense Category ID {$category->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -122,8 +114,6 @@ class ExpenseCategoryService
     /**
      * Delete the given expense category instance.
      *
-     * @param ExpenseCategory $category
-     * @return bool
      * @throws \Exception
      */
     public function delete(ExpenseCategory $category): bool
@@ -140,14 +130,14 @@ class ExpenseCategoryService
                 properties: $data
             );
 
-            Log::info("Expense Category deleted successfully", [
+            Log::info('Expense Category deleted successfully', [
                 'id' => $category->id,
                 'name' => $category->name,
             ]);
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error("Error deleting Expense Category ID {$category->id}: " . $e->getMessage());
+            Log::error("Error deleting Expense Category ID {$category->id}: ".$e->getMessage());
             throw $e;
         }
     }

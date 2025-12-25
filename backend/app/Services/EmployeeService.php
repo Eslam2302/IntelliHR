@@ -6,10 +6,10 @@ use App\DataTransferObjects\EmployeeDTO;
 use App\Models\Employee;
 use App\Models\User;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class EmployeeService
 {
@@ -18,12 +18,12 @@ class EmployeeService
         protected ActivityLoggerService $activityLogger
     ) {}
 
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching employees: ' . $e->getMessage());
+            Log::error('Error fetching employees: '.$e->getMessage());
             throw $e;
         }
     }
@@ -50,12 +50,12 @@ class EmployeeService
                 description: 'employee_created',
                 subject: $employee,
                 properties: [
-                    'name'              => $employee->first_name . $employee->last_name,
-                    'personal_email'    => $employee->personal_email,
-                    'phone'             => $employee->phone,
-                    'department_id'     => $employee->department_id,
-                    'job_id'            => $employee->job_id,
-                    'manager_id'        => $employee->manager_id
+                    'name' => $employee->first_name.$employee->last_name,
+                    'personal_email' => $employee->personal_email,
+                    'phone' => $employee->phone,
+                    'department_id' => $employee->department_id,
+                    'job_id' => $employee->job_id,
+                    'manager_id' => $employee->manager_id,
                 ]
             );
 
@@ -66,7 +66,7 @@ class EmployeeService
             return $employee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating employee: ' . $e->getMessage(), ['data' => $dto->toArray()]);
+            Log::error('Error creating employee: '.$e->getMessage(), ['data' => $dto->toArray()]);
             throw $e;
         }
     }
@@ -83,7 +83,7 @@ class EmployeeService
                 'employee_status',
                 'department_id',
                 'manager_id',
-                'job_id'
+                'job_id',
             ]);
 
             // Update Employee
@@ -104,7 +104,7 @@ class EmployeeService
                 subject: $updatedEmployee,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedEmployee
+                    'after' => $updatedEmployee
                         ->only([
                             'first_name',
                             'last_name',
@@ -112,7 +112,7 @@ class EmployeeService
                             'employee_status',
                             'department_id',
                             'manager_id',
-                            'job_id'
+                            'job_id',
                         ]),
                 ]
             );
@@ -124,7 +124,7 @@ class EmployeeService
             return $updatedEmployee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error updating employee {$employee->id}: " . $e->getMessage(), ['data' => $dto->toArray()]);
+            Log::error("Error updating employee {$employee->id}: ".$e->getMessage(), ['data' => $dto->toArray()]);
             throw $e;
         }
     }
@@ -156,7 +156,7 @@ class EmployeeService
             return $deleted;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error deleting employee {$employee->id}: " . $e->getMessage());
+            Log::error("Error deleting employee {$employee->id}: ".$e->getMessage());
             throw $e;
         }
     }

@@ -9,9 +9,8 @@ interface EmployeeTrainingRepositoryInterface
 {
     /**
      * Get paginated list of employee trainings.
-     * 
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Show single employee training.

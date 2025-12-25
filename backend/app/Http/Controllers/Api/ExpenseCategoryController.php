@@ -32,25 +32,26 @@ class ExpenseCategoryController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of all expense categories.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $categories = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $categories = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => ExpenseCategoryResource::collection($categories),
+            'meta' => [
+                'current_page' => $categories->currentPage(),
+                'per_page' => $categories->perPage(),
+                'total' => $categories->total(),
+                'last_page' => $categories->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Store a newly created expense category in the database.
-     *
-     * @param ExpenseCategoryRequest $request
-     * @return JsonResponse
      */
     public function store(ExpenseCategoryRequest $request): JsonResponse
     {
@@ -66,9 +67,6 @@ class ExpenseCategoryController extends Controller implements HasMiddleware
 
     /**
      * Display the specified expense category.
-     *
-     * @param ExpenseCategory $category
-     * @return JsonResponse
      */
     public function show(ExpenseCategory $category): JsonResponse
     {
@@ -80,10 +78,6 @@ class ExpenseCategoryController extends Controller implements HasMiddleware
 
     /**
      * Update the specified expense category in storage.
-     *
-     * @param ExpenseCategoryRequest $request
-     * @param ExpenseCategory $category
-     * @return JsonResponse
      */
     public function update(ExpenseCategoryRequest $request, ExpenseCategory $category): JsonResponse
     {
@@ -99,9 +93,6 @@ class ExpenseCategoryController extends Controller implements HasMiddleware
 
     /**
      * Remove the specified expense category from storage.
-     *
-     * @param ExpenseCategory $category
-     * @return JsonResponse
      */
     public function destroy(ExpenseCategory $category): JsonResponse
     {

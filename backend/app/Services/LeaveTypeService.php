@@ -5,10 +5,9 @@ namespace App\Services;
 use App\DataTransferObjects\LeaveTypeDTO;
 use App\Models\LeaveType;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class LeaveTypeService
 {
@@ -18,16 +17,16 @@ class LeaveTypeService
     ) {}
 
     /*
-     * Get all paginated leave type 10 per page
+     * Get all leave types with optional filters
     */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching leave types: ' . $e->getMessage());
+            Log::error('Error fetching leave types: '.$e->getMessage());
             throw $e;
-        };
+        }
     }
 
     /**
@@ -50,14 +49,14 @@ class LeaveTypeService
                 ]
             );
 
-            Log::info("Leave type created successfully", [
+            Log::info('Leave type created successfully', [
                 'id' => $leaveType->id,
-                'name' => $leaveType->name
+                'name' => $leaveType->name,
             ]);
 
             return $leaveType;
         } catch (Exception $e) {
-            Log::error('Error creating LeaveType: ' . $e->getMessage(), ['data' => $dto->toArray()]);
+            Log::error('Error creating LeaveType: '.$e->getMessage(), ['data' => $dto->toArray()]);
             throw $e;
         }
     }
@@ -90,7 +89,7 @@ class LeaveTypeService
                 subject: $UpdatedLeaveType,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $UpdatedLeaveType->only([
+                    'after' => $UpdatedLeaveType->only([
                         'name',
                         'code',
                         'annual_entitlement',
@@ -106,15 +105,15 @@ class LeaveTypeService
                 ]
             );
 
-            Log::info("Leave type Updated successfully", [
+            Log::info('Leave type Updated successfully', [
                 'id' => $leaveType->id,
-                'name' => $leaveType->name
+                'name' => $leaveType->name,
             ]);
 
             return $UpdatedLeaveType;
         } catch (Exception $e) {
-            Log::error("Error updating leave type {$leaveType->id}: " . $e->getMessage(), [
-                'data' => $dto->toArray()
+            Log::error("Error updating leave type {$leaveType->id}: ".$e->getMessage(), [
+                'data' => $dto->toArray(),
             ]);
             throw $e;
         }
@@ -146,15 +145,15 @@ class LeaveTypeService
                 properties: $data
             );
 
-            Log::info("Leave type deleted successfully", [
+            Log::info('Leave type deleted successfully', [
                 'id' => $leaveType->id,
-                'name' => $leaveType->name
+                'name' => $leaveType->name,
             ]);
 
             return $deleted;
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error("Error deleting leave type {$leaveType->id}: " . $e->getMessage());
+            Log::error("Error deleting leave type {$leaveType->id}: ".$e->getMessage());
             throw $e;
         }
     }

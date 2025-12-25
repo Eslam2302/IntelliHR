@@ -4,33 +4,38 @@ namespace App\Repositories;
 
 use App\Models\HiringStage;
 use App\Repositories\Contracts\HiringStageRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class HiringStageRepository implements HiringStageRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected HiringStage $model
     ) {}
 
     /**
      * Get paginated list of hiring stages.
-     *
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with('job')
-            ->latest()
-            ->paginate($perPage);
+        $query = $this->model->with('job');
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['stage_name', 'job.title', 'job.status'],
+            ['id', 'stage_name', 'order', 'created_at'],
+            'order',
+            'asc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
      * Get a hiring stage by ID.
-     *
-     * @param int $hiringStageId
-     * @return HiringStage
      */
     public function show(int $hiringStageId): HiringStage
     {
@@ -42,7 +47,6 @@ class HiringStageRepository implements HiringStageRepositoryInterface
     /**
      * Get all hiring stages for a specific job post.
      *
-     * @param int $jobPostId
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getByJobPost(int $jobPostId)
@@ -54,12 +58,8 @@ class HiringStageRepository implements HiringStageRepositoryInterface
             ->get();
     }
 
-
     /**
      * Create a new hiring stage.
-     *
-     * @param array $data
-     * @return HiringStage
      */
     public function create(array $data): HiringStage
     {
@@ -70,22 +70,16 @@ class HiringStageRepository implements HiringStageRepositoryInterface
 
     /**
      * Update an existing hiring stage.
-     *
-     * @param HiringStage $hiringStage
-     * @param array $data
-     * @return HiringStage
      */
     public function update(HiringStage $hiringStage, array $data): HiringStage
     {
         $hiringStage->update($data);
+
         return $hiringStage->fresh()->load('job');
     }
 
     /**
      * Delete a hiring stage.
-     *
-     * @param HiringStage $hiringStage
-     * @return bool
      */
     public function delete(HiringStage $hiringStage): bool
     {

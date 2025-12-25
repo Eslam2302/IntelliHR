@@ -4,15 +4,29 @@ namespace App\Repositories;
 
 use App\Models\Attendance;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class AttendanceRepository implements AttendanceRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(protected Attendance $model) {}
 
-    public function getAllPaginatedForUser($user, int $perPage = 15): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model->visibleToUser($user)->with('employee')->orderBy('check_in', 'desc')->paginate($perPage);
+        $query = $this->model->with('employee');
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_id', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone'],
+            ['id', 'employee_id', 'check_in', 'check_out', 'created_at'],
+            'check_in',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 15));
     }
 
     public function findTodayByEmployee(int $employeeId): ?Attendance
@@ -28,6 +42,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function update(Attendance $attendance, array $data): Attendance
     {
         $attendance->update($data);
+
         return $attendance->fresh();
     }
 

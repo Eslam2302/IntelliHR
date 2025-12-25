@@ -21,25 +21,12 @@ class DepartmentService
     /**
      * Get all departments with pagination
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching departments: ' . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
-     * Get all departments without pagination
-     */
-    public function getAll(): Collection
-    {
-        try {
-            return $this->repository->getAll();
-        } catch (\Exception $e) {
-            Log::error('Error fetching all departments: ' . $e->getMessage());
+            Log::error('Error fetching departments: '.$e->getMessage());
             throw $e;
         }
     }
@@ -52,7 +39,7 @@ class DepartmentService
         try {
             return $this->repository->findById($id);
         } catch (\Exception $e) {
-            Log::error("Error finding department {$id}: " . $e->getMessage());
+            Log::error("Error finding department {$id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -65,7 +52,7 @@ class DepartmentService
         try {
             return $this->repository->findByIdOrFail($id);
         } catch (\Exception $e) {
-            Log::error("Department {$id} not found: " . $e->getMessage());
+            Log::error("Department {$id} not found: ".$e->getMessage());
             throw $e;
         }
     }
@@ -85,20 +72,20 @@ class DepartmentService
                 subject: $department,
                 properties: [
                     'name' => $department->name,
-                    'description'        => $department->description,
+                    'description' => $department->description,
                 ]
             );
 
-            Log::info("Department created successfully", [
+            Log::info('Department created successfully', [
                 'id' => $department->id,
-                'name' => $department->name
+                'name' => $department->name,
             ]);
 
             return $department;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating department: ' . $e->getMessage(), [
-                'data' => $dto->toArray()
+            Log::error('Error creating department: '.$e->getMessage(), [
+                'data' => $dto->toArray(),
             ]);
             throw $e;
         }
@@ -120,20 +107,20 @@ class DepartmentService
                 subject: $updatedDepartment,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedDepartment->only(['name', 'description']),
+                    'after' => $updatedDepartment->only(['name', 'description']),
                 ]
             );
 
-            Log::info("Department updated successfully", [
+            Log::info('Department updated successfully', [
                 'id' => $updatedDepartment->id,
-                'name' => $updatedDepartment->name
+                'name' => $updatedDepartment->name,
             ]);
 
             return $updatedDepartment;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error updating department {$department->id}: " . $e->getMessage(), [
-                'data' => $dto->toArray()
+            Log::error("Error updating department {$department->id}: ".$e->getMessage(), [
+                'data' => $dto->toArray(),
             ]);
             throw $e;
         }
@@ -164,9 +151,9 @@ class DepartmentService
                 properties: $data
             );
 
-            Log::info("Department deleted successfully", [
+            Log::info('Department deleted successfully', [
                 'id' => $department->id,
-                'name' => $department->name
+                'name' => $department->name,
             ]);
 
             return $deleted;
@@ -175,7 +162,7 @@ class DepartmentService
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error deleting department {$department->id}: " . $e->getMessage());
+            Log::error("Error deleting department {$department->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -196,7 +183,7 @@ class DepartmentService
         try {
             return $this->repository->findWithEmployeesCount($id);
         } catch (\Exception $e) {
-            Log::error("Error fetching department {$id} with employees count: " . $e->getMessage());
+            Log::error("Error fetching department {$id} with employees count: ".$e->getMessage());
             throw $e;
         }
     }
@@ -209,7 +196,7 @@ class DepartmentService
         try {
             return $this->repository->searchByName($name);
         } catch (\Exception $e) {
-            Log::error("Error searching departments by name '{$name}': " . $e->getMessage());
+            Log::error("Error searching departments by name '{$name}': ".$e->getMessage());
             throw $e;
         }
     }

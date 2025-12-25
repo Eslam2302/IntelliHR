@@ -8,16 +8,12 @@ use App\Http\Requests\LeaveTypeRequest;
 use App\Http\Resources\LeaveTypeResource;
 use App\Models\LeaveType;
 use App\Services\LeaveTypeService;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Http\JsonResponse;
-
-
 
 class LeaveTypeController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected LeaveTypeService $leaveTypeService
     ) {}
@@ -39,12 +35,18 @@ class LeaveTypeController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $leaveType = $this->leaveTypeService->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $leaveType = $this->leaveTypeService->getAll($filters);
 
         return response()->json([
             'status' => 'success',
-            'data'  => LeaveTypeResource::collection($leaveType),
+            'data' => LeaveTypeResource::collection($leaveType),
+            'meta' => [
+                'current_page' => $leaveType->currentPage(),
+                'per_page' => $leaveType->perPage(),
+                'total' => $leaveType->total(),
+                'last_page' => $leaveType->lastPage(),
+            ],
         ], 200);
     }
 
@@ -98,7 +100,7 @@ class LeaveTypeController extends Controller implements HasMiddleware
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Leave type deleted successfully.'
+            'message' => 'Leave type deleted successfully.',
         ], 200);
     }
 }

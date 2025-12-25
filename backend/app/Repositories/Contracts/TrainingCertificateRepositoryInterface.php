@@ -10,7 +10,7 @@ interface TrainingCertificateRepositoryInterface
     /**
      * Get paginated list of certificates.
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Get certificate by ID.

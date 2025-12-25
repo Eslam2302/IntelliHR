@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\DocumentDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DocumentRequest;
 use App\Http\Resources\DocumentResource;
-use App\DataTransferObjects\DocumentDTO;
 use App\Models\Document;
 use App\Services\DocumentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -33,18 +32,25 @@ class DocumentController extends Controller implements HasMiddleware
 
     public function index(): JsonResponse
     {
-        $perPage = request()->get('per_page', 10);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $documents = $this->service->getAll($filters);
 
-        return response()->json(
-            DocumentResource::collection($this->service->getAllPaginated($perPage))
-        );
+        return response()->json([
+            'status' => 'success',
+            'data' => DocumentResource::collection($documents),
+            'meta' => [
+                'current_page' => $documents->currentPage(),
+                'per_page' => $documents->perPage(),
+                'total' => $documents->total(),
+                'last_page' => $documents->lastPage(),
+            ],
+        ]);
     }
 
     public function show(Document $document): JsonResponse
     {
         return response()->json(new DocumentResource($document));
     }
-
 
     public function getByEmployee(int $employeeId): JsonResponse
     {
@@ -80,7 +86,7 @@ class DocumentController extends Controller implements HasMiddleware
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Document deleted successfully.'
+            'message' => 'Document deleted successfully.',
         ], 200);
     }
 }

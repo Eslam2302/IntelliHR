@@ -11,7 +11,7 @@ interface PayrollRepositoryInterface
     /**
      * Return paginated list of all payrolls
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Create a new payroll record

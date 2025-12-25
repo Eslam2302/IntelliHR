@@ -7,7 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface AttendanceRepositoryInterface
 {
-    public function getAllPaginatedForUser($user, int $perPage = 15): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     public function findTodayByEmployee(int $employeeId): ?Attendance;
 

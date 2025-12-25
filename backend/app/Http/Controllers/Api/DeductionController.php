@@ -8,15 +8,12 @@ use App\Http\Requests\DeductionRequest;
 use App\Http\Resources\DeductionResource;
 use App\Models\Deduction;
 use App\Services\DeductionService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-
 class DeductionController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected DeductionService $service
     ) {}
@@ -25,7 +22,7 @@ class DeductionController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-deductions', only: ['index','EmployeeDeductions','PayrollDeductions']),
+            new Middleware('permission:view-all-deductions', only: ['index', 'EmployeeDeductions', 'PayrollDeductions']),
             new Middleware('permission:view-deduction', only: ['show']),
             new Middleware('permission:create-deduction', only: ['store']),
             new Middleware('permission:edit-deduction', only: ['update']),
@@ -35,30 +32,32 @@ class DeductionController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of all Deductions.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $deductions = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $deductions = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => DeductionResource::collection($deductions),
+            'meta' => [
+                'current_page' => $deductions->currentPage(),
+                'per_page' => $deductions->perPage(),
+                'total' => $deductions->total(),
+                'last_page' => $deductions->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Display a paginated list of Deductions for a specific employee.
-     *
-     * @param int $employeeId
-     * @return JsonResponse
      */
     public function EmployeeDeductions(int $employeeId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $deductions = $this->service->showEmployeeDeductions($employeeId, $perpage);
+
         return response()->json([
             'status' => 'success',
             'data' => DeductionResource::collection($deductions),
@@ -67,14 +66,12 @@ class DeductionController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of Deductions for a specific payroll.
-     *
-     * @param int $payrollId
-     * @return JsonResponse
      */
     public function PayrollDeductions(int $payrollId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $deductions = $this->service->showPayrollDeductions($payrollId, $perpage);
+
         return response()->json([
             'status' => 'success',
             'data' => DeductionResource::collection($deductions),
@@ -83,9 +80,6 @@ class DeductionController extends Controller implements HasMiddleware
 
     /**
      * Store a newly created Deduction in the database.
-     *
-     * @param DeductionRequest $request
-     * @return JsonResponse
      */
     public function store(DeductionRequest $request): JsonResponse
     {
@@ -101,9 +95,6 @@ class DeductionController extends Controller implements HasMiddleware
 
     /**
      * Display the specified Deduction.
-     *
-     * @param Deduction $deduction
-     * @return JsonResponse
      */
     public function show(Deduction $deduction): JsonResponse
     {
@@ -115,10 +106,6 @@ class DeductionController extends Controller implements HasMiddleware
 
     /**
      * Update the specified Deduction in storage.
-     *
-     * @param DeductionRequest $request
-     * @param Deduction $deduction
-     * @return JsonResponse
      */
     public function update(DeductionRequest $request, Deduction $deduction): JsonResponse
     {
@@ -134,9 +121,6 @@ class DeductionController extends Controller implements HasMiddleware
 
     /**
      * Remove the specified Deduction from storage.
-     *
-     * @param Deduction $deduction
-     * @return JsonResponse
      */
     public function destroy(Deduction $deduction): JsonResponse
     {

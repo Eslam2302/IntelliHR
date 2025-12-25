@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\TrainingEvaluationService;
-use App\Http\Requests\TrainingEvaluationRequest;
 use App\DataTransferObjects\TrainingEvaluationDTO;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\TrainingEvaluationRequest;
 use App\Http\Resources\TrainingEvaluationResource;
 use App\Models\TrainingEvaluation;
+use App\Services\TrainingEvaluationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -33,12 +33,18 @@ class TrainingEvaluationController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $evaluations = $this->service->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $evaluations = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => TrainingEvaluationResource::collection($evaluations),
+            'meta' => [
+                'current_page' => $evaluations->currentPage(),
+                'per_page' => $evaluations->perPage(),
+                'total' => $evaluations->total(),
+                'last_page' => $evaluations->lastPage(),
+            ],
         ], 200);
     }
 

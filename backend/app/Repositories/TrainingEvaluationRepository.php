@@ -4,18 +4,29 @@ namespace App\Repositories;
 
 use App\Models\TrainingEvaluation;
 use App\Repositories\Contracts\TrainingEvaluationRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class TrainingEvaluationRepository implements TrainingEvaluationRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(protected TrainingEvaluation $model) {}
 
-    /**
-     * Get paginated list of training evaluations
-     */
-    public function getAllPaginated(int $perPage = 10)
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model->with(['employee', 'training'])->latest()->paginate($perPage);
+        $query = $this->model->with(['employee', 'training']);
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_id', 'training_id', 'rating', 'feedback', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'training.title'],
+            ['id', 'rating', 'feedback', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
@@ -40,6 +51,7 @@ class TrainingEvaluationRepository implements TrainingEvaluationRepositoryInterf
     public function update(TrainingEvaluation $evaluation, array $data): TrainingEvaluation
     {
         $evaluation->update($data);
+
         return $evaluation->fresh();
     }
 

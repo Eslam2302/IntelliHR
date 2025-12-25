@@ -5,9 +5,8 @@ namespace App\Services;
 use App\DataTransferObjects\TrainingCertificateDTO;
 use App\Models\TrainingCertificate;
 use App\Repositories\Contracts\TrainingCertificateRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class TrainingCertificateService
 {
@@ -20,14 +19,14 @@ class TrainingCertificateService
     ) {}
 
     /**
-     * Get paginated list of certificates.
+     * Get all certificates with optional filters.
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching training certificates: ' . $e->getMessage());
+            Log::error('Error fetching training certificates: '.$e->getMessage());
             throw $e;
         }
     }
@@ -40,7 +39,7 @@ class TrainingCertificateService
         try {
             return $this->repository->show($id);
         } catch (Exception $e) {
-            Log::error("Error fetching certificate ID {$id}: " . $e->getMessage());
+            Log::error("Error fetching certificate ID {$id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -64,14 +63,14 @@ class TrainingCertificateService
                 ]
             );
 
-            Log::info("Training Certificate created successfully", [
+            Log::info('Training Certificate created successfully', [
                 'id' => $certificate->id,
                 'employee_training_id' => $certificate->employee_training_id,
             ]);
 
             return $certificate;
         } catch (Exception $e) {
-            Log::error('Error creating training certificate: ' . $e->getMessage());
+            Log::error('Error creating training certificate: '.$e->getMessage());
             throw $e;
         }
     }
@@ -96,7 +95,7 @@ class TrainingCertificateService
                 subject: $updatedCertificate,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedCertificate->only([
+                    'after' => $updatedCertificate->only([
                         'employee_training_id',
                         'issued_at',
                         'certificate_path',
@@ -104,14 +103,14 @@ class TrainingCertificateService
                 ]
             );
 
-            Log::info("Training Certificate updated successfully", [
+            Log::info('Training Certificate updated successfully', [
                 'id' => $updatedCertificate->id,
                 'employee_training_id' => $updatedCertificate->employee_training_id,
             ]);
 
             return $updatedCertificate;
         } catch (Exception $e) {
-            Log::error("Error updating certificate ID {$certificate->id}: " . $e->getMessage());
+            Log::error("Error updating certificate ID {$certificate->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -137,14 +136,14 @@ class TrainingCertificateService
                 properties: $data
             );
 
-            Log::info("Training Certificate deleted successfully", [
+            Log::info('Training Certificate deleted successfully', [
                 'id' => $certificate->id,
                 'employee_training_id' => $certificate->employee_training_id,
             ]);
 
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting certificate ID {$certificate->id}: " . $e->getMessage());
+            Log::error("Error deleting certificate ID {$certificate->id}: ".$e->getMessage());
             throw $e;
         }
     }

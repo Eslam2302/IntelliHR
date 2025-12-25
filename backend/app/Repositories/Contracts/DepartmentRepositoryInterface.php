@@ -3,20 +3,15 @@
 namespace App\Repositories\Contracts;
 
 use App\Models\Department;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface DepartmentRepositoryInterface
 {
     /**
      * Get all departments with pagination
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator;
-
-    /**
-     * Get all departments without pagination
-     */
-    public function getAll(): Collection;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Find department by ID

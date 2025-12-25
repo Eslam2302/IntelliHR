@@ -5,9 +5,8 @@ namespace App\Services;
 use App\DataTransferObjects\TrainingEvaluationDTO;
 use App\Models\TrainingEvaluation;
 use App\Repositories\Contracts\TrainingEvaluationRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class TrainingEvaluationService
 {
@@ -17,14 +16,14 @@ class TrainingEvaluationService
     ) {}
 
     /**
-     * Get paginated list of training evaluations
+     * Get all training evaluations with optional filters
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Training Evaluations: ' . $e->getMessage());
+            Log::error('Error fetching Training Evaluations: '.$e->getMessage());
             throw $e;
         }
     }
@@ -37,7 +36,7 @@ class TrainingEvaluationService
         try {
             return $this->repository->show($evaluationId);
         } catch (Exception $e) {
-            Log::error("Error fetching Training Evaluation ID {$evaluationId}: " . $e->getMessage());
+            Log::error("Error fetching Training Evaluation ID {$evaluationId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -62,7 +61,7 @@ class TrainingEvaluationService
                 ]
             );
 
-            Log::info("Training Evaluation created successfully", [
+            Log::info('Training Evaluation created successfully', [
                 'id' => $evaluation->id,
                 'employee_id' => $evaluation->employee_id,
                 'training_id' => $evaluation->training_id,
@@ -70,7 +69,7 @@ class TrainingEvaluationService
 
             return $evaluation;
         } catch (Exception $e) {
-            Log::error('Error creating Training Evaluation: ' . $e->getMessage());
+            Log::error('Error creating Training Evaluation: '.$e->getMessage());
             throw $e;
         }
     }
@@ -96,7 +95,7 @@ class TrainingEvaluationService
                 subject: $updatedEvaluation,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedEvaluation->only([
+                    'after' => $updatedEvaluation->only([
                         'employee_id',
                         'training_id',
                         'rating',
@@ -105,14 +104,14 @@ class TrainingEvaluationService
                 ]
             );
 
-            Log::info("Training Evaluation updated successfully", [
+            Log::info('Training Evaluation updated successfully', [
                 'id' => $updatedEvaluation->id,
                 'employee_id' => $updatedEvaluation->employee_id,
             ]);
 
             return $updatedEvaluation;
         } catch (Exception $e) {
-            Log::error("Error updating Training Evaluation ID {$evaluation->id}: " . $e->getMessage());
+            Log::error("Error updating Training Evaluation ID {$evaluation->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -139,14 +138,14 @@ class TrainingEvaluationService
                 properties: $data
             );
 
-            Log::info("Training Evaluation deleted successfully", [
+            Log::info('Training Evaluation deleted successfully', [
                 'id' => $evaluation->id,
                 'employee_id' => $evaluation->employee_id,
             ]);
 
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting Training Evaluation ID {$evaluation->id}: " . $e->getMessage());
+            Log::error("Error deleting Training Evaluation ID {$evaluation->id}: ".$e->getMessage());
             throw $e;
         }
     }

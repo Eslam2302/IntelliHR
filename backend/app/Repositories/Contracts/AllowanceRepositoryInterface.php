@@ -7,7 +7,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 interface AllowanceRepositoryInterface
 {
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     public function showEmployeeAllowances(int $employeeId, int $perpage = 10): LengthAwarePaginator;
 

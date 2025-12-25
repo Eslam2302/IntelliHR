@@ -4,33 +4,35 @@ namespace App\Repositories;
 
 use App\Models\JobPost;
 use App\Repositories\Contracts\JobPostRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class JobPostRepository implements JobPostRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected JobPost $model
     ) {}
 
-    /**
-     * Get paginated list of job posts.
-     *
-     * @param int $perPage
-     * @return LengthAwarePaginator
-     */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with('department')
-            ->latest()
-            ->paginate($perPage);
+        $query = $this->model->with('department');
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['title', 'description', 'status', 'department.name'],
+            ['id', 'title', 'description', 'status', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
      * Get a job post by ID.
-     *
-     * @param int $jobPostId
-     * @return JobPost
      */
     public function show(int $jobPostId): JobPost
     {
@@ -41,9 +43,6 @@ class JobPostRepository implements JobPostRepositoryInterface
 
     /**
      * Create a new job post.
-     *
-     * @param array $data
-     * @return JobPost
      */
     public function create(array $data): JobPost
     {
@@ -54,22 +53,16 @@ class JobPostRepository implements JobPostRepositoryInterface
 
     /**
      * Update existing job post.
-     *
-     * @param JobPost $jobPost
-     * @param array $data
-     * @return JobPost
      */
     public function update(JobPost $jobPost, array $data): JobPost
     {
         $jobPost->update($data);
+
         return $jobPost->fresh()->load('department');
     }
 
     /**
      * Delete a job post.
-     *
-     * @param JobPost $jobPost
-     * @return bool
      */
     public function delete(JobPost $jobPost): bool
     {

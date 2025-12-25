@@ -8,14 +8,12 @@ use App\Http\Requests\JobPositionRequest;
 use App\Http\Resources\JobPositionResource;
 use App\Models\JobPosition;
 use App\Services\JobPositionService;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class JobPositionController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected JobPositionService $jobPositionService
     ) {}
@@ -37,12 +35,18 @@ class JobPositionController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $jobPoistion = $this->jobPositionService->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $jobPoistion = $this->jobPositionService->getAll($filters);
 
         return response()->json([
             'status' => 'success',
-            'data'  => JobPositionResource::collection($jobPoistion),
+            'data' => JobPositionResource::collection($jobPoistion),
+            'meta' => [
+                'current_page' => $jobPoistion->currentPage(),
+                'per_page' => $jobPoistion->perPage(),
+                'total' => $jobPoistion->total(),
+                'last_page' => $jobPoistion->lastPage(),
+            ],
         ], 200);
     }
 
@@ -93,9 +97,10 @@ class JobPositionController extends Controller implements HasMiddleware
     public function destroy(JobPosition $jobPosition): JsonResponse
     {
         $this->jobPositionService->delete($jobPosition);
+
         return response()->json([
             'status' => 'success',
-            'message' => 'Job position deleted successfully.'
+            'message' => 'Job position deleted successfully.',
         ], 200);
     }
 }

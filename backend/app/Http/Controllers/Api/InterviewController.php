@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\InterviewService;
-use App\Http\Requests\InterviewRequest;
 use App\DataTransferObjects\InterviewDTO;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\InterviewRequest;
 use App\Http\Resources\InterviewResource;
 use App\Models\Interview;
+use App\Services\InterviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -30,25 +30,26 @@ class InterviewController extends Controller implements HasMiddleware
 
     /**
      * Get paginated list of interviews.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $interviews = $this->service->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $interviews = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => InterviewResource::collection($interviews),
+            'meta' => [
+                'current_page' => $interviews->currentPage(),
+                'per_page' => $interviews->perPage(),
+                'total' => $interviews->total(),
+                'last_page' => $interviews->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new interview.
-     *
-     * @param InterviewRequest $request
-     * @return JsonResponse
      */
     public function store(InterviewRequest $request): JsonResponse
     {
@@ -65,8 +66,7 @@ class InterviewController extends Controller implements HasMiddleware
     /**
      * Show a specific interview.
      *
-     * @param Interview $interview
-     * @return JsonResponse
+     * @param  Interview  $interview
      */
     public function show(int $interviewId): JsonResponse
     {
@@ -80,10 +80,6 @@ class InterviewController extends Controller implements HasMiddleware
 
     /**
      * Update a specific interview.
-     *
-     * @param InterviewRequest $request
-     * @param Interview $interview
-     * @return JsonResponse
      */
     public function update(InterviewRequest $request, Interview $interview): JsonResponse
     {
@@ -99,9 +95,6 @@ class InterviewController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific interview.
-     *
-     * @param Interview $interview
-     * @return JsonResponse
      */
     public function destroy(Interview $interview): JsonResponse
     {

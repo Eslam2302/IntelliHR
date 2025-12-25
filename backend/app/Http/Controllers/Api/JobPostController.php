@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\JobPostService;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\DataTransferObjects\JobPostDto;
-use App\Http\Resources\JobPostResource;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\JobPostRequest;
+use App\Http\Resources\JobPostResource;
 use App\Models\JobPost;
+use App\Services\JobPostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -17,8 +16,6 @@ class JobPostController extends Controller implements HasMiddleware
 {
     /**
      * JobPostController constructor.
-     *
-     * @param JobPostService $service
      */
     public function __construct(
         protected JobPostService $service
@@ -38,25 +35,26 @@ class JobPostController extends Controller implements HasMiddleware
 
     /**
      * Get paginated list of job posts.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $jobPosts = $this->service->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $jobPosts = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => JobPostResource::collection($jobPosts),
+            'meta' => [
+                'current_page' => $jobPosts->currentPage(),
+                'per_page' => $jobPosts->perPage(),
+                'total' => $jobPosts->total(),
+                'last_page' => $jobPosts->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new job post.
-     *
-     * @param jobPostRequest $request
-     * @return JsonResponse
      */
     public function store(jobPostRequest $request): JsonResponse
     {
@@ -72,9 +70,6 @@ class JobPostController extends Controller implements HasMiddleware
 
     /**
      * Display a specific job post.
-     *
-     * @param JobPost $jobPost
-     * @return JsonResponse
      */
     public function show(JobPost $jobPost): JsonResponse
     {
@@ -86,10 +81,6 @@ class JobPostController extends Controller implements HasMiddleware
 
     /**
      * Update a specific job post.
-     *
-     * @param JobPostRequest $request
-     * @param JobPost $jobPost
-     * @return JsonResponse
      */
     public function update(JobPostRequest $request, JobPost $jobPost): JsonResponse
     {
@@ -105,9 +96,6 @@ class JobPostController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific job post.
-     *
-     * @param JobPost $jobPost
-     * @return JsonResponse
      */
     public function destroy(JobPost $jobPost): JsonResponse
     {

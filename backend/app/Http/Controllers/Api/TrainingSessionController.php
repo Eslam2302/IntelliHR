@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\DataTransferObjects\TrainingSessionDTO;
 use App\Http\Controllers\Controller;
-use App\Services\TrainingSessionService;
 use App\Http\Requests\TrainingSessionRequest;
 use App\Http\Resources\TrainingSessionResource;
-use App\DataTransferObjects\TrainingSessionDTO;
 use App\Models\TrainingSession;
+use App\Services\TrainingSessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -32,26 +32,27 @@ class TrainingSessionController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of training sessions.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
 
-        $sessions = $this->service->getAllPaginated($perPage);
+        $sessions = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => TrainingSessionResource::collection($sessions),
+            'meta' => [
+                'current_page' => $sessions->currentPage(),
+                'per_page' => $sessions->perPage(),
+                'total' => $sessions->total(),
+                'last_page' => $sessions->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Store a newly created training session.
-     *
-     * @param TrainingSessionRequest $request
-     * @return JsonResponse
      */
     public function store(TrainingSessionRequest $request): JsonResponse
     {
@@ -68,9 +69,6 @@ class TrainingSessionController extends Controller implements HasMiddleware
 
     /**
      * Display the specified training session.
-     *
-     * @param TrainingSession $trainingSession
-     * @return JsonResponse
      */
     public function show(TrainingSession $trainingSession): JsonResponse
     {
@@ -84,10 +82,6 @@ class TrainingSessionController extends Controller implements HasMiddleware
 
     /**
      * Update the specified training session.
-     *
-     * @param TrainingSessionRequest $request
-     * @param TrainingSession $trainingSession
-     * @return JsonResponse
      */
     public function update(TrainingSessionRequest $request, TrainingSession $trainingSession): JsonResponse
     {
@@ -104,9 +98,6 @@ class TrainingSessionController extends Controller implements HasMiddleware
 
     /**
      * Remove the specified training session.
-     *
-     * @param TrainingSession $trainingSession
-     * @return JsonResponse
      */
     public function destroy(TrainingSession $trainingSession): JsonResponse
     {

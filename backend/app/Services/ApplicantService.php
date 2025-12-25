@@ -5,10 +5,9 @@ namespace App\Services;
 use App\DataTransferObjects\ApplicantDTO;
 use App\Models\Applicant;
 use App\Repositories\Contracts\ApplicantRepositoryInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Collection;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class ApplicantService
 {
@@ -17,12 +16,12 @@ class ApplicantService
         protected ActivityLoggerService $activityLogger
     ) {}
 
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perPage);
+            return $this->repository->getAll($filters);
         } catch (Exception $e) {
-            Log::error('Error fetching Applicants: ' . $e->getMessage());
+            Log::error('Error fetching Applicants: '.$e->getMessage());
             throw $e;
         }
     }
@@ -32,7 +31,7 @@ class ApplicantService
         try {
             return $this->repository->show($applicantId);
         } catch (Exception $e) {
-            Log::error("Error fetching Applicant ID {$applicantId}: " . $e->getMessage());
+            Log::error("Error fetching Applicant ID {$applicantId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -71,16 +70,16 @@ class ApplicantService
                 ]
             );
 
-            Log::info("Applicant created successfully", [
+            Log::info('Applicant created successfully', [
                 'id' => $applicant->id,
-                'name' => $applicant->first_name . ' ' . $applicant->last_name,
+                'name' => $applicant->first_name.' '.$applicant->last_name,
                 'job_id' => $applicant->job_id,
                 'current_stage_id' => $applicant->current_stage_id,
             ]);
 
             return $applicant;
         } catch (Exception $e) {
-            Log::error("Error creating Applicant: " . $e->getMessage());
+            Log::error('Error creating Applicant: '.$e->getMessage());
             throw $e;
         }
     }
@@ -109,7 +108,7 @@ class ApplicantService
                 subject: $updated,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updated->only([
+                    'after' => $updated->only([
                         'first_name',
                         'last_name',
                         'email',
@@ -124,10 +123,11 @@ class ApplicantService
                 ]
             );
 
-            Log::info("Applicant updated successfully", ['id' => $updated->id]);
+            Log::info('Applicant updated successfully', ['id' => $updated->id]);
+
             return $updated;
         } catch (Exception $e) {
-            Log::error("Error updating Applicant ID {$applicant->id}: " . $e->getMessage());
+            Log::error("Error updating Applicant ID {$applicant->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -157,10 +157,11 @@ class ApplicantService
                 properties: $data
             );
 
-            Log::info("Applicant deleted successfully", ['id' => $applicant->id]);
+            Log::info('Applicant deleted successfully', ['id' => $applicant->id]);
+
             return $deleted;
         } catch (Exception $e) {
-            Log::error("Error deleting Applicant ID {$applicant->id}: " . $e->getMessage());
+            Log::error("Error deleting Applicant ID {$applicant->id}: ".$e->getMessage());
             throw $e;
         }
     }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\DataTransferObjects\EmployeeDTO;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
@@ -31,13 +31,19 @@ class EmployeeController extends Controller implements HasMiddleware
 
     public function index(): JsonResponse
     {
-        $perPage = request('per_page', 10);
-        $employees = $this->employeeService->getAllPaginated($perPage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $employees = $this->employeeService->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => EmployeeResource::collection($employees),
-        ], 200);
+            'meta' => [
+                'current_page' => $employees->currentPage(),
+                'per_page' => $employees->perPage(),
+                'total' => $employees->total(),
+                'last_page' => $employees->lastPage(),
+            ],
+        ]);
     }
 
     public function store(StoreEmployeeRequest $request): JsonResponse
@@ -78,7 +84,7 @@ class EmployeeController extends Controller implements HasMiddleware
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Employee deleted successfully.'
+            'message' => 'Employee deleted successfully.',
         ], 200);
     }
 }

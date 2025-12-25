@@ -17,18 +17,18 @@ class ExpenseService
     ) {}
 
     /**
-     * Retrieve paginated list of expenses.
+     * Retrieve all expenses with optional filters.
      *
-     * @param int $perpage
-     * @return LengthAwarePaginator
+     * @return mixed
+     *
      * @throws \Exception
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error("Error fetching Expenses: " . $e->getMessage());
+            Log::error('Error fetching Expenses: '.$e->getMessage());
             throw $e;
         }
     }
@@ -36,8 +36,6 @@ class ExpenseService
     /**
      * Retrieve an expense by ID.
      *
-     * @param int $id
-     * @return Expense
      * @throws \Exception
      */
     public function show(int $id): Expense
@@ -45,7 +43,7 @@ class ExpenseService
         try {
             return $this->repository->show($id);
         } catch (\Exception $e) {
-            Log::error("Error fetching Expense ID {$id}: " . $e->getMessage());
+            Log::error("Error fetching Expense ID {$id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -53,8 +51,6 @@ class ExpenseService
     /**
      * Create a new expense using the provided DTO.
      *
-     * @param ExpenseDTO $dto
-     * @return Expense
      * @throws \Exception
      */
     public function create(ExpenseDTO $dto): Expense
@@ -62,7 +58,7 @@ class ExpenseService
         try {
             $data = $dto->toArray();
 
-            if (!isset($data['status'])) {
+            if (! isset($data['status'])) {
                 $data['status'] = 'pending';
             }
 
@@ -86,7 +82,7 @@ class ExpenseService
                 ]
             );
 
-            Log::info("Expense created successfully", [
+            Log::info('Expense created successfully', [
                 'id' => $expense->id,
                 'amount' => $expense->amount,
                 'employee_id' => $expense->employee_id,
@@ -94,7 +90,7 @@ class ExpenseService
 
             return $expense;
         } catch (\Exception $e) {
-            Log::error("Error creating Expense: " . $e->getMessage());
+            Log::error('Error creating Expense: '.$e->getMessage());
             throw $e;
         }
     }
@@ -102,9 +98,6 @@ class ExpenseService
     /**
      * Update the given expense using the provided DTO.
      *
-     * @param Expense $expense
-     * @param ExpenseDTO $dto
-     * @return Expense
      * @throws \Exception
      */
     public function update(Expense $expense, ExpenseDTO $dto): Expense
@@ -115,7 +108,7 @@ class ExpenseService
                 'expense_date',
                 'category_id',
                 'status',
-                'notes'
+                'notes',
             ]);
 
             $data = $dto->toArray();
@@ -137,17 +130,17 @@ class ExpenseService
                 subject: $updated,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updated->only([
+                    'after' => $updated->only([
                         'amount',
                         'expense_date',
                         'category_id',
                         'status',
-                        'notes'
+                        'notes',
                     ]),
                 ]
             );
 
-            Log::info("Expense updated successfully", [
+            Log::info('Expense updated successfully', [
                 'id' => $updated->id,
                 'amount' => $updated->amount,
                 'employee_id' => $updated->employee_id,
@@ -155,7 +148,7 @@ class ExpenseService
 
             return $updated;
         } catch (\Exception $e) {
-            Log::error("Error updating Expense ID {$expense->id}: " . $e->getMessage());
+            Log::error("Error updating Expense ID {$expense->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -163,8 +156,6 @@ class ExpenseService
     /**
      * Delete the given expense instance.
      *
-     * @param Expense $expense
-     * @return bool
      * @throws \Exception
      */
     public function delete(Expense $expense): bool
@@ -176,7 +167,7 @@ class ExpenseService
                 'expense_date',
                 'category_id',
                 'status',
-                'notes'
+                'notes',
             ]);
 
             // Delete receipt file if exists
@@ -193,31 +184,27 @@ class ExpenseService
                 properties: $data
             );
 
-            Log::info("Expense deleted successfully", [
+            Log::info('Expense deleted successfully', [
                 'id' => $expense->id,
                 'amount' => $expense->amount,
             ]);
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error("Error deleting Expense ID {$expense->id}: " . $e->getMessage());
+            Log::error("Error deleting Expense ID {$expense->id}: ".$e->getMessage());
             throw $e;
         }
     }
 
     /**
      * Get paginated expenses for a specific employee.
-     *
-     * @param int $employeeId
-     * @param int $perPage
-     * @return LengthAwarePaginator
      */
     public function getEmployeeExpenses(int $employeeId, int $perPage = 10): LengthAwarePaginator
     {
         try {
             return $this->repository->getByEmployee($employeeId, $perPage);
         } catch (\Exception $e) {
-            Log::error("Error fetching expenses for Employee ID {$employeeId}: " . $e->getMessage());
+            Log::error("Error fetching expenses for Employee ID {$employeeId}: ".$e->getMessage());
             throw $e;
         }
     }

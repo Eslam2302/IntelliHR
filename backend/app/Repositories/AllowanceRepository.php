@@ -4,20 +4,31 @@ namespace App\Repositories;
 
 use App\Models\Allowance;
 use App\Repositories\Contracts\AllowanceRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class AllowanceRepository implements AllowanceRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected Allowance $model
     ) {}
 
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with(['employee', 'payroll'])
-            ->latest()
-            ->paginate($perpage);
+        $query = $this->model->with(['employee', 'payroll']);
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_id', 'type', 'amount', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'payroll.year', 'payroll.month', 'payroll.payment_status'],
+            ['id', 'type', 'amount', 'created_at', 'updated_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     public function showEmployeeAllowances(int $employeeId, int $perpage = 10): LengthAwarePaginator
@@ -46,6 +57,7 @@ class AllowanceRepository implements AllowanceRepositoryInterface
     public function update(Allowance $allowance, array $data): Allowance
     {
         $allowance->update($data);
+
         return $allowance->fresh();
     }
 
@@ -55,9 +67,7 @@ class AllowanceRepository implements AllowanceRepositoryInterface
     }
 
     /**
-     *
      * Get allowances where payroll_id IS NULL (pending)
-     *
      */
     public function getPendingForEmployeeMonth(int $employeeId)
     {
@@ -68,9 +78,7 @@ class AllowanceRepository implements AllowanceRepositoryInterface
     }
 
     /**
-     *
      * Mark allowances as processed by adding payroll_id
-     *
      */
     public function markAsProcessed(array $allowanceIds, int $payrollId)
     {

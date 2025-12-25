@@ -16,12 +16,12 @@ class BenefitService
 
     ) {}
 
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->getAllPaginated($perpage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching Benefits: ' . $e->getMessage());
+            Log::error('Error fetching Benefits: '.$e->getMessage());
             throw $e;
         }
     }
@@ -31,7 +31,7 @@ class BenefitService
         try {
             return $this->repository->showEmployeeBenefits($employeeId, $perpage);
         } catch (\Exception $e) {
-            Log::error('Error fetching Employee Benefits: ' . $e->getMessage());
+            Log::error('Error fetching Employee Benefits: '.$e->getMessage());
             throw $e;
         }
     }
@@ -47,20 +47,21 @@ class BenefitService
                 subject: $benefit,
                 properties: [
                     'employee_id' => $benefit->employee_id,
-                    'type'        => $benefit->benefit_type,
-                    'amount'      => $benefit->amount,
-                    'is_deduction'=> $benefit->is_deduction,
+                    'type' => $benefit->benefit_type,
+                    'amount' => $benefit->amount,
+                    'is_deduction' => $benefit->is_deduction,
                 ]
             );
 
-            Log::info("Benefit created successfully", [
+            Log::info('Benefit created successfully', [
                 'id' => $benefit->id,
                 'employee_id' => $benefit->employee_id,
                 'type' => $benefit->type,
             ]);
+
             return $benefit;
         } catch (\Exception $e) {
-            Log::error('Error creating Benefit: ' . $e->getMessage());
+            Log::error('Error creating Benefit: '.$e->getMessage());
             throw $e;
         }
     }
@@ -78,18 +79,19 @@ class BenefitService
                 subject: $updatedBenefit,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updatedBenefit->only(['benefit_type', 'amount', 'is_deduction']),
+                    'after' => $updatedBenefit->only(['benefit_type', 'amount', 'is_deduction']),
                 ]
             );
 
-            Log::info("Benefit updated successfully", [
+            Log::info('Benefit updated successfully', [
                 'id' => $updatedBenefit->id,
                 'employee_id' => $updatedBenefit->employee_id,
                 'type' => $updatedBenefit->type,
             ]);
+
             return $updatedBenefit;
         } catch (\Exception $e) {
-            Log::error('Error updating Benefit: ' . $e->getMessage());
+            Log::error('Error updating Benefit: '.$e->getMessage());
             throw $e;
         }
     }
@@ -108,14 +110,15 @@ class BenefitService
                 properties: $data
             );
 
-            Log::info("Benefit deleted successfully", [
+            Log::info('Benefit deleted successfully', [
                 'id' => $benefit->id,
                 'employee_id' => $benefit->employee_id,
                 'type' => $benefit->type,
             ]);
+
             return $deleted;
         } catch (\Exception $e) {
-            Log::error('Error deleting Benefit: ' . $e->getMessage());
+            Log::error('Error deleting Benefit: '.$e->getMessage());
             throw $e;
         }
     }

@@ -4,11 +4,14 @@ namespace App\Repositories;
 
 use App\Models\Department;
 use App\Repositories\Contracts\DepartmentRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DepartmentRepository implements DepartmentRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected Department $model
     ) {}
@@ -16,21 +19,24 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     /**
      * Get all departments with pagination
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->latest()
-            ->paginate($perPage);
-    }
+        $query = $this->model->query();
 
-    /**
-     * Get all departments without pagination
-     */
-    public function getAll(): Collection
-    {
-        return $this->model
-            ->latest()
-            ->get();
+        // Search
+        if (! empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        // Sorting
+        $sort = $filters['sort'] ?? 'name';
+        $direction = $filters['direction'] ?? 'asc';
+        $query->orderBy($sort, $direction);
+
+        $perPage = $filters['per_page'] ?? 10;
+
+        return $query->paginate($perPage);
     }
 
     /**
@@ -63,6 +69,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     public function update(Department $department, array $data): Department
     {
         $department->update($data);
+
         return $department->fresh();
     }
 

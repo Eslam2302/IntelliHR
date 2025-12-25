@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 interface BenefitRepositoryInterface
 {
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     public function showEmployeeBenefits(int $employeeId, int $perpage = 10): LengthAwarePaginator;
 

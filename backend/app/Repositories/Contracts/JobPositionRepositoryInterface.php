@@ -10,7 +10,7 @@ interface JobPositionRepositoryInterface
     /**
      * Get all jobs with pagination
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Create new Job position
@@ -20,7 +20,7 @@ interface JobPositionRepositoryInterface
     /**
      * Update the existing position
      */
-    public function update(JobPosition $jobPosition,array $data): JobPosition;
+    public function update(JobPosition $jobPosition, array $data): JobPosition;
 
     /**
      * delete job position

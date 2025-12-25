@@ -5,17 +5,23 @@ namespace App\Services;
 use App\DataTransferObjects\AttendanceDTO;
 use App\Models\Attendance;
 use App\Repositories\Contracts\AttendanceRepositoryInterface;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class AttendanceService
 {
     public function __construct(protected AttendanceRepositoryInterface $repository) {}
 
-    public function getAllPaginatedForUser($user, int $perPage = 15)
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->repository->getAllPaginatedForUser($user, $perPage);
+        try {
+            return $this->repository->getAll($filters);
+        } catch (\Exception $e) {
+            Log::error('Error fetching attendances: '.$e->getMessage());
+            throw $e;
+        }
     }
 
     public function checkIn(AttendanceDTO $dto): Attendance
@@ -32,16 +38,16 @@ class AttendanceService
             $attendance = $this->repository->create([
                 'employee_id' => $dto->employee_id,
                 'check_in' => now(),
-                'is_late' => $isLate
+                'is_late' => $isLate,
             ]);
 
             DB::commit();
-            Log::info("Employee checked in", ['employee_id' => $dto->employee_id]);
+            Log::info('Employee checked in', ['employee_id' => $dto->employee_id]);
 
             return $attendance->load('employee');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Check-in error: " . $e->getMessage(), ['employee_id' => $dto->employee_id]);
+            Log::error('Check-in error: '.$e->getMessage(), ['employee_id' => $dto->employee_id]);
             throw $e;
         }
     }
@@ -51,7 +57,7 @@ class AttendanceService
         DB::beginTransaction();
         try {
             $attendance = $this->repository->findTodayByEmployee($dto->employee_id);
-            if (!$attendance) {
+            if (! $attendance) {
                 throw new \Exception('You must check in first.');
             }
 
@@ -64,16 +70,16 @@ class AttendanceService
 
             $attendance = $this->repository->update($attendance, [
                 'check_out' => $dto->check_out,
-                'calculated_hours' => $calculatedHours
+                'calculated_hours' => $calculatedHours,
             ]);
 
             DB::commit();
-            Log::info("Employee checked out", ['employee_id' => $dto->employee_id]);
+            Log::info('Employee checked out', ['employee_id' => $dto->employee_id]);
 
             return $attendance->load('employee');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Check-out error: " . $e->getMessage(), ['employee_id' => $dto->employee_id]);
+            Log::error('Check-out error: '.$e->getMessage(), ['employee_id' => $dto->employee_id]);
             throw $e;
         }
     }

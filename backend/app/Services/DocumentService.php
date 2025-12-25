@@ -5,24 +5,22 @@ namespace App\Services;
 use App\DataTransferObjects\DocumentDTO;
 use App\Models\Document;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class DocumentService
-
 {
     public function __construct(
         protected DocumentRepositoryInterface $repository,
         protected ActivityLoggerService $activityLogger
     ) {}
 
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = [])
     {
         try {
-            return $this->repository->all($perPage);
+            return $this->repository->getAll($filters);
         } catch (\Exception $e) {
-            Log::error('Error fetching documents: ' . $e->getMessage());
+            Log::error('Error fetching documents: '.$e->getMessage());
             throw $e;
         }
     }
@@ -32,7 +30,7 @@ class DocumentService
         try {
             return $this->repository->getByEmployee($employeeId, $perPage);
         } catch (\Exception $e) {
-            Log::error("Error fetching documents for employee {$employeeId}: " . $e->getMessage());
+            Log::error("Error fetching documents for employee {$employeeId}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -42,7 +40,7 @@ class DocumentService
         try {
             return $this->repository->find($id);
         } catch (\Exception $e) {
-            Log::error("Error finding document {$id}: " . $e->getMessage());
+            Log::error("Error finding document {$id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -58,8 +56,8 @@ class DocumentService
 
             $data = [
                 'employee_id' => $dto->employee_id,
-                'doc_type'    => $dto->doc_type,
-                'file_path'   => $filePath,
+                'doc_type' => $dto->doc_type,
+                'file_path' => $filePath,
                 'uploaded_at' => now(),
             ];
 
@@ -71,14 +69,14 @@ class DocumentService
                 subject: $document,
                 properties: [
                     'employee_id' => $document->employee_id,
-                    'doc_type'        => $document->doc_type,
-                    'file_path'      => $document->file_path,
+                    'doc_type' => $document->doc_type,
+                    'file_path' => $document->file_path,
                 ]
             );
 
             return $document;
         } catch (\Exception $e) {
-            Log::error('Error creating document: ' . $e->getMessage());
+            Log::error('Error creating document: '.$e->getMessage());
             throw $e;
         }
     }
@@ -97,12 +95,11 @@ class DocumentService
                 $filePath = $document->file_path;
             }
 
-
             // 2. Create the update data
             $data = [
                 'employee_id' => $dto->employee_id ?? $document->employee_id,
-                'doc_type'    => $dto->doc_type    ?? $document->doc_type,
-                'file_path'   => $filePath,
+                'doc_type' => $dto->doc_type ?? $document->doc_type,
+                'file_path' => $filePath,
                 'uploaded_at' => $dto->attachment ? now() : $document->uploaded_at,
             ];
 
@@ -115,11 +112,11 @@ class DocumentService
                 subject: $updated,
                 properties: [
                     'before' => $oldData,
-                    'after'  => $updated->only(['doc_type', 'file_path']),
+                    'after' => $updated->only(['doc_type', 'file_path']),
                 ]
             );
 
-            Log::info("Document updated successfully", [
+            Log::info('Document updated successfully', [
                 'id' => $updated->id,
                 'employee_id' => $updated->employee_id,
                 'doc_type' => $updated->doc_type,
@@ -128,7 +125,7 @@ class DocumentService
 
             return $updated;
         } catch (\Exception $e) {
-            Log::error("Error updating document {$document->id}: " . $e->getMessage());
+            Log::error("Error updating document {$document->id}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -149,7 +146,7 @@ class DocumentService
 
             return $deleted;
         } catch (\Exception $e) {
-            Log::error("Error deleting document " . $e->getMessage());
+            Log::error('Error deleting document '.$e->getMessage());
             throw $e;
         }
     }

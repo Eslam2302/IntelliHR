@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\AssetService;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\DataTransferObjects\AssetDTO;
-use App\Http\Resources\AssetResource;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\AssetRequest;
+use App\Http\Resources\AssetResource;
 use App\Models\Asset;
+use App\Services\AssetService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -17,8 +16,6 @@ class AssetController extends Controller implements HasMiddleware
 {
     /**
      * AssetController constructor.
-     *
-     * @param AssetService $service
      */
     public function __construct(
         protected AssetService $service
@@ -38,25 +35,26 @@ class AssetController extends Controller implements HasMiddleware
 
     /**
      * Get paginated list of assets.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 20);
-        $assets = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $assets = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => AssetResource::collection($assets),
+            'meta' => [
+                'current_page' => $assets->currentPage(),
+                'per_page' => $assets->perPage(),
+                'total' => $assets->total(),
+                'last_page' => $assets->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new asset.
-     *
-     * @param AssetRequest $request
-     * @return JsonResponse
      */
     public function store(AssetRequest $request): JsonResponse
     {
@@ -72,9 +70,6 @@ class AssetController extends Controller implements HasMiddleware
 
     /**
      * Display a specific asset.
-     *
-     * @param Asset $asset
-     * @return JsonResponse
      */
     public function show(Asset $asset): JsonResponse
     {
@@ -86,10 +81,6 @@ class AssetController extends Controller implements HasMiddleware
 
     /**
      * Update a specific asset.
-     *
-     * @param AssetRequest $request
-     * @param Asset $asset
-     * @return JsonResponse
      */
     public function update(AssetRequest $request, Asset $asset): JsonResponse
     {
@@ -105,9 +96,6 @@ class AssetController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific asset.
-     *
-     * @param Asset $asset
-     * @return JsonResponse
      */
     public function destroy(Asset $asset): JsonResponse
     {

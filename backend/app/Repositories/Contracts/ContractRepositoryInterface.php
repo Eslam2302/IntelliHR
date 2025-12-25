@@ -10,7 +10,7 @@ interface ContractRepositoryInterface
     /**
      * Get all contracts with pagination
      */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Create new contract position
@@ -28,12 +28,8 @@ interface ContractRepositoryInterface
     public function delete(Contract $contract): bool;
 
     /**
-     *
      * Return the basic salary for the given employee from the active contract.
      * If none found, return 0.
-     *
-     * @param int $employeeId
-     * @return float
      */
     public function getBasicSalaryForActiveEmployee(int $employeeId): float;
 }

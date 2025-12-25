@@ -8,15 +8,12 @@ use App\Http\Requests\AllowanceRequest;
 use App\Http\Resources\AllowanceResource;
 use App\Models\Allowance;
 use App\Services\AllowanceService;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
-
 class AllowanceController extends Controller implements HasMiddleware
 {
-
     public function __construct(
         protected AllowanceService $service
     ) {}
@@ -25,7 +22,7 @@ class AllowanceController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            new Middleware('permission:view-all-allowances', only: ['index','EmployeeAllowances','PayrollAllowances']),
+            new Middleware('permission:view-all-allowances', only: ['index', 'EmployeeAllowances', 'PayrollAllowances']),
             new Middleware('permission:view-allowance', only: ['show']),
             new Middleware('permission:create-allowance', only: ['store']),
             new Middleware('permission:edit-allowance', only: ['update']),
@@ -33,33 +30,34 @@ class AllowanceController extends Controller implements HasMiddleware
         ];
     }
 
-
     /**
      * Display a paginated list of all allowances.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $allowances = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $allowances = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => AllowanceResource::collection($allowances),
+            'meta' => [
+                'current_page' => $allowances->currentPage(),
+                'per_page' => $allowances->perPage(),
+                'total' => $allowances->total(),
+                'last_page' => $allowances->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Display a paginated list of allowances for a specific employee.
-     *
-     * @param int $employeeId
-     * @return JsonResponse
      */
     public function employeeAllowances(int $employeeId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $allowances = $this->service->showEmployeeAllowances($employeeId, $perpage);
+
         return response()->json([
             'status' => 'success',
             'data' => AllowanceResource::collection($allowances),
@@ -68,14 +66,12 @@ class AllowanceController extends Controller implements HasMiddleware
 
     /**
      * Display a paginated list of allowances for a specific payroll.
-     *
-     * @param int $payrollId
-     * @return JsonResponse
      */
     public function payrollAllowances(int $payrollId): JsonResponse
     {
         $perpage = request('per_page', 10);
         $allowances = $this->service->showPayrollAllowances($payrollId, $perpage);
+
         return response()->json([
             'status' => 'success',
             'data' => AllowanceResource::collection($allowances),
@@ -84,9 +80,6 @@ class AllowanceController extends Controller implements HasMiddleware
 
     /**
      * Store a newly created allowance in the database.
-     *
-     * @param AllowanceRequest $request
-     * @return JsonResponse
      */
     public function store(AllowanceRequest $request): JsonResponse
     {
@@ -102,9 +95,6 @@ class AllowanceController extends Controller implements HasMiddleware
 
     /**
      * Display the specified allowance.
-     *
-     * @param Allowance $allowance
-     * @return JsonResponse
      */
     public function show(Allowance $allowance): JsonResponse
     {
@@ -116,10 +106,6 @@ class AllowanceController extends Controller implements HasMiddleware
 
     /**
      * Update the specified allowance in storage.
-     *
-     * @param AllowanceRequest $request
-     * @param Allowance $allowance
-     * @return JsonResponse
      */
     public function update(AllowanceRequest $request, Allowance $allowance): JsonResponse
     {
@@ -135,9 +121,6 @@ class AllowanceController extends Controller implements HasMiddleware
 
     /**
      * Remove the specified allowance from storage.
-     *
-     * @param Allowance $allowance
-     * @return JsonResponse
      */
     public function destroy(Allowance $allowance): JsonResponse
     {

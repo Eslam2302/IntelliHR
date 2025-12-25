@@ -11,15 +11,14 @@ interface JobPostRepositoryInterface
     /**
      * Get paginated list of job posts.
      *
-     * @param int $perPage
-     * @return LengthAwarePaginator
+     * @param  int  $perPage
      */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator;
+    public function getAll(array $filters = []): LengthAwarePaginator;
 
     /**
      * Find a job post by its ID.
      *
-     * @param int $id
+     * @param  int  $id
      * @return JobPost|null
      */
     public function show(int $jobPostId): JobPost;
@@ -27,16 +26,15 @@ interface JobPostRepositoryInterface
     /**
      * Create a new job post.
      *
-     * @param JobPostDto $dto
-     * @return JobPost
+     * @param  JobPostDto  $dto
      */
     public function create(array $data): JobPost;
 
     /**
      * Update an existing job post.
      *
-     * @param int $id
-     * @param JobPostDto $dto
+     * @param  int  $id
+     * @param  JobPostDto  $dto
      * @return JobPost|null
      */
     public function update(JobPost $jobPost, array $data): JobPost;
@@ -44,8 +42,7 @@ interface JobPostRepositoryInterface
     /**
      * Delete a job post.
      *
-     * @param int $id
-     * @return bool
+     * @param  int  $id
      */
     public function delete(JobPost $jobPost): bool;
 }

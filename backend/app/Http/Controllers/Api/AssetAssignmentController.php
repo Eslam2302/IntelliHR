@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Services\AssetAssignmentService;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\DataTransferObjects\AssetAssignmentDTO;
-use App\Http\Resources\AssetAssignmentResource;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\AssetAssignmentRequest;
+use App\Http\Resources\AssetAssignmentResource;
 use App\Models\AssetAssignment;
+use App\Services\AssetAssignmentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -17,12 +16,11 @@ class AssetAssignmentController extends Controller implements HasMiddleware
 {
     /**
      * AssetAssignmentController constructor.
-     *
-     * @param AssetAssignmentService $service
      */
     public function __construct(
         protected AssetAssignmentService $service
     ) {}
+
     public static function middleware(): array
     {
         return [
@@ -34,27 +32,29 @@ class AssetAssignmentController extends Controller implements HasMiddleware
             new Middleware('permission:delete-asset-assignment', only: ['destroy']),
         ];
     }
+
     /**
      * Get paginated list of asset assignments.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        $perpage = request('per_page', 10);
-        $assignments = $this->service->getAllPaginated($perpage);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $assignments = $this->service->getAll($filters);
 
         return response()->json([
             'status' => 'success',
             'data' => AssetAssignmentResource::collection($assignments),
+            'meta' => [
+                'current_page' => $assignments->currentPage(),
+                'per_page' => $assignments->perPage(),
+                'total' => $assignments->total(),
+                'last_page' => $assignments->lastPage(),
+            ],
         ], 200);
     }
 
     /**
      * Create a new asset assignment.
-     *
-     * @param AssetAssignmentRequest $request
-     * @return JsonResponse
      */
     public function store(AssetAssignmentRequest $request): JsonResponse
     {
@@ -70,9 +70,6 @@ class AssetAssignmentController extends Controller implements HasMiddleware
 
     /**
      * Display a specific asset assignment.
-     *
-     * @param AssetAssignment $asset_assignment
-     * @return JsonResponse
      */
     public function show(AssetAssignment $asset_assignment): JsonResponse
     {
@@ -84,10 +81,6 @@ class AssetAssignmentController extends Controller implements HasMiddleware
 
     /**
      * Update a specific asset assignment.
-     *
-     * @param AssetAssignmentRequest $request
-     * @param AssetAssignment $asset_assignment
-     * @return JsonResponse
      */
     public function update(AssetAssignmentRequest $request, AssetAssignment $asset_assignment): JsonResponse
     {
@@ -103,9 +96,6 @@ class AssetAssignmentController extends Controller implements HasMiddleware
 
     /**
      * Delete a specific asset assignment.
-     *
-     * @param AssetAssignment $asset_assignment
-     * @return JsonResponse
      */
     public function destroy(AssetAssignment $asset_assignment): JsonResponse
     {

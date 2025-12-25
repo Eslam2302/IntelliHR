@@ -4,22 +4,31 @@ namespace App\Repositories;
 
 use App\Models\LeaveType;
 use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class LeaveTypeRepository implements LeaveTypeRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected LeaveType $model
     ) {}
 
-    /**
-     * Get all leave type with pagination
-     */
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->latest()
-            ->paginate($perpage);
+        $query = $this->model->query();
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['name', 'description'],
+            ['id', 'name', 'description', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
@@ -36,6 +45,7 @@ class LeaveTypeRepository implements LeaveTypeRepositoryInterface
     public function update(LeaveType $leaveType, array $data): LeaveType
     {
         $leaveType->update($data);
+
         return $leaveType->fresh();
     }
 

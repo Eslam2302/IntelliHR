@@ -4,21 +4,32 @@ namespace App\Repositories;
 
 use App\Models\Benefit;
 use App\Repositories\Contracts\BenefitRepositoryInterface;
-use Carbon\Carbon;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class BenefitRepository implements BenefitRepositoryInterface
 {
+    use FilterQueryTrait;
 
     public function __construct(
         protected Benefit $model
     ) {}
-    public function getAllPaginated(int $perpage = 10): LengthAwarePaginator
+
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->latest()
-            ->paginate($perpage);
+        $query = $this->model->query();
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['benefit_type', 'amount'],
+            ['id', 'benefit_type', 'amount', 'created_at', 'updated_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     public function showEmployeeBenefits(int $employeeId, int $perpage = 10): LengthAwarePaginator
@@ -37,6 +48,7 @@ class BenefitRepository implements BenefitRepositoryInterface
     public function update(Benefit $benefit, array $data): Benefit
     {
         $benefit->update($data);
+
         return $benefit->fresh();
     }
 

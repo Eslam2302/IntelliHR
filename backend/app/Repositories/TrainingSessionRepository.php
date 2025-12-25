@@ -4,33 +4,35 @@ namespace App\Repositories;
 
 use App\Models\TrainingSession;
 use App\Repositories\Contracts\TrainingSessionRepositoryInterface;
+use App\Repositories\Traits\FilterQueryTrait;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class TrainingSessionRepository implements TrainingSessionRepositoryInterface
 {
+    use FilterQueryTrait;
+
     public function __construct(
         protected TrainingSession $model
     ) {}
 
-    /**
-     * Get paginated list of training sessions with trainer & department relations
-     *
-     * @param int $perPage
-     * @return LengthAwarePaginator
-     */
-    public function getAllPaginated(int $perPage = 10): LengthAwarePaginator
+    public function getAll(array $filters = []): LengthAwarePaginator
     {
-        return $this->model
-            ->with(['trainer.employee', 'department'])
-            ->latest()
-            ->paginate($perPage);
+        $query = $this->model->with(['trainer.employee', 'department']);
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['title', 'description', 'trainer.employee.first_name', 'trainer.employee.last_name', 'trainer.employee.personal_email', 'trainer.employee.phone', 'department.name'],
+            ['id', 'title', 'description', 'created_at'],
+            'created_at',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**
      * Get a single training session by ID
-     *
-     * @param int $id
-     * @return TrainingSession
      */
     public function show(int $id): TrainingSession
     {
@@ -41,9 +43,6 @@ class TrainingSessionRepository implements TrainingSessionRepositoryInterface
 
     /**
      * Create a new training session
-     *
-     * @param array $data
-     * @return TrainingSession
      */
     public function create(array $data): TrainingSession
     {
@@ -52,22 +51,16 @@ class TrainingSessionRepository implements TrainingSessionRepositoryInterface
 
     /**
      * Update an existing training session
-     *
-     * @param TrainingSession $trainingSession
-     * @param array $data
-     * @return TrainingSession
      */
     public function update(TrainingSession $trainingSession, array $data): TrainingSession
     {
         $trainingSession->update($data);
+
         return $trainingSession->fresh()->load(['trainer.employee', 'department']);
     }
 
     /**
      * Delete a training session
-     *
-     * @param TrainingSession $trainingSession
-     * @return bool
      */
     public function delete(TrainingSession $trainingSession): bool
     {
