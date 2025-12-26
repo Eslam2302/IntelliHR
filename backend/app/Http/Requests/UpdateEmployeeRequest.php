@@ -3,11 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UpdateEmployeeRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -16,16 +14,17 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         $employeeId = $this->route('employees');
+
         return [
             'first_name' => [
                 'required',
                 'string',
-                'max:100'
+                'max:100',
             ],
             'last_name' => [
                 'required',
                 'string',
-                'max:100'
+                'max:100',
             ],
             'personal_email' => ['nullable', 'email', 'unique:employees,personal_email'],
 
@@ -36,32 +35,32 @@ class UpdateEmployeeRequest extends FormRequest
             ],
             'gender' => [
                 'required',
-                'in:male,female'
+                'in:male,female',
             ],
             'national_id' => [
                 'required',
                 'string',
-                'max:20'
+                'max:20',
             ],
             'birth_date' => [
                 'required',
                 'date',
-                'before:today'
+                'before:today',
             ],
             'address' => [
                 'nullable',
-                'string'
+                'string',
             ],
             'employee_status' => [
-                'in:active,probation,resigned,terminated'
+                'in:active,probation,resigned,terminated',
             ],
             'department_id' => [
                 'required',
-                'exists:departments,id'
+                'exists:departments,id',
             ],
             'manager_id' => [
                 'nullable',
-                'exists:employees,id'
+                'exists:employees,id',
             ],
             'job_id' => [
                 'nullable',
@@ -78,8 +77,10 @@ class UpdateEmployeeRequest extends FormRequest
                 'unique:users,email',
             ],
             'password' => [
+                'nullable',
                 'string',
                 'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]+$/',
             ],
         ];
     }

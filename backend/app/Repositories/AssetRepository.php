@@ -39,7 +39,7 @@ class AssetRepository implements AssetRepositoryInterface
      */
     public function show(int $assetId): Asset
     {
-        return $this->model->findOrFail($assetId);
+        return $this->model->with('currentAssignment')->findOrFail($assetId);
     }
 
     /**

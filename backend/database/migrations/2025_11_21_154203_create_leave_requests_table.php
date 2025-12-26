@@ -43,13 +43,17 @@ return new class extends Migration
 
             // Indexes for search and filtering
             $table->index('employee_id');
+            $table->index('leave_type_id');
+            $table->index('manager_id');
+            $table->index('hr_id');
             $table->index('status');
             $table->index('start_date');
             $table->index('end_date');
             $table->index('created_at');
 
-            // Composite index for common filter combinations
+            // Composite indexes for common filter combinations
             $table->index(['employee_id', 'status']);
+            $table->index(['employee_id', 'leave_type_id']);
         });
     }
 

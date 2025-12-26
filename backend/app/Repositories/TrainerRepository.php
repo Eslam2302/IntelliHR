@@ -36,7 +36,7 @@ class TrainerRepository implements TrainerRepositoryInterface
      */
     public function show(int $trainerId): Trainer
     {
-        return $this->model->findOrFail($trainerId);
+        return $this->model->with('employee')->findOrFail($trainerId);
     }
 
     /**

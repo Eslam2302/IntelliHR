@@ -66,7 +66,9 @@ class EmployeeService
             return $employee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating employee: '.$e->getMessage(), ['data' => $dto->toArray()]);
+            $logData = $dto->toArray();
+            unset($logData['password']);
+            Log::error('Error creating employee: '.$e->getMessage(), ['data' => $logData]);
             throw $e;
         }
     }
@@ -124,7 +126,9 @@ class EmployeeService
             return $updatedEmployee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error updating employee {$employee->id}: ".$e->getMessage(), ['data' => $dto->toArray()]);
+            $logData = $dto->toArray();
+            unset($logData['password']);
+            Log::error("Error updating employee {$employee->id}: ".$e->getMessage(), ['data' => $logData]);
             throw $e;
         }
     }

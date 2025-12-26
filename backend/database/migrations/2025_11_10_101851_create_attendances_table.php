@@ -25,6 +25,7 @@ return new class extends Migration
             $table->index('employee_id');
             $table->index('check_in');
             $table->index('created_at');
+            $table->index('is_late');
 
             // Composite index for common filter combinations
             $table->index(['employee_id', 'check_in']);

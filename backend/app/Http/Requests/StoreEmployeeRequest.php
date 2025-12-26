@@ -3,11 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class StoreEmployeeRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -19,17 +17,17 @@ class StoreEmployeeRequest extends FormRequest
             'first_name' => [
                 'required',
                 'string',
-                'max:100'
+                'max:100',
             ],
             'last_name' => [
                 'required',
                 'string',
-                'max:100'
+                'max:100',
             ],
             'personal_email' => [
                 'nullable',
                 'email',
-                'unique:employees,personal_email'
+                'unique:employees,personal_email',
             ],
             'phone' => [
                 'nullable',
@@ -38,24 +36,24 @@ class StoreEmployeeRequest extends FormRequest
             ],
             'gender' => [
                 'required',
-                'in:male,female'
+                'in:male,female',
             ],
             'national_id' => [
                 'required',
                 'string',
-                'max:20'
+                'max:20',
             ],
             'birth_date' => [
                 'required',
                 'date',
-                'before:today'
+                'before:today',
             ],
             'address' => [
                 'nullable',
-                'string'
+                'string',
             ],
             'employee_status' => [
-                'in:active,probation,resigned,terminated'
+                'in:active,probation,resigned,terminated',
             ],
             'department_id' => [
                 'required',
@@ -80,6 +78,7 @@ class StoreEmployeeRequest extends FormRequest
                 'required',
                 'string',
                 'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]+$/',
             ],
         ];
     }

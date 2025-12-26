@@ -3,43 +3,41 @@
 use App\Http\Controllers\Api\ActivityLogController;
 use App\Http\Controllers\Api\AllowanceController;
 use App\Http\Controllers\Api\ApplicantController;
+use App\Http\Controllers\Api\AssetAssignmentController;
+use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\AttendanceController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BenefitController;
 use App\Http\Controllers\Api\ContractController;
+use App\Http\Controllers\Api\DeductionController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\EmployeeController;
-use App\Http\Controllers\Api\JobPositionController;
-use App\Http\Controllers\Api\LeaveTypeController;
-use App\Http\Controllers\Api\LeaveRequestController;
-use App\Http\Controllers\Api\BenefitController;
-use App\Http\Controllers\Api\DeductionController;
-use App\Http\Controllers\Api\EmployeeTrainingController;
-use App\Http\Controllers\Api\PayrollController;
-use App\Http\Controllers\Api\TrainerController;
-use App\Http\Controllers\Api\TrainingSessionController;
-use App\Http\Controllers\Api\TrainingCertificateController;
-use App\Http\Controllers\Api\TrainingEvaluationController;
-use App\Http\Controllers\Api\JobPostController;
-use App\Http\Controllers\Api\HiringStageController;
-use App\Http\Controllers\Api\InterviewController;
-use App\Http\Controllers\Api\AssetController;
-use App\Http\Controllers\Api\AssetAssignmentController;
 use App\Http\Controllers\Api\EmployeeRoleController;
-use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\EmployeeTrainingController;
 use App\Http\Controllers\Api\ExpenseCategoryController;
+use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\HiringStageController;
+use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\InterviewController;
+use App\Http\Controllers\Api\JobPositionController;
+use App\Http\Controllers\Api\JobPostController;
+use App\Http\Controllers\Api\LeaveRequestController;
+use App\Http\Controllers\Api\LeaveTypeController;
+use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\PayrollPaymentController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\TrainerController;
+use App\Http\Controllers\Api\TrainingCertificateController;
+use App\Http\Controllers\Api\TrainingEvaluationController;
+use App\Http\Controllers\Api\TrainingSessionController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::get('home', [HomeController::class, 'index']);
 
-Route::post('login', [AuthController::class, 'store']);
-
-
+Route::post('login', [AuthController::class, 'store'])->middleware('throttle:5,1');
 
 // (Protected Routes)
 Route::middleware('auth:sanctum')->group(function () {
@@ -47,8 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-
-    Route::post('logout', [AuthController::class, 'destroy']);
+    Route::post('logout', [AuthController::class, 'destroy'])->middleware('throttle:10,1');
 
     // APIs
 
@@ -164,7 +161,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('payrolls/{payroll}/pay', [PayrollPaymentController::class, 'processPayment']);
-
 
     // Trainer Routes
     Route::prefix('trainers')->group(function () {

@@ -6,6 +6,7 @@ use App\DataTransferObjects\AllowanceDTO;
 use App\Models\Allowance;
 use App\Repositories\Contracts\AllowanceRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AllowanceService
@@ -48,27 +49,29 @@ class AllowanceService
     public function create(AllowanceDTO $dto): Allowance
     {
         try {
-            $allowance = $this->repository->create($dto->toArray());
+            return DB::transaction(function () use ($dto) {
+                $allowance = $this->repository->create($dto->toArray());
 
-            $this->activityLogger->log(
-                logName: 'payroll',
-                description: 'allowance_created',
-                subject: $allowance,
-                properties: [
+                $this->activityLogger->log(
+                    logName: 'payroll',
+                    description: 'allowance_created',
+                    subject: $allowance,
+                    properties: [
+                        'employee_id' => $allowance->employee_id,
+                        'type' => $allowance->type,
+                        'amount' => $allowance->amount,
+                    ]
+                );
+
+                Log::info('Allowance created successfully', [
+                    'id' => $allowance->id,
                     'employee_id' => $allowance->employee_id,
                     'type' => $allowance->type,
                     'amount' => $allowance->amount,
-                ]
-            );
+                ]);
 
-            Log::info('Allowance created successfully', [
-                'id' => $allowance->id,
-                'employee_id' => $allowance->employee_id,
-                'type' => $allowance->type,
-                'amount' => $allowance->amount,
-            ]);
-
-            return $allowance;
+                return $allowance;
+            });
         } catch (\Exception $e) {
             Log::error('Error creating Allowance: '.$e->getMessage());
             throw $e;
@@ -78,28 +81,30 @@ class AllowanceService
     public function update(Allowance $allowance, AllowanceDTO $dto): Allowance
     {
         try {
-            $oldData = $allowance->only(['type', 'amount']);
+            return DB::transaction(function () use ($allowance, $dto) {
+                $oldData = $allowance->only(['type', 'amount']);
 
-            $updatedAllowance = $this->repository->update($allowance, $dto->toArray());
+                $updatedAllowance = $this->repository->update($allowance, $dto->toArray());
 
-            $this->activityLogger->log(
-                logName: 'payroll',
-                description: 'allowance_updated',
-                subject: $updatedAllowance,
-                properties: [
-                    'before' => $oldData,
-                    'after' => $updatedAllowance->only(['type', 'amount']),
-                ]
-            );
+                $this->activityLogger->log(
+                    logName: 'payroll',
+                    description: 'allowance_updated',
+                    subject: $updatedAllowance,
+                    properties: [
+                        'before' => $oldData,
+                        'after' => $updatedAllowance->only(['type', 'amount']),
+                    ]
+                );
 
-            Log::info('Allowance updated successfully', [
-                'id' => $updatedAllowance->id,
-                'employee_id' => $updatedAllowance->employee_id,
-                'type' => $updatedAllowance->type,
-                'amount' => $updatedAllowance->amount,
-            ]);
+                Log::info('Allowance updated successfully', [
+                    'id' => $updatedAllowance->id,
+                    'employee_id' => $updatedAllowance->employee_id,
+                    'type' => $updatedAllowance->type,
+                    'amount' => $updatedAllowance->amount,
+                ]);
 
-            return $updatedAllowance;
+                return $updatedAllowance;
+            });
         } catch (\Exception $e) {
             Log::error('Error updating Allowance: '.$e->getMessage());
             throw $e;
@@ -109,25 +114,27 @@ class AllowanceService
     public function delete(Allowance $allowance): bool
     {
         try {
-            $data = $allowance->only(['employee_id', 'type', 'amount']);
+            return DB::transaction(function () use ($allowance) {
+                $data = $allowance->only(['employee_id', 'type', 'amount']);
 
-            $deleted = $this->repository->delete($allowance);
+                $deleted = $this->repository->delete($allowance);
 
-            $this->activityLogger->log(
-                logName: 'payroll',
-                description: 'allowance_deleted',
-                subject: $allowance,
-                properties: $data
-            );
+                $this->activityLogger->log(
+                    logName: 'payroll',
+                    description: 'allowance_deleted',
+                    subject: $allowance,
+                    properties: $data
+                );
 
-            Log::info('Allowance deleted successfully', [
-                'id' => $allowance->id,
-                'employee_id' => $allowance->employee_id,
-                'type' => $allowance->type,
-                'amount' => $allowance->amount,
-            ]);
+                Log::info('Allowance deleted successfully', [
+                    'id' => $allowance->id,
+                    'employee_id' => $allowance->employee_id,
+                    'type' => $allowance->type,
+                    'amount' => $allowance->amount,
+                ]);
 
-            return $deleted;
+                return $deleted;
+            });
         } catch (\Exception $e) {
             Log::error('Error deleting Allowance: '.$e->getMessage());
             throw $e;
