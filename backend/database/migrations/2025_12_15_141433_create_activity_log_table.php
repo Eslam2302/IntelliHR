@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateActivityLogTable extends Migration
 {
@@ -17,6 +17,14 @@ class CreateActivityLogTable extends Migration
             $table->json('properties')->nullable();
             $table->timestamps();
             $table->index('log_name');
+
+            // Additional indexes for subject filtering
+            $table->index('subject_type');
+            $table->index('subject_id');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
+            $table->index(['subject_type', 'subject_id']);
         });
     }
 

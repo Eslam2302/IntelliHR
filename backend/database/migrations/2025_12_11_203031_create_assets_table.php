@@ -18,6 +18,16 @@ return new class extends Migration
             $table->string('condition');
             $table->enum('status', ['available', 'assigned', 'maintenance', 'retired'])->default('available');
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('name');
+            $table->index('serial_number');
+            $table->index('status');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

@@ -23,7 +23,7 @@ class TrainerRepository implements TrainerRepositoryInterface
             $query,
             $filters,
             ['employee_id', 'name', 'email', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'employee.employee_status'],
-            ['id', 'name', 'email', 'created_at'],
+            ['id', 'name', 'email', 'created_at', 'deleted_at'],
             'created_at',
             'desc'
         );

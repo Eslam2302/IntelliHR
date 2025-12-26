@@ -23,20 +23,16 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     {
         $query = $this->model->query();
 
-        // Search
-        if (! empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where('name', 'like', "%{$search}%");
-        }
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['name', 'description'],
+            ['id', 'name', 'description', 'created_at', 'updated_at', 'deleted_at'],
+            'name',
+            'asc'
+        );
 
-        // Sorting
-        $sort = $filters['sort'] ?? 'name';
-        $direction = $filters['direction'] ?? 'asc';
-        $query->orderBy($sort, $direction);
-
-        $perPage = $filters['per_page'] ?? 10;
-
-        return $query->paginate($perPage);
+        return $query->paginate($this->getPaginationLimit($filters, 10));
     }
 
     /**

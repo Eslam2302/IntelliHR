@@ -23,7 +23,7 @@ class JobPositionRepository implements JobPositionRepositoryInterface
             $query,
             $filters,
             ['title', 'grade'],
-            ['id', 'title', 'grade', 'created_at'],
+            ['id', 'title', 'grade', 'created_at', 'deleted_at'],
             'created_at',
             'desc'
         );

@@ -36,6 +36,12 @@ return new class extends Migration
                 ->references('id')
                 ->on('expense_categories')
                 ->onDelete('cascade');
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('status');
+            $table->index('category_id');
+            $table->index('created_at');
         });
     }
 

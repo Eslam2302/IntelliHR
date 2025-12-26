@@ -29,6 +29,12 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['employee_id', 'payroll_id']);
+
+            // Additional indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('payroll_id');
+            $table->index('type');
+            $table->index('created_at');
         });
     }
 

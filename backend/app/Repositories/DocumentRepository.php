@@ -23,7 +23,7 @@ class DocumentRepository implements DocumentRepositoryInterface
             $query,
             $filters,
             ['doc_type'],
-            ['id', 'doc_type', 'created_at', 'updated_at'],
+            ['id', 'doc_type', 'created_at', 'updated_at', 'deleted_at'],
             'created_at',
             'desc'
         );

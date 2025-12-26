@@ -23,7 +23,7 @@ class RoleRepository implements RoleRepositoryInterface
             $query,
             $filters,
             ['name', 'description', 'permissions.name'],
-            ['id', 'name', 'description', 'created_at'],
+            ['id', 'name', 'description', 'created_at', 'deleted_at'],
             'created_at',
             'desc'
         );

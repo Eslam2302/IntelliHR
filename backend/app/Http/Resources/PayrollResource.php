@@ -16,7 +16,7 @@ class PayrollResource extends JsonResource
     {
         return [
             'employee_id' => $this->employee_id,
-            'employee'    => new EmployeeResource($this->whenLoaded('employee')),
+            'employee' => new EmployeeResource($this->whenLoaded('employee')),
 
             'year' => (int) $this->year,
             'month' => (int) $this->month,
@@ -28,8 +28,9 @@ class PayrollResource extends JsonResource
             'net_pay' => (float) $this->net_pay,
             'processed_at' => $this->processed_at?->format('Y-m-d H:i:s'),
 
-            'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

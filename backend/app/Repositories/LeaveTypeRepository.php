@@ -23,7 +23,7 @@ class LeaveTypeRepository implements LeaveTypeRepositoryInterface
             $query,
             $filters,
             ['name', 'description'],
-            ['id', 'name', 'description', 'created_at'],
+            ['id', 'name', 'description', 'created_at', 'deleted_at'],
             'created_at',
             'desc'
         );

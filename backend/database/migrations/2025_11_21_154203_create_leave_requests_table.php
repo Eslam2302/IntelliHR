@@ -30,7 +30,7 @@ return new class extends Migration
             $table->string('attachment')->nullable();
 
             // Workflow statuses
-            $table->enum('status', ['pending', 'manager_approved', 'hr_approved', 'rejected','cancelled'])
+            $table->enum('status', ['pending', 'manager_approved', 'hr_approved', 'rejected', 'cancelled'])
                 ->default('pending');
 
             $table->foreignId('manager_id')->nullable();
@@ -40,6 +40,16 @@ return new class extends Migration
             $table->timestamp('hr_approved_at')->nullable();
 
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('status');
+            $table->index('start_date');
+            $table->index('end_date');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
+            $table->index(['employee_id', 'status']);
         });
     }
 

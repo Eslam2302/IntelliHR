@@ -38,6 +38,16 @@ return new class extends Migration
             $table->enum('payment_type', ['paid', 'unpaid', 'partially_paid'])->default('paid');
             $table->boolean('requires_attachment')->default(false);
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('name');
+            $table->index('code');
+            $table->index('is_active');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

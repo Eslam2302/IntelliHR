@@ -28,6 +28,10 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['name', 'guard_name']);
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
 
         Schema::create($tableNames['roles'], static function (Blueprint $table) use ($teams, $columnNames) {
@@ -45,6 +49,10 @@ return new class extends Migration
             } else {
                 $table->unique(['name', 'guard_name']);
             }
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
 
         Schema::create($tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {

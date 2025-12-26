@@ -18,6 +18,14 @@ return new class extends Migration
             $table->date('assigned_date');
             $table->date('return_date')->nullable();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('asset_id');
+            $table->index('employee_id');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
+            $table->index(['asset_id', 'employee_id']);
         });
     }
 

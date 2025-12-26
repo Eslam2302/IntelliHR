@@ -23,7 +23,7 @@ class ContractRepository implements ContractRepositoryInterface
             $query,
             $filters,
             ['contract_type'],
-            ['id', 'employee_id', 'start_date', 'end_date', 'created_at'],
+            ['id', 'employee_id', 'start_date', 'end_date', 'created_at', 'deleted_at'],
             'created_at',
             'desc'
         );

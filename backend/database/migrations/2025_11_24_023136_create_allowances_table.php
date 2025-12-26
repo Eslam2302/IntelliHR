@@ -26,9 +26,20 @@ return new class extends Migration
             $table->string('type');
             $table->decimal('amount', 10, 2);
 
+            $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('payroll_id');
+            $table->index('type');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
             $table->index(['employee_id', 'payroll_id']);
 
-            $table->timestamps();
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

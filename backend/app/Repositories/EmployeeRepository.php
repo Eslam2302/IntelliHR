@@ -51,6 +51,7 @@ class EmployeeRepository implements EmployeeRepositoryInterface
             'job_id',
             'created_at',
             'updated_at',
+            'deleted_at',
         ];
 
         // Apply filters using trait

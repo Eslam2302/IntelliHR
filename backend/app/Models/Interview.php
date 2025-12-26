@@ -12,7 +12,7 @@ class Interview extends Model
         'scheduled_at',
         'score',
         'notes',
-        'status'
+        'status',
     ];
 
     public function applicant()

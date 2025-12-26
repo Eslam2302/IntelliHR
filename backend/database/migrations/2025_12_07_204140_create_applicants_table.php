@@ -38,6 +38,16 @@ return new class extends Migration
             $table->string('resume_path');
             $table->timestamp('applied_at')->nullable();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('first_name');
+            $table->index('last_name');
+            $table->index('email');
+            $table->index('phone');
+            $table->index('status');
+            $table->index('job_id');
+            $table->index('current_stage_id');
+            $table->index('created_at');
         });
     }
 

@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('name');
+            $table->index('created_at');
         });
     }
 

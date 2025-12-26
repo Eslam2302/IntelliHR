@@ -26,7 +26,7 @@ class AssetRepository implements AssetRepositoryInterface
             $query,
             $filters,
             ['name', 'serial_number', 'currentAssignment.employee.first_name', 'currentAssignment.employee.last_name', 'currentAssignment.employee.personal_email', 'currentAssignment.employee.phone'],
-            ['id', 'name', 'serial_number', 'created_at', 'updated_at'],
+            ['id', 'name', 'serial_number', 'created_at', 'updated_at', 'deleted_at'],
             'created_at',
             'desc'
         );

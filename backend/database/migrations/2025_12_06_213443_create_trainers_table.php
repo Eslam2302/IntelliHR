@@ -25,6 +25,16 @@ return new class extends Migration
                 ->references('id')
                 ->on('employees')
                 ->nullOnDelete();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('name');
+            $table->index('email');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

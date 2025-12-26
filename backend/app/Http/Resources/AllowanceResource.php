@@ -15,19 +15,20 @@ class AllowanceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'   => $this->id,
+            'id' => $this->id,
 
             'employee_id' => $this->employee_id,
-            'employee'    => new EmployeeResource($this->whenLoaded('employee')),
+            'employee' => new EmployeeResource($this->whenLoaded('employee')),
 
-            'payroll_id'  => $this->payroll_id,
-            'payroll'     => new PayrollResource($this->whenLoaded('payroll')),
+            'payroll_id' => $this->payroll_id,
+            'payroll' => new PayrollResource($this->whenLoaded('payroll')),
 
-            'type'        => $this->type,
-            'amount'      => (float) $this->amount,
+            'type' => $this->type,
+            'amount' => (float) $this->amount,
 
-            'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            'deleted_at' => $this->deleted_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Allowance extends Model
 {
+    use SoftDeletes;
 
     protected $fillable = [
         'payroll_id',
@@ -13,7 +15,7 @@ class Allowance extends Model
         'type',
         'amount',
     ];
-    
+
     public function payroll()
     {
         return $this->belongsTo(Payroll::class);

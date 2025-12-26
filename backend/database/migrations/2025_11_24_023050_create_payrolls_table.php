@@ -37,6 +37,20 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['employee_id', 'year', 'month']);
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('payment_status');
+            $table->index('month');
+            $table->index('year');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
+            $table->index(['employee_id', 'payment_status', 'month', 'year']);
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

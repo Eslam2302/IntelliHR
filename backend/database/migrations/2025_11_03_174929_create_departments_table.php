@@ -16,6 +16,14 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->text('description')->nullable();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('name');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

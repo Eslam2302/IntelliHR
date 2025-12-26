@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Contract extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'employee_id',
@@ -17,7 +17,7 @@ class Contract extends Model
         'contract_type',
         'probation_period_days',
         'salary',
-        'terms'
+        'terms',
     ];
 
     protected $casts = [
@@ -30,5 +30,4 @@ class Contract extends Model
     {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
-    
 }

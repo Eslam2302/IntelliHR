@@ -21,6 +21,11 @@ return new class extends Migration
             $table->foreign('employee_training_id')
                 ->references('id')->on('employee_trainings')
                 ->cascadeOnDelete();
+
+            // Indexes for search and filtering
+            $table->index('employee_training_id');
+            $table->index('issued_at');
+            $table->index('created_at');
         });
     }
 

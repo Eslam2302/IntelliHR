@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('requirements')->nullable();
             $table->text('responsibilities')->nullable();
 
-
             $table->unsignedBigInteger('department_id');
             $table->foreign('department_id')
                 ->references('id')
@@ -30,6 +29,12 @@ return new class extends Migration
             $table->timestamp('posted_at')->nullable();
             $table->string('linkedin_job_id')->nullable();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('title');
+            $table->index('status');
+            $table->index('department_id');
+            $table->index('created_at');
         });
     }
 

@@ -29,6 +29,13 @@ return new class extends Migration
                 ->references('id')
                 ->on('employees')
                 ->nullOnDelete();
+
+            // Indexes for search and filtering
+            $table->index('applicant_id');
+            $table->index('interviewer_id');
+            $table->index('status');
+            $table->index('scheduled_at');
+            $table->index('created_at');
         });
     }
 

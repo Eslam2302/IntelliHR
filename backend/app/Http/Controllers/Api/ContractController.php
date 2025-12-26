@@ -34,7 +34,7 @@ class ContractController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search', 'deleted']);
         $contract = $this->contractService->getAll($filters);
 
         return response()->json([

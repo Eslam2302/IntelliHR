@@ -21,6 +21,15 @@ return new class extends Migration
 
             $table->rememberToken();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('email');
+            $table->index('employee_id');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

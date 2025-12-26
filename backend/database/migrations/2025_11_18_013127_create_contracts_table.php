@@ -35,7 +35,7 @@ return new class extends Migration
                 'freelance',
                 'hourly',
                 'commission_based',
-                'on_call'
+                'on_call',
             ]);
             $table->unsignedSmallInteger('probation_period_days')->default(90);
             $table->decimal('salary', 12, 2);
@@ -43,7 +43,18 @@ return new class extends Migration
 
             $table->timestamps();
 
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('contract_type');
+            $table->index('created_at');
             $table->index(['employee_id', 'start_date']);
+
+            // Composite index for common filter combinations
+            $table->index(['employee_id', 'contract_type', 'start_date']);
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

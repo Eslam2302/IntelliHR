@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Department;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\Access\Authorizable;
+use Spatie\Permission\Traits\HasRoles;
 
 class Employee extends Model implements AuthorizableContract
 {
-    use HasFactory, HasRoles, Authorizable;
+    use Authorizable, HasFactory, HasRoles, SoftDeletes;
+
     protected $guard_name = 'web';
 
     protected $fillable = [

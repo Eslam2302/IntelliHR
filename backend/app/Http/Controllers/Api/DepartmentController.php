@@ -36,7 +36,7 @@ class DepartmentController extends Controller implements HasMiddleware
      */
     public function index(): JsonResponse
     {
-        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search']);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search', 'deleted']);
         $departments = $this->departmentService->getAll($filters);
 
         return response()->json([

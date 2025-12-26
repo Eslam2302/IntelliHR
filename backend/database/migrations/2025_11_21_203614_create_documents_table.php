@@ -16,8 +16,8 @@ return new class extends Migration
 
             // Foreign key to employees table
             $table->foreignId('employee_id')
-                  ->constrained('employees')
-                  ->onDelete('cascade');
+                ->constrained('employees')
+                ->onDelete('cascade');
 
             // Document type (e.g., contract, ID, resume)
             $table->string('doc_type');
@@ -29,6 +29,15 @@ return new class extends Migration
             $table->timestamp('uploaded_at')->nullable();
 
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('doc_type');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

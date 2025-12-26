@@ -30,6 +30,12 @@ return new class extends Migration
                 ->references('id')
                 ->on('departments')
                 ->nullOnDelete();
+
+            // Indexes for search and filtering
+            $table->index('title');
+            $table->index('trainer_id');
+            $table->index('department_id');
+            $table->index('created_at');
         });
     }
 

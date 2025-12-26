@@ -24,7 +24,7 @@ class BenefitRepository implements BenefitRepositoryInterface
             $query,
             $filters,
             ['benefit_type', 'amount'],
-            ['id', 'benefit_type', 'amount', 'created_at', 'updated_at'],
+            ['id', 'benefit_type', 'amount', 'created_at', 'updated_at', 'deleted_at'],
             'created_at',
             'desc'
         );

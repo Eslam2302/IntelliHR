@@ -28,6 +28,16 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->unique(['employee_id', 'training_id']);
+            $table->softDeletes();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('training_id');
+            $table->index('status');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
+            $table->index(['employee_id', 'status']);
         });
     }
 

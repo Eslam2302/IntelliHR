@@ -20,6 +20,16 @@ return new class extends Migration
             $table->decimal('max_salary', 10, 2);
             $table->text('responsibilities')->nullable();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('title');
+            $table->index('grade');
+            $table->index('department_id');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

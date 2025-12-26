@@ -20,6 +20,14 @@ return new class extends Migration
             $table->decimal('calculated_hours', 8, 2)->nullable();
 
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('check_in');
+            $table->index('created_at');
+
+            // Composite index for common filter combinations
+            $table->index(['employee_id', 'check_in']);
         });
     }
 

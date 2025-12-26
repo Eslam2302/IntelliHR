@@ -22,6 +22,11 @@ return new class extends Migration
                 ->references('id')
                 ->on('job_posts')
                 ->onDelete('cascade');
+
+            // Indexes for search and filtering
+            $table->index('job_id');
+            $table->index('order');
+            $table->index('created_at');
         });
     }
 

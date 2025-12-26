@@ -2,15 +2,16 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Employee;
 use App\Models\LeaveBalance;
 use App\Models\LeaveType;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class ProcessEmployeeProbation extends Command
 {
     protected $signature = 'employees:process-probation';
+
     protected $description = 'Activate employees after probation and assign their leave balances';
 
     public function handle()
@@ -22,25 +23,20 @@ class ProcessEmployeeProbation extends Command
 
         // 1. Get employees still on probation
         $employees = Employee::where('employee_status', 'probation')
-            ->get()
-            ->filter(function ($employee) use ($today) {
-                $probationDays = $employee->contract?->probation_period_days ?? 90;
-
-                return $today->gte(Carbon::parse($employee->hire_date)->addDays($probationDays));
-            });
+            ->whereRaw('DATE_ADD(hire_date, INTERVAL COALESCE((SELECT probation_period_days FROM contracts WHERE employee_id = employees.id LIMIT 1), 90) DAY) <= ?', [$today])
+            ->get();
 
         if ($employees->isEmpty()) {
             $this->info('No employees found completing probation today.');
+
             return Command::SUCCESS;
         }
-
-        $count = 0;
 
         foreach ($employees as $employee) {
 
             $contract = $employee->contract; // Make sure relation exists
 
-            if (!$contract) {
+            if (! $contract) {
                 continue;
             }
 
@@ -53,7 +49,7 @@ class ProcessEmployeeProbation extends Command
 
                 // 2. Set employee active
                 $employee->update([
-                    'employee_status' => 'active'
+                    'employee_status' => 'active',
                 ]);
 
                 // 3. Assign leave entitlements

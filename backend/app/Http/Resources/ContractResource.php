@@ -17,20 +17,22 @@ class ContractResource extends JsonResource
         return [
             'id' => $this->id,
 
-            'employee'       => [
-                'id'         => $this->employee->id,
-                'name'       => $this->employee->first_name . ' ' . $this->employee->last_name,
-            ],
-            'contract_type'  => $this->contract_type,
+            'employee' => $this->employee?->id ? [
+                'id' => $this->employee->id,
+                'name' => $this->employee->first_name.' '.$this->employee->last_name,
+            ] : null,
+
+            'contract_type' => $this->contract_type,
             'probation_period_days' => $this->probation_period_days,
-            'salary'         => $this->salary,
-            'terms'          => $this->terms,
+            'salary' => $this->salary,
+            'terms' => $this->terms,
 
-            'start_date'     => $this->start_date,
-            'end_date'       => $this->end_date,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
 
-            'created_at'     => $this->created_at?->toDateTimeString(),
-            'updated_at'     => $this->updated_at?->toDateTimeString(),
+            'created_at' => $this->created_at?->toDateTimeString(),
+            'updated_at' => $this->updated_at?->toDateTimeString(),
+            'deleted_at' => $this->deleted_at?->toDateTimeString(),
         ];
     }
 }

@@ -69,12 +69,6 @@ class AttendanceController extends Controller implements HasMiddleware
     public function show($attendanceId): JsonResponse
     {
         $attendance = Attendance::findOrFail($attendanceId);
-        if ($attendance) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized or record not found',
-            ], 403);
-        }
 
         return response()->json([
             'status' => 'success',

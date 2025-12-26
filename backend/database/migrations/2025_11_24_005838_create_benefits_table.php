@@ -20,6 +20,16 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->timestamps();
+
+            // Indexes for search and filtering
+            $table->index('employee_id');
+            $table->index('benefit_type');
+            $table->index('is_deduction');
+            $table->index('created_at');
+
+            // Soft deletes for audit trail
+            $table->softDeletes();
+            $table->index('deleted_at');
         });
     }
 

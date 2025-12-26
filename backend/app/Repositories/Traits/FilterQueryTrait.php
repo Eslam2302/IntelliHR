@@ -17,6 +17,10 @@ trait FilterQueryTrait
         string $defaultSort = 'id',
         string $defaultDirection = 'desc'
     ): Builder {
+        // Apply trashed filter first
+        $trashedState = $filters['deleted'] ?? 'without';
+        $query = $this->applyTrashedFilter($query, $trashedState);
+
         // Apply search filter
         if (! empty($filters['search']) && ! empty($searchableFields)) {
             $query = $this->applySearch($query, $filters['search'], $searchableFields);
@@ -70,6 +74,28 @@ trait FilterQueryTrait
                 }
             }
         });
+    }
+
+    /**
+     * Apply trashed filter to query
+     * Supports: 'without' (default), 'only', 'with'
+     * Only applies if the model uses SoftDeletes trait
+     */
+    public function applyTrashedFilter(
+        Builder $query,
+        string $trashedState = 'without'
+    ): Builder {
+        // Check if the model uses SoftDeletes trait
+        if (! in_array('Illuminate\Database\Eloquent\SoftDeletes', class_uses($query->getModel()))) {
+            // Model doesn't use SoftDeletes, skip filtering
+            return $query;
+        }
+
+        return match ($trashedState) {
+            'only' => $query->onlyTrashed(),
+            'with' => $query->withTrashed(),
+            default => $query->withoutTrashed(),
+        };
     }
 
     /**

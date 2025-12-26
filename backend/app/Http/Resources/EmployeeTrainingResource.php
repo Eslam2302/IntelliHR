@@ -17,8 +17,8 @@ class EmployeeTrainingResource extends JsonResource
             'training_session' => $this->whenLoaded('training'),
             'status' => $this->status,
             'completion_date' => $this->completion_date,
-            'created_at'  => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at'  => $this->updated_at?->format('Y-m-d H:i:s'),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
