@@ -7,6 +7,7 @@ use App\Models\Document;
 use App\Repositories\Contracts\DocumentRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentService
 {
@@ -133,8 +134,12 @@ class DocumentService
     public function delete(Document $document): bool
     {
         try {
-            $data = $document->only(['employee_id', 'doc_type', 'file_path']);
+            // Delete file first
+            if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
+                Storage::disk('public')->delete($document->file_path);
+            }
 
+            $data = $document->only(['employee_id', 'doc_type', 'file_path']);
             $deleted = $this->repository->delete($document);
 
             $this->activityLogger->log(

@@ -78,6 +78,7 @@ class StoreEmployeeRequest extends FormRequest
                 'required',
                 'string',
                 'min:8',
+                'confirmed',
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]+$/',
             ],
         ];

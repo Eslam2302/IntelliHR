@@ -28,6 +28,7 @@ class ContractService
     public function create(ContractDTO $dto): Contract
     {
         try {
+
             $contract = $this->repository->create($dto->toArray());
 
             $this->activityLogger->log(

@@ -40,7 +40,7 @@ Route::get('home', [HomeController::class, 'index']);
 Route::post('login', [AuthController::class, 'store'])->middleware('throttle:5,1');
 
 // (Protected Routes)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
     Route::get('/user', function (Request $request) {
         return $request->user();
