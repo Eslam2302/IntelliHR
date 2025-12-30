@@ -32,6 +32,12 @@ use App\Http\Controllers\Api\TrainerController;
 use App\Http\Controllers\Api\TrainingCertificateController;
 use App\Http\Controllers\Api\TrainingEvaluationController;
 use App\Http\Controllers\Api\TrainingSessionController;
+use App\Http\Controllers\Api\EvaluationCycleController;
+use App\Http\Controllers\Api\CompetencyController;
+use App\Http\Controllers\Api\PerformanceReviewController;
+use App\Http\Controllers\Api\ReviewRatingController;
+use App\Http\Controllers\Api\GoalController;
+use App\Http\Controllers\Api\GoalProgressUpdateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -301,4 +307,30 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     });
 
     Route::get('/activity-log', [ActivityLogController::class, 'index']);
+
+    // Performance Evaluation Routes
+
+    // Evaluation Cycles
+    Route::apiResource('evaluation-cycles', EvaluationCycleController::class);
+
+    // Competencies
+    Route::apiResource('competencies', CompetencyController::class);
+
+    // Performance Reviews
+    Route::apiResource('performance-reviews', PerformanceReviewController::class);
+
+    // Review Ratings
+    Route::apiResource('review-ratings', ReviewRatingController::class);
+
+    // Goals
+    Route::apiResource('goals', GoalController::class);
+
+    // Goal Progress Updates
+    Route::prefix('goals')->group(function () {
+        Route::post('{goal}/progress-updates', [GoalProgressUpdateController::class, 'store']);
+    });
+    Route::get('goal-progress-updates', [GoalProgressUpdateController::class, 'index']);
+    Route::get('goal-progress-updates/{goal_progress_update}', [GoalProgressUpdateController::class, 'show']);
+    Route::put('goal-progress-updates/{goal_progress_update}', [GoalProgressUpdateController::class, 'update']);
+    Route::delete('goal-progress-updates/{goal_progress_update}', [GoalProgressUpdateController::class, 'destroy']);
 });

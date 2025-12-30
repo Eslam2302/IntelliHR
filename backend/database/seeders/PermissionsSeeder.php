@@ -221,6 +221,47 @@ class PermissionsSeeder extends Seeder
             'roles-manage',
             'assign-roles',
 
+            // Evaluation Cycles
+            'view-all-evaluation-cycles',
+            'view-evaluation-cycle',
+            'create-evaluation-cycle',
+            'edit-evaluation-cycle',
+            'delete-evaluation-cycle',
+
+            // Competencies
+            'view-all-competencies',
+            'view-competency',
+            'create-competency',
+            'edit-competency',
+            'delete-competency',
+
+            // Performance Reviews
+            'view-all-performance-reviews',
+            'view-performance-review',
+            'create-performance-review',
+            'edit-performance-review',
+            'delete-performance-review',
+
+            // Review Ratings
+            'view-all-review-ratings',
+            'view-review-rating',
+            'create-review-rating',
+            'edit-review-rating',
+            'delete-review-rating',
+
+            // Goals
+            'view-all-goals',
+            'view-goal',
+            'create-goal',
+            'edit-goal',
+            'delete-goal',
+
+            // Goal Progress Updates
+            'view-all-goal-progress-updates',
+            'view-goal-progress-update',
+            'create-goal-progress-update',
+            'edit-goal-progress-update',
+            'delete-goal-progress-update',
         ];
 
         foreach ($permissions as $permission) {

@@ -165,6 +165,10 @@ class PayrollProcessingService
                             'deductions'  => $totalDeductions,
                             'net_pay'     => $netPay,
                             'processed_at' => now(),
+                            'payment_status' => 'pending',
+                            'stripe_charge_id' => null,
+                            'paid_at' => null,
+                            'deleted_at' => null,
                         ]);
 
                         $this->activityLogger->log(

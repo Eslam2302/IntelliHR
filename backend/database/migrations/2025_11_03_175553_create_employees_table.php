@@ -41,10 +41,6 @@ return new class extends Migration
             $table->index('department_id');
             $table->index('manager_id');
             $table->index('created_at');
-            $table->index('updated_at');
-            $table->index('department_id');
-            $table->index('manager_id');
-            $table->index('job_id');
 
             // Composite indexes for common filter combinations
             $table->index(['department_id', 'employee_status']);

@@ -37,6 +37,12 @@ use App\Repositories\Contracts\TrainerRepositoryInterface;
 use App\Repositories\Contracts\TrainingCertificateRepositoryInterface;
 use App\Repositories\Contracts\TrainingEvaluationRepositoryInterface;
 use App\Repositories\Contracts\TrainingSessionRepositoryInterface;
+use App\Repositories\Contracts\EvaluationCycleRepositoryInterface;
+use App\Repositories\Contracts\CompetencyRepositoryInterface;
+use App\Repositories\Contracts\PerformanceReviewRepositoryInterface;
+use App\Repositories\Contracts\ReviewRatingRepositoryInterface;
+use App\Repositories\Contracts\GoalRepositoryInterface;
+use App\Repositories\Contracts\GoalProgressUpdateRepositoryInterface;
 use App\Repositories\DeductionRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
@@ -58,6 +64,12 @@ use App\Repositories\TrainerRepository;
 use App\Repositories\TrainingCertificateRepository;
 use App\Repositories\TrainingEvaluationRepository;
 use App\Repositories\TrainingSessionRepository;
+use App\Repositories\EvaluationCycleRepository;
+use App\Repositories\CompetencyRepository;
+use App\Repositories\PerformanceReviewRepository;
+use App\Repositories\ReviewRatingRepository;
+use App\Repositories\GoalRepository;
+use App\Repositories\GoalProgressUpdateRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -233,6 +245,42 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             EmployeeRoleRepositoryInterface::class,
             EmployeeRoleRepository::class
+        );
+
+        // bind Evaluation Cycle Repository
+        $this->app->bind(
+            EvaluationCycleRepositoryInterface::class,
+            EvaluationCycleRepository::class
+        );
+
+        // bind Competency Repository
+        $this->app->bind(
+            CompetencyRepositoryInterface::class,
+            CompetencyRepository::class
+        );
+
+        // bind Performance Review Repository
+        $this->app->bind(
+            PerformanceReviewRepositoryInterface::class,
+            PerformanceReviewRepository::class
+        );
+
+        // bind Review Rating Repository
+        $this->app->bind(
+            ReviewRatingRepositoryInterface::class,
+            ReviewRatingRepository::class
+        );
+
+        // bind Goal Repository
+        $this->app->bind(
+            GoalRepositoryInterface::class,
+            GoalRepository::class
+        );
+
+        // bind Goal Progress Update Repository
+        $this->app->bind(
+            GoalProgressUpdateRepositoryInterface::class,
+            GoalProgressUpdateRepository::class
         );
     }
 

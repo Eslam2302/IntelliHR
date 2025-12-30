@@ -35,6 +35,9 @@ return new class extends Migration
             $table->index('payroll_id');
             $table->index('type');
             $table->index('created_at');
+
+            $table->softDeletes();
+
         });
     }
 
