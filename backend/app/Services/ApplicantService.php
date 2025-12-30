@@ -100,7 +100,7 @@ class ApplicantService
                 'current_stage_id',
             ]);
 
-            $updated = $this->repository->update($applicant, $dto->toArray());
+            $updated = $this->repository->update($applicant, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'applicant',

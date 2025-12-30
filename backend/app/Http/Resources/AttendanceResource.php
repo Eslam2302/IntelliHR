@@ -15,17 +15,27 @@ class AttendanceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'  => $this->id,
-
+            'id' => $this->id,
+            'employee_id' => $this->employee_id,
             'employee' => [
-                'id'   => $this->employee->id,
-                'name'  => $this->employee->name,
+                'id' => $this->employee->id ?? null,
+                'name' => $this->employee->name ?? null,
             ],
-
-            'check_in' => $this->check_in,
-            'check_out' => $this->check_out ?? null,
-            'is_late' => $this->is_late ?? null,
-            'calculated_hours'  => $this->calculated_hours ?? null
+            'date' => $this->date?->format('Y-m-d'),
+            'check_in' => $this->check_in?->format('Y-m-d H:i:s'),
+            'check_out' => $this->check_out?->format('Y-m-d H:i:s'),
+            'is_late' => $this->is_late ?? false,
+            'calculated_hours' => $this->calculated_hours,
+            'location' => $this->location,
+            'check_in_ip' => $this->check_in_ip,
+            'check_out_ip' => $this->check_out_ip,
+            'notes' => $this->notes,
+            'status' => $this->status ?? 'present',
+            'break_duration_minutes' => $this->break_duration_minutes,
+            'overtime_hours' => $this->overtime_hours,
+            'worked_hours' => $this->getWorkedHours(),
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

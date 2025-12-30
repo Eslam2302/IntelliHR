@@ -80,7 +80,7 @@ class DeductionService
         try {
             $oldData = $deduction->only(['type', 'amount']);
 
-            $updatedDeduction = $this->repository->update($deduction, $dto->toArray());
+            $updatedDeduction = $this->repository->update($deduction, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'payroll',

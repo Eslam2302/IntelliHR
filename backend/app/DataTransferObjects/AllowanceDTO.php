@@ -9,17 +9,24 @@ class AllowanceDTO
     public function __construct(
         public readonly int $employee_id,
         public readonly ?int $payroll_id,
-        public readonly string $type,
-        public readonly float $amount,
+        public readonly ?string $type,
+        public readonly ?float $amount,
     ) {}
 
     public static function fromRequest(AllowanceRequest $request): self
     {
+        $allowance = $request->route('allowance');
+        $isUpdate = !empty($allowance);
+        
         return new self(
-            employee_id: $request->validated('employee_id'),
+            employee_id: $isUpdate
+                ? ($request->validated('employee_id') ?? $allowance->employee_id)
+                : $request->validated('employee_id'),
             payroll_id: $request->validated('payroll_id') ?? null,
-            type: $request->validated('type'),
-            amount: (float) $request->validated('amount'),
+            type: $isUpdate
+                ? ($request->validated('type') ?? $allowance->type)
+                : $request->validated('type'),
+            amount: $request->validated('amount') ? (float) $request->validated('amount') : null,
         );
     }
 
@@ -29,7 +36,18 @@ class AllowanceDTO
             'employee_id'   => $this->employee_id,
             'payroll_id'    => $this->payroll_id,
             'type'          => $this->type,
-            'amount'        => (float) $this->amount
+            'amount'        => $this->amount !== null ? (float) $this->amount : null
         ];
+    }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Remove employee_id from updates (shouldn't change)
+        unset($data['employee_id']);
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
     }
 }

@@ -13,7 +13,9 @@ class UpdateEmployeeRequest extends FormRequest
 
     public function rules(): array
     {
-        $employeeId = $this->route('employees');
+        $employee = $this->route('employees');
+        $employeeId = $employee?->id;
+        $userId = $employee?->user?->id;
 
         return [
             'first_name' => [
@@ -26,7 +28,11 @@ class UpdateEmployeeRequest extends FormRequest
                 'string',
                 'max:100',
             ],
-            'personal_email' => ['nullable', 'email', 'unique:employees,personal_email'],
+            'personal_email' => [
+                'nullable',
+                'email',
+                'unique:employees,personal_email,' . $employeeId,
+            ],
 
             'phone' => [
                 'nullable',
@@ -74,7 +80,7 @@ class UpdateEmployeeRequest extends FormRequest
             'email' => [
                 'required',
                 'email',
-                'unique:users,email',
+                'unique:users,email,' . $userId,
             ],
             'password' => [
                 'nullable',

@@ -25,5 +25,10 @@ interface ReviewRatingRepositoryInterface
      * Delete existing review rating
      */
     public function delete(ReviewRating $reviewRating): bool;
+
+    /**
+     * Find review rating by ID
+     */
+    public function find(int $id): ?ReviewRating;
 }
 

@@ -106,7 +106,7 @@ class HiringStageService
                 'order',
             ]);
 
-            $updatedStage = $this->repository->update($hiringStage, $dto->toArray());
+            $updatedStage = $this->repository->update($hiringStage, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'hiringStage',

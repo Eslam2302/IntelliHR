@@ -38,4 +38,15 @@ class EmployeeTrainingDTO
             'completion_date' => $this->completion_date,
         ];
     }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Remove immutable fields from updates (shouldn't change)
+        unset($data['employee_id'], $data['training_id']);
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+    }
 }

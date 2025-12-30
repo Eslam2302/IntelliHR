@@ -22,12 +22,23 @@ class AssetAssignmentRequest extends FormRequest
      */
     public function rules(): array
     {
-        $assignmentId = $this->asset_assignment ? $this->asset_assignment->id : null;
+        $assignment = $this->route('asset_assignment');
+        $assignmentId = $assignment?->id ?? ($this->asset_assignment ? $this->asset_assignment->id : null);
+        $isUpdate = !empty($assignment);
 
         return [
-            'asset_id' => ['required', 'exists:assets,id'],
-            'employee_id' => ['required', 'exists:employees,id'],
-            'assigned_date' => ['required', 'date'],
+            'asset_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:assets,id'
+            ],
+            'employee_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:employees,id'
+            ],
+            'assigned_date' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'date'
+            ],
             'return_date' => ['nullable', 'date', 'after_or_equal:assigned_date'],
         ];
     }

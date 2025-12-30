@@ -87,4 +87,17 @@ class EmployeeDTO
             'password' => $this->password,
         ];
     }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Remove immutable fields from updates (shouldn't change)
+        unset($data['national_id'], $data['hire_date']);
+        // Remove email and password - they're handled separately for User model
+        unset($data['email'], $data['password']);
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+    }
 }

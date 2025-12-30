@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\DataTransferObjects\EmployeeDTO;
 use App\Models\Employee;
-use App\Models\User;
 use App\Repositories\Contracts\EmployeeRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +15,7 @@ class EmployeeService
 {
     public function __construct(
         protected EmployeeRepositoryInterface $repository,
+        protected UserRepositoryInterface $userRepository,
         protected ActivityLoggerService $activityLogger
     ) {}
 
@@ -39,7 +40,7 @@ class EmployeeService
             $employee = $this->repository->create($employeeData);
 
             // Create associated User
-            User::create([
+            $this->userRepository->create([
                 'employee_id' => $employee->id,
                 'email' => $dto->email,
                 'password' => Hash::make($dto->password),
@@ -89,11 +90,15 @@ class EmployeeService
             ]);
 
             // Update Employee
-            $employeeData = $dto->toArray();
-            unset($employeeData['email'], $employeeData['password']);
+            $employeeData = $dto->toUpdateArray();
+            // Email and password are already excluded in toUpdateArray()
             $updatedEmployee = $this->repository->update($employee, $employeeData);
 
             // Update associated User
+            if (!$employee->user) {
+                throw new \Exception("User not found for employee {$employee->id}.");
+            }
+            
             $userData = ['email' => $dto->email];
             if ($dto->password !== null) {
                 $userData['password'] = Hash::make($dto->password);

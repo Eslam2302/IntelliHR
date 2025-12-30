@@ -34,7 +34,7 @@ class GoalDTO
         return new self(
             employeeId: $employeeId,
             evaluationCycleId: $request->validated('evaluation_cycle_id'),
-            setBy: $request->user()->employee->id ?? 0,
+            setBy: $request->user()->employee_id ?? 0,
             title: $request->validated('title') ?? '',
             description: $request->validated('description') ?? '',
             type: $request->validated('type') ?? '',

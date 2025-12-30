@@ -19,13 +19,24 @@ class InterviewRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('interview'));
+        
         return [
-            'applicant_id' => ['required', 'exists:applicants,id'],
+            'applicant_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:applicants,id'
+            ],
             'interviewer_id' => ['nullable', 'exists:employees,id'],
-            'scheduled_at' => ['required', 'date'],
+            'scheduled_at' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'date'
+            ],
             'score' => ['nullable', 'integer', 'min:0', 'max:100'],
             'notes' => ['nullable', 'string'],
-            'status' => ['required', Rule::in(['scheduled', 'done', 'canceled'])],
+            'status' => [
+                $isUpdate ? 'sometimes' : 'required',
+                Rule::in(['scheduled', 'done', 'canceled'])
+            ],
         ];
     }
 }

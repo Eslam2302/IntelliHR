@@ -50,7 +50,7 @@ class EvaluationCycleDTO
                 ? $request->boolean('include_goals') 
                 : ($isUpdate ? null : true), // null for update (don't change), true for create (default)
             description: $request->validated('description'),
-            createdBy: $isUpdate ? 0 : ($request->user()->employee->id ?? 0),
+            createdBy: $isUpdate ? 0 : ($request->user()->employee_id ?? 0),
         );
     }
 

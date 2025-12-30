@@ -56,4 +56,12 @@ class LeaveTypeRepository implements LeaveTypeRepositoryInterface
     {
         return $leaveType->delete();
     }
+
+    /**
+     * Find leave type by ID
+     */
+    public function find(int $id): ?LeaveType
+    {
+        return $this->model->find($id);
+    }
 }

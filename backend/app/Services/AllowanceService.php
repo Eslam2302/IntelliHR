@@ -84,7 +84,7 @@ class AllowanceService
             return DB::transaction(function () use ($allowance, $dto) {
                 $oldData = $allowance->only(['type', 'amount']);
 
-                $updatedAllowance = $this->repository->update($allowance, $dto->toArray());
+                $updatedAllowance = $this->repository->update($allowance, $dto->toUpdateArray());
 
                 $this->activityLogger->log(
                     logName: 'payroll',

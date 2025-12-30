@@ -21,16 +21,35 @@ class JobPostRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('jobPost'));
+        
         return [
-            'title'             => ['required', 'string', 'max:255'],
-            'description'       => ['required', 'string'],
+            'title'             => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
+            'description'       => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string'
+            ],
             'requirements'      => ['nullable', 'string'],
             'responsibilities'  => ['nullable', 'string'],
 
-            'department_id' => ['required', 'integer', 'exists:departments,id'],
+            'department_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'integer',
+                'exists:departments,id'
+            ],
 
-            'job_type' => ['required', 'in:internal,external,both'],
-            'status'   => ['required', 'in:open,closed'],
+            'job_type' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'in:internal,external,both'
+            ],
+            'status'   => [
+                $isUpdate ? 'sometimes' : 'required',
+                'in:open,closed'
+            ],
 
             'posted_at' => ['nullable', 'date'],
 

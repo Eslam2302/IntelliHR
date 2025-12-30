@@ -81,7 +81,7 @@ class LeaveTypeService
                 'requires_attachment',
             ]);
 
-            $UpdatedLeaveType = $this->repository->update($leaveType, $dto->toArray());
+            $UpdatedLeaveType = $this->repository->update($leaveType, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'leaveType',

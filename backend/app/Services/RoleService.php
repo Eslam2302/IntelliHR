@@ -96,7 +96,7 @@ class RoleService
                 'permissions' => $role->permissions->pluck('id')->toArray(),
             ];
 
-            $updatedRole = $this->repository->update($role, $dto->toArray());
+            $updatedRole = $this->repository->update($role, $dto->toUpdateArray());
 
             if (! is_null($dto->permissions)) {
                 $this->repository->syncPermissions($updatedRole, $dto->permissions);

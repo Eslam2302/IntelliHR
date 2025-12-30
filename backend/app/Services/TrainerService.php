@@ -103,7 +103,7 @@ class TrainerService
                 'company',
             ]);
 
-            $updatedTrainer = $this->repository->update($trainer, $dto->toArray());
+            $updatedTrainer = $this->repository->update($trainer, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'trainer',

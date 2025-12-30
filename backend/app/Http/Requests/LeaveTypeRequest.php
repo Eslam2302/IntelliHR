@@ -15,11 +15,12 @@ class LeaveTypeRequest extends FormRequest
     {
         // Get ID for update (unique rule exception)
         $leaveTypeId = $this->route('leave_type')?->id;
+        $isUpdate = !empty($leaveTypeId);
 
         return [
             // Name
             'name' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'max:100',
                 'unique:leave_types,name,' . ($leaveTypeId ?? 'NULL'),
@@ -27,7 +28,7 @@ class LeaveTypeRequest extends FormRequest
 
             // Short code (AL, SL, ML)
             'code' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'max:10',
                 'unique:leave_types,code,' . ($leaveTypeId ?? 'NULL'),
@@ -35,7 +36,7 @@ class LeaveTypeRequest extends FormRequest
 
             // Annual leave entitlement
             'annual_entitlement' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'integer',
                 'min:0',
                 'max:365'
@@ -43,13 +44,13 @@ class LeaveTypeRequest extends FormRequest
 
             // Accrual method
             'accrual_policy' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'in:none,monthly,annual'
             ],
 
             // Carry over limit
             'carry_over_limit' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'integer',
                 'min:0',
                 'max:365'
@@ -57,14 +58,14 @@ class LeaveTypeRequest extends FormRequest
 
             // Minimum request days
             'min_request_days' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'integer',
                 'min:1'
             ],
 
             // Maximum request days
             'max_request_days' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'integer',
                 'min:1',
                 'gte:min_request_days'
@@ -72,7 +73,7 @@ class LeaveTypeRequest extends FormRequest
 
             // Workflow – HR approval needed?
             'requires_hr_approval' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'boolean'
             ],
 
@@ -84,13 +85,13 @@ class LeaveTypeRequest extends FormRequest
 
             // paid / unpaid / partially paid
             'payment_type' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'in:paid,unpaid,partially_paid'
             ],
 
             // Does it require proof (e.g. sick leave)?
             'requires_attachment' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'boolean'
             ],
         ];

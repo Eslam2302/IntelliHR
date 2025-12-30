@@ -39,4 +39,15 @@ class LeaveRequestDTO
             'attachment'    => $this->attachment,
         ];
     }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Remove immutable fields from updates (shouldn't change)
+        unset($data['employee_id'], $data['leave_type_id'], $data['start_date'], $data['end_date']);
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+    }
 }

@@ -49,4 +49,15 @@ class ExpenseDTO
         // Remove null values to prevent overwriting existing DB values
         return array_filter($data, fn($value) => !is_null($value));
     }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Remove employee_id from updates (shouldn't change)
+        unset($data['employee_id']);
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+    }
 }

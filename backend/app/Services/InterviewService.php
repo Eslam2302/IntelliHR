@@ -87,7 +87,7 @@ class InterviewService
                 'status',
             ]);
 
-            $updated = $this->repository->update($interview, $dto->toArray());
+            $updated = $this->repository->update($interview, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'interview',

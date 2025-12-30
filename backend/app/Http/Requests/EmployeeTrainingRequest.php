@@ -21,10 +21,21 @@ class EmployeeTrainingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('employeeTraining'));
+        
         return [
-            'employee_id' => ['required', 'exists:employees,id'],
-            'training_id' => ['required', 'exists:training_sessions,id'],
-            'status' => ['required', 'in:enrolled,completed,cancelled'],
+            'employee_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:employees,id'
+            ],
+            'training_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:training_sessions,id'
+            ],
+            'status' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'in:enrolled,completed,cancelled'
+            ],
             'completion_date' => ['nullable', 'date'],
         ];
     }

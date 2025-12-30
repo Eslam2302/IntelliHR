@@ -23,4 +23,13 @@ class AssignRoleDTO
             'role' => $this->role,
         ];
     }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
+    }
 }

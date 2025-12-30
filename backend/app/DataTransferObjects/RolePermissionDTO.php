@@ -23,4 +23,13 @@ class RolePermissionDTO
             'permissions' => $this->permissions,
         ];
     }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Filter out empty arrays and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '' && (!is_array($value) || !empty($value));
+        });
+    }
 }

@@ -99,7 +99,7 @@ class DepartmentService
         try {
             $oldData = $department->only(['name', 'description']);
 
-            $updatedDepartment = $this->repository->update($department, $dto->toArray());
+            $updatedDepartment = $this->repository->update($department, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'department',

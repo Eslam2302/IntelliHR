@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\DataTransferObjects\LeaveRequestDTO;
-use App\Models\LeaveBalance;
 use App\Models\LeaveRequest;
-use App\Models\LeaveType;
+use App\Repositories\Contracts\LeaveBalanceRepositoryInterface;
 use App\Repositories\Contracts\LeaveRequestRepositoryInterface;
+use App\Repositories\Contracts\LeaveTypeRepositoryInterface;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\LeaveRequestCreated;
 use Carbon\Carbon;
@@ -17,6 +17,8 @@ class LeaveRequestService
 {
     public function __construct(
         protected LeaveRequestRepositoryInterface $repository,
+        protected LeaveTypeRepositoryInterface $leaveTypeRepository,
+        protected LeaveBalanceRepositoryInterface $leaveBalanceRepository,
         protected ActivityLoggerService $activityLogger
     ) {}
 
@@ -46,12 +48,13 @@ class LeaveRequestService
         }
 
         // Check leave balance if paid
-        $leaveType = LeaveType::find($dto->leave_type_id);
-        if ($leaveType->payment_type === 'paid') {
-            $balance = LeaveBalance::where('employee_id', $employeeId)
-                ->where('leave_type_id', $leaveType->id)
-                ->where('year', now()->year)
-                ->first();
+        $leaveType = $this->leaveTypeRepository->find($dto->leave_type_id);
+        if ($leaveType && $leaveType->payment_type === 'paid') {
+            $balance = $this->leaveBalanceRepository->findByEmployeeAndLeaveTypeAndYear(
+                $employeeId,
+                $leaveType->id,
+                now()->year
+            );
 
             if (!$balance || $balance->remaining_days < $days) {
                 throw new Exception("Insufficient leave balance.");
@@ -208,14 +211,18 @@ class LeaveRequestService
     private function approveAndDeduct(LeaveRequest $request, string $role, int $userId): LeaveRequest
     {
         if ($request->type->payment_type === 'paid') {
-            $balance = LeaveBalance::where('employee_id', $request->employee_id)
-                ->where('leave_type_id', $request->leave_type_id)
-                ->where('year', now()->year)
-                ->first();
+            $balance = $this->leaveBalanceRepository->findByEmployeeAndLeaveTypeAndYear(
+                $request->employee_id,
+                $request->leave_type_id,
+                now()->year
+            );
 
-            $balance->used_days += $request->days;
-            $balance->remaining_days -= $request->days;
-            $balance->save();
+            if ($balance) {
+                $this->leaveBalanceRepository->update($balance, [
+                    'used_days' => $balance->used_days + $request->days,
+                    'remaining_days' => $balance->remaining_days - $request->days,
+                ]);
+            }
         }
 
         $data = [

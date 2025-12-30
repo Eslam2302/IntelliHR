@@ -21,10 +21,23 @@ class TrainingEvaluationRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('evaluation'));
+        
         return [
-            'employee_id' => ['required', 'exists:employees,id'],
-            'training_id' => ['required', 'exists:training_sessions,id'],
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'employee_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:employees,id'
+            ],
+            'training_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:training_sessions,id'
+            ],
+            'rating' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'integer',
+                'min:1',
+                'max:5'
+            ],
             'feedback' => ['nullable', 'string'],
         ];
     }

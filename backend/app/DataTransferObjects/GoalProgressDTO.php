@@ -17,7 +17,7 @@ class GoalProgressDTO
     public static function fromRequest(GoalProgressRequest $request): self
     {
         return new self(
-            updatedBy: $request->user()->employee->id ?? 0,
+            updatedBy: $request->user()->employee_id ?? 0,
             updateNote: $request->validated('update_note') ?? '',
             progressPercentage: $request->validated('progress_percentage') ?? 0,
             status: $request->validated('status') ?? '',

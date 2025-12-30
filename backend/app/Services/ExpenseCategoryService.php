@@ -87,7 +87,7 @@ class ExpenseCategoryService
         try {
             $oldData = $category->only(['name']);
 
-            $updated = $this->repository->update($category, $dto->toArray());
+            $updated = $this->repository->update($category, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'expenseCategory',

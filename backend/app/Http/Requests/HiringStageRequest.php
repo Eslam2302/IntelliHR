@@ -24,18 +24,26 @@ class HiringStageRequest extends FormRequest
      */
     public function rules(): array
     {
-        $hiringStageId = $this->route('hiringStage')?->id; 
+        $hiringStageId = $this->route('hiringStage')?->id;
+        $isUpdate = !empty($hiringStageId);
 
         return [
-            'job_id'     => ['required', 'integer', 'exists:job_posts,id'],
-            'stage_name' => ['required', 'string', 'max:255'],
+            'job_id'     => [
+                $isUpdate ? 'sometimes' : 'required',
+                'integer',
+                'exists:job_posts,id'
+            ],
+            'stage_name' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
             'order'      => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'integer',
                 'min:1',
-
                 Rule::unique('hiring_stages')->where(function ($query) {
-                    return $query->where('job_id', $this->input('job_id'));
+                    return $query->where('job_id', $this->input('job_id') ?? $this->route('hiringStage')?->job_id);
                 })->ignore($hiringStageId),
             ],
         ];

@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateDepartmentRequest;
 class DepartmentDTO
 {
     public function __construct(
-        public readonly string $name,
+        public readonly ?string $name,
         public readonly ?string $description = null,
     ) {}
 
@@ -26,13 +26,18 @@ class DepartmentDTO
     }
 
     /**
-     * Create DTO from store request
+     * Create DTO from update request
      */
     public static function fromUpdateRequest(UpdateDepartmentRequest $request): self
     {
+        $department = $request->route('department');
+        $isUpdate = !empty($department);
+        
         return new self(
-            name: $request->validated('name'),
-            description: $request->validated('description'),
+            name: $isUpdate
+                ? ($request->validated('name') ?? $department->name)
+                : $request->validated('name'),
+            description: $request->validated('description') ?? ($isUpdate ? $department->description : null),
         );
     }
 
@@ -56,5 +61,14 @@ class DepartmentDTO
             'name' => $this->name,
             'description' => $this->description,
         ];
+    }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
     }
 }

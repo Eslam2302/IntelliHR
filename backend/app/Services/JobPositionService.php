@@ -78,7 +78,7 @@ class JobPositionService
                 'responsibilities',
             ]);
 
-            $updatedJobPosition = $this->repository->update($jobPosition, $dto->toArray());
+            $updatedJobPosition = $this->repository->update($jobPosition, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'jobPosition',

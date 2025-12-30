@@ -31,27 +31,29 @@ class JobPositionRequest extends FormRequest
     public function rules(): array
     {
         $jobPositionId = $this->route('job_position')?->id;
+        $isUpdate = !empty($jobPositionId);
+        
         return [
             'title' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'unique:job_positions,title,' . $jobPositionId,
                 'string',
                 'max:100'
             ],
             'grade' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'string',
             ],
             'department_id' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
             ],
             'min_salary' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'numeric',
                 'regex:/^\d{1,10}(\.\d{1,2})?$/'
             ],
             'max_salary' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'numeric',
                 'regex:/^\d{1,10}(\.\d{1,2})?$/'
             ],

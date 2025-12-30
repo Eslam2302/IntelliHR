@@ -71,7 +71,7 @@ class BenefitService
         try {
             $oldData = $benefit->only(['benefit_type', 'amount', 'is_deduction']);
 
-            $updatedBenefit = $this->repository->update($benefit, $dto->toArray());
+            $updatedBenefit = $this->repository->update($benefit, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'payroll',

@@ -26,4 +26,9 @@ interface LeaveTypeRepositoryInterface
      * Delete existing leave type
     */
     public function delete(LeaveType $leaveType): bool;
+
+    /**
+     * Find leave type by ID
+     */
+    public function find(int $id): ?LeaveType;
 }

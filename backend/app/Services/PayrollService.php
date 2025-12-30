@@ -84,12 +84,18 @@ class PayrollService
             $oldData = $payroll;
 
             // Recalculate net pay
-            $data = $dto->toArray();
-            $data['net_pay'] = $this->repository->calculateNetPay(
-                $data['basic_salary'],
-                $data['allowances'],
-                $data['deductions']
-            );
+            $data = $dto->toUpdateArray();
+            // Calculate net pay if salary/allowances/deductions are being updated
+            if (isset($data['basic_salary']) || isset($data['allowances']) || isset($data['deductions'])) {
+                $basicSalary = $data['basic_salary'] ?? $payroll->basic_salary;
+                $allowances = $data['allowances'] ?? $payroll->allowances;
+                $deductions = $data['deductions'] ?? $payroll->deductions;
+                $data['net_pay'] = $this->repository->calculateNetPay(
+                    $basicSalary,
+                    $allowances,
+                    $deductions
+                );
+            }
 
             $updatedPayroll = $this->repository->update($payroll, $data);
 

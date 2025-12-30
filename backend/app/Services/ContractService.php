@@ -63,7 +63,7 @@ class ContractService
         try {
             $oldData = $contract;
 
-            $updatedContract = $this->repository->update($contract, $dto->toArray());
+            $updatedContract = $this->repository->update($contract, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'contract',

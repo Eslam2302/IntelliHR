@@ -87,7 +87,7 @@ class TrainingCertificateService
                 'certificate_path',
             ]);
 
-            $updatedCertificate = $this->repository->update($certificate, $dto->toArray());
+            $updatedCertificate = $this->repository->update($certificate, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'trainingCertificate',

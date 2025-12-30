@@ -92,7 +92,7 @@ class EmployeeTrainingService
                 'completion_date',
             ]);
 
-            $updatedTraining = $this->repository->update($employeeTraining, $dto->toArray());
+            $updatedTraining = $this->repository->update($employeeTraining, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'employeeTraining',

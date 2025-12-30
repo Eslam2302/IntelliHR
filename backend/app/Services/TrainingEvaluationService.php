@@ -87,7 +87,7 @@ class TrainingEvaluationService
                 'feedback',
             ]);
 
-            $updatedEvaluation = $this->repository->update($evaluation, $dto->toArray());
+            $updatedEvaluation = $this->repository->update($evaluation, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'trainingEvaluation',

@@ -21,8 +21,14 @@ class ExpenseCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('category'));
+        
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
         ];
     }
 

@@ -92,7 +92,7 @@ class TrainingSessionService
                 'description',
             ]);
 
-            $updatedSession = $this->repository->update($trainingSession, $dto->toArray());
+            $updatedSession = $this->repository->update($trainingSession, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'trainingSession',

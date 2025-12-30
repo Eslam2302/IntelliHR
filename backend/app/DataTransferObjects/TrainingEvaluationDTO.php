@@ -7,9 +7,9 @@ use App\Http\Requests\TrainingEvaluationRequest;
 class TrainingEvaluationDTO
 {
     public function __construct(
-        public readonly int $employee_id,
-        public readonly int $training_id,
-        public readonly int $rating,
+        public readonly ?int $employee_id,
+        public readonly ?int $training_id,
+        public readonly ?int $rating,
         public readonly ?string $feedback = null
     ) {}
 
@@ -18,11 +18,20 @@ class TrainingEvaluationDTO
      */
     public static function fromRequest(TrainingEvaluationRequest $request): self
     {
+        $evaluation = $request->route('evaluation');
+        $isUpdate = !empty($evaluation);
+        
         return new self(
-            employee_id: $request->validated('employee_id'),
-            training_id: $request->validated('training_id'),
-            rating: $request->validated('rating'),
-            feedback: $request->validated('feedback')
+            employee_id: $isUpdate
+                ? ($request->validated('employee_id') ?? $evaluation->employee_id)
+                : $request->validated('employee_id'),
+            training_id: $isUpdate
+                ? ($request->validated('training_id') ?? $evaluation->training_id)
+                : $request->validated('training_id'),
+            rating: $isUpdate
+                ? ($request->validated('rating') ?? $evaluation->rating)
+                : $request->validated('rating'),
+            feedback: $request->validated('feedback') ?? ($isUpdate ? $evaluation->feedback : null)
         );
     }
 
@@ -37,5 +46,16 @@ class TrainingEvaluationDTO
             'rating' => $this->rating,
             'feedback' => $this->feedback,
         ];
+    }
+
+    public function toUpdateArray(): array
+    {
+        $data = $this->toArray();
+        // Remove immutable fields from updates (shouldn't change)
+        unset($data['employee_id'], $data['training_id']);
+        // Filter out empty strings and null values for partial updates
+        return array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
     }
 }

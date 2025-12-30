@@ -96,7 +96,7 @@ class AssetService
                 'status',
             ]);
 
-            $updatedAsset = $this->repository->update($asset, $dto->toArray());
+            $updatedAsset = $this->repository->update($asset, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'asset',

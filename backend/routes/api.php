@@ -58,11 +58,13 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('employees', EmployeeController::class);
 
+    // Attendance routes - CRUD operations
+    Route::apiResource('attendances', AttendanceController::class);
+    
+    // Attendance check-in/check-out routes
     Route::controller(AttendanceController::class)->prefix('attendance')->group(function () {
-        Route::get('/', 'index');
         Route::post('check-in', 'checkIn');
         Route::post('check-out', 'checkOut');
-        Route::get('{attendance}', 'show');
     });
 
     Route::apiResource('leave-types', LeaveTypeController::class);

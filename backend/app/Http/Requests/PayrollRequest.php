@@ -22,21 +22,33 @@ class PayrollRequest extends FormRequest
     public function rules(): array
     {
         $payrollId = $this->route('payroll')?->id ?? null;
+        $isUpdate = !empty($payrollId);
 
         return [
-
             'employee_id' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'exists:employees,id',
                 // unique payroll per employee/year/month
-                'unique:payrolls,employee_id,' . $payrollId . ',id,year,' . $this->year . ',month,' . $this->month,
-
+                'unique:payrolls,employee_id,' . $payrollId . ',id,year,' . ($this->year ?? $this->route('payroll')?->year) . ',month,' . ($this->month ?? $this->route('payroll')?->month),
             ],
 
-            'year'  => ['required', 'integer', 'min:2000', 'max:2100'],
-            'month' => ['required', 'integer', 'between:1,12'],
+            'year'  => [
+                $isUpdate ? 'sometimes' : 'required',
+                'integer',
+                'min:2000',
+                'max:2100'
+            ],
+            'month' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'integer',
+                'between:1,12'
+            ],
 
-            'basic_salary' => ['required', 'numeric', 'min:0'],
+            'basic_salary' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'numeric',
+                'min:0'
+            ],
 
             'allowances'   => ['nullable', 'numeric', 'min:0'],
             'deductions'   => ['nullable', 'numeric', 'min:0'],

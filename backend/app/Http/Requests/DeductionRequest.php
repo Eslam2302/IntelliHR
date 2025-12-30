@@ -21,11 +21,24 @@ class DeductionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('deduction'));
+        
         return [
             'payroll_id' =>    ['nullable', 'exists:payrolls,id'],
-            'employee_id' => ['required', 'exists:employees,id'],
-            'type' =>        ['required', 'string', 'max:255'],
-            'amount' =>      ['required', 'numeric', 'min:0'],
+            'employee_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:employees,id'
+            ],
+            'type' =>        [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
+            'amount' =>      [
+                $isUpdate ? 'sometimes' : 'required',
+                'numeric',
+                'min:0'
+            ],
         ];
     }
 

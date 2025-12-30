@@ -22,18 +22,31 @@ class AssetRequest extends FormRequest
      */
     public function rules(): array
     {
-        $assetId = $this->asset ? $this->asset->id : null;
+        $asset = $this->route('asset');
+        $assetId = $asset?->id ?? ($this->asset ? $this->asset->id : null);
+        $isUpdate = !empty($asset);
 
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
             'serial_number' => [
-                'required',
+                $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'max:100',
                 Rule::unique('assets', 'serial_number')->ignore($assetId)
             ],
-            'condition' => ['required', 'string', 'max:50'],
-            'status' => ['required', 'in:available,assigned,maintenance,retired'],
+            'condition' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:50'
+            ],
+            'status' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'in:available,assigned,maintenance,retired'
+            ],
         ];
     }
 

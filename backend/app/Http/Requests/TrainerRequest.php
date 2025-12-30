@@ -22,24 +22,48 @@ class TrainerRequest extends FormRequest
      */
     public function rules(): array
     {
-        $trainerId = $this->trainer ? $this->trainer->id : null;
+        $trainer = $this->route('trainer');
+        $trainerId = $trainer?->id ?? ($this->trainer ? $this->trainer->id : null);
+        $isUpdate = !empty($trainer);
 
         return [
-            'type' => ['required', 'in:internal,external'],
+            'type' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'in:internal,external'
+            ],
             // Internal trainer
-            'employee_id' => ['nullable', 'required_if:type,internal', 'exists:employees,id'],
+            'employee_id' => [
+                'nullable',
+                $isUpdate ? 'sometimes' : 'required_if:type,internal',
+                'exists:employees,id'
+            ],
 
             // External trainer
-            'name' => ['nullable', 'required_if:type,external', 'string', 'max:255'],
+            'name' => [
+                'nullable',
+                $isUpdate ? 'sometimes' : 'required_if:type,external',
+                'string',
+                'max:255'
+            ],
             'email' => [
                 'nullable',
-                'required_if:type,external',
+                $isUpdate ? 'sometimes' : 'required_if:type,external',
                 'email',
                 'max:255',
-                Rule::unique('trainers', 'email')->ignore($this->trainer ?? null)
+                Rule::unique('trainers', 'email')->ignore($trainer ?? $this->trainer ?? null)
             ],
-            'phone' => ['nullable', 'required_if:type,external', 'string', 'max:20'],
-            'company' => ['nullable','required_if:type,external', 'string', 'max:255'],
+            'phone' => [
+                'nullable',
+                $isUpdate ? 'sometimes' : 'required_if:type,external',
+                'string',
+                'max:20'
+            ],
+            'company' => [
+                'nullable',
+                $isUpdate ? 'sometimes' : 'required_if:type,external',
+                'string',
+                'max:255'
+            ],
         ];
     }
 

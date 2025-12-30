@@ -95,7 +95,7 @@ class AssetAssignmentService
                 'return_date',
             ]);
 
-            $updatedAssignment = $this->repository->update($assignment, $dto->toArray());
+            $updatedAssignment = $this->repository->update($assignment, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'assetAssignment',

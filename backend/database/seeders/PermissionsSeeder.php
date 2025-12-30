@@ -216,6 +216,10 @@ class PermissionsSeeder extends Seeder
 
             // Attendance
             'view-all-attendances',
+            'view-attendance',
+            'create-attendance',
+            'edit-attendance',
+            'delete-attendance',
 
             // Mangage Roles & in UI (Work in the future)
             'roles-manage',

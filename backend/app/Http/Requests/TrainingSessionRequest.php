@@ -21,12 +21,32 @@ class TrainingSessionRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('trainingSession'));
+        
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'start_date' => ['required', 'date', 'before_or_equal:end_date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-            'trainer_id' => ['required', 'exists:trainers,id'],
-            'department_id' => ['required', 'exists:departments,id'],
+            'title' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
+            'start_date' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'date',
+                'before_or_equal:end_date'
+            ],
+            'end_date' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'date',
+                'after_or_equal:start_date'
+            ],
+            'trainer_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:trainers,id'
+            ],
+            'department_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:departments,id'
+            ],
             'description' => ['nullable', 'string'],
         ];
     }

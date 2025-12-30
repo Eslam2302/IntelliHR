@@ -105,7 +105,7 @@ class JobPostService
                 'posted_at',
             ]);
 
-            $updatedJobPost = $this->repository->update($jobPost, $dto->toArray());
+            $updatedJobPost = $this->repository->update($jobPost, $dto->toUpdateArray());
 
             $this->activityLogger->log(
                 logName: 'jobPost',

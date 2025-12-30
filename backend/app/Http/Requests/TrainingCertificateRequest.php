@@ -19,10 +19,19 @@ class TrainingCertificateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isUpdate = !empty($this->route('certificate'));
+        
         return [
-            'employee_training_id' => ['required', 'exists:employee_trainings,id'],
+            'employee_training_id' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'exists:employee_trainings,id'
+            ],
             'issued_at' => ['nullable', 'date'],
-            'certificate_path' => ['required', 'string', 'max:255'],
+            'certificate_path' => [
+                $isUpdate ? 'sometimes' : 'required',
+                'string',
+                'max:255'
+            ],
         ];
     }
 

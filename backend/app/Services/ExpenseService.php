@@ -111,7 +111,7 @@ class ExpenseService
                 'notes',
             ]);
 
-            $data = $dto->toArray();
+            $data = $dto->toUpdateArray();
 
             // Handle receipt file upload if provided
             if ($dto->receipt_path instanceof \Illuminate\Http\UploadedFile) {

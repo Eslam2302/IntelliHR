@@ -44,5 +44,10 @@ class ReviewRatingRepository implements ReviewRatingRepositoryInterface
     {
         return $reviewRating->delete();
     }
+
+    public function find(int $id): ?ReviewRating
+    {
+        return $this->model->find($id);
+    }
 }
 

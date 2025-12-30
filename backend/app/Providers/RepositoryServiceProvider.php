@@ -43,6 +43,8 @@ use App\Repositories\Contracts\PerformanceReviewRepositoryInterface;
 use App\Repositories\Contracts\ReviewRatingRepositoryInterface;
 use App\Repositories\Contracts\GoalRepositoryInterface;
 use App\Repositories\Contracts\GoalProgressUpdateRepositoryInterface;
+use App\Repositories\Contracts\LeaveBalanceRepositoryInterface;
+use App\Repositories\Contracts\UserRepositoryInterface;
 use App\Repositories\DeductionRepository;
 use App\Repositories\DepartmentRepository;
 use App\Repositories\DocumentRepository;
@@ -70,6 +72,8 @@ use App\Repositories\PerformanceReviewRepository;
 use App\Repositories\ReviewRatingRepository;
 use App\Repositories\GoalRepository;
 use App\Repositories\GoalProgressUpdateRepository;
+use App\Repositories\LeaveBalanceRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -281,6 +285,18 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             GoalProgressUpdateRepositoryInterface::class,
             GoalProgressUpdateRepository::class
+        );
+
+        // bind Leave Balance Repository
+        $this->app->bind(
+            LeaveBalanceRepositoryInterface::class,
+            LeaveBalanceRepository::class
+        );
+
+        // bind User Repository
+        $this->app->bind(
+            UserRepositoryInterface::class,
+            UserRepository::class
         );
     }
 
