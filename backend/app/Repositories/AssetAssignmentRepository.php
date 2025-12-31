@@ -36,7 +36,7 @@ class AssetAssignmentRepository implements AssetAssignmentRepositoryInterface
      */
     public function show(int $assignmentId): AssetAssignment
     {
-        return $this->model->findOrFail($assignmentId);
+        return $this->model->with(['asset', 'employee'])->findOrFail($assignmentId);
     }
 
     /**
@@ -54,7 +54,7 @@ class AssetAssignmentRepository implements AssetAssignmentRepositoryInterface
     {
         $assignment->update($data);
 
-        return $assignment->fresh();
+        return $assignment->fresh()->load(['asset', 'employee']);
     }
 
     /**

@@ -52,7 +52,7 @@ class EmployeeTrainingRepository implements EmployeeTrainingRepositoryInterface
     {
         $employeeTraining->update($data);
 
-        return $employeeTraining->fresh();
+        return $employeeTraining->fresh()->load(['employee', 'training']);
     }
 
     /**

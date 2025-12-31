@@ -75,11 +75,20 @@ class LeaveRequestController extends Controller implements HasMiddleware
      * HR approves a leave request.
      *
      * @param int $id
-     * @param int $hrId
      * @return JsonResponse
      */
-    public function hrApprove(int $id, int $hrId): JsonResponse
+    public function hrApprove(int $id): JsonResponse
     {
+        // Use authenticated user's employee ID instead of URL parameter
+        $hrId = Auth::user()->employee_id;
+        
+        if (!$hrId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User must be associated with an employee.'
+            ], 403);
+        }
+
         $leaveRequest = $this->service->hrApprove($id, $hrId);
 
         return response()->json([
@@ -99,6 +108,16 @@ class LeaveRequestController extends Controller implements HasMiddleware
      */
     public function managerDashboard(int $managerId)
     {
+        // Verify that the authenticated user is the manager
+        $authenticatedEmployeeId = Auth::user()->employee_id;
+        
+        if ($managerId !== $authenticatedEmployeeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized. You can only view your own team\'s leave requests.'
+            ], 403);
+        }
+
         $filters = [
             'status' => request()->query('status'),
             'year'   => request()->query('year'),

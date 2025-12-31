@@ -25,5 +25,13 @@ class LeaveBalanceRepository implements LeaveBalanceRepositoryInterface
 
         return $leaveBalance->fresh();
     }
+
+    public function getByEmployeeAndYear(int $employeeId, int $year): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->model->where('employee_id', $employeeId)
+            ->where('year', $year)
+            ->with('leaveType')
+            ->get();
+    }
 }
 

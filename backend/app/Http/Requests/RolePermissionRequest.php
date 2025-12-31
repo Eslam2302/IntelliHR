@@ -8,7 +8,9 @@ class RolePermissionRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // Authorization is handled by middleware
+        // This ensures user is authenticated
+        return $this->user() !== null;
     }
 
     public function rules(): array

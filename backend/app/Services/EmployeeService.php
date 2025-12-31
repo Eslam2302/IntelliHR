@@ -67,8 +67,9 @@ class EmployeeService
             return $employee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
+            // Never log password - create safe log data without sensitive fields
             $logData = $dto->toArray();
-            unset($logData['password']);
+            unset($logData['password'], $logData['email']);
             Log::error('Error creating employee: '.$e->getMessage(), ['data' => $logData]);
             throw $e;
         }
@@ -131,8 +132,9 @@ class EmployeeService
             return $updatedEmployee->load(['department', 'job', 'manager', 'user']);
         } catch (\Exception $e) {
             DB::rollBack();
+            // Never log password - create safe log data without sensitive fields
             $logData = $dto->toArray();
-            unset($logData['password']);
+            unset($logData['password'], $logData['email']);
             Log::error("Error updating employee {$employee->id}: ".$e->getMessage(), ['data' => $logData]);
             throw $e;
         }

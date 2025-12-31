@@ -18,7 +18,22 @@ class Applicant extends Model
         'experience_years',
         'current_stage_id',
         'resume_path',
-        'applied_at'
+        'applied_at',
+        'ai_score',
+        'ai_analysis',
+        'ai_matched_skills',
+        'ai_missing_skills',
+        'ai_recommendation',
+        'ai_analyzed_at',
+        'ai_analysis_status',
+    ];
+
+    protected $casts = [
+        'ai_analysis' => 'array',
+        'ai_matched_skills' => 'array',
+        'ai_missing_skills' => 'array',
+        'ai_analyzed_at' => 'datetime',
+        'applied_at' => 'datetime',
     ];
 
     public function job()

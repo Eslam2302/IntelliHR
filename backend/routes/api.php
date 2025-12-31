@@ -38,6 +38,8 @@ use App\Http\Controllers\Api\PerformanceReviewController;
 use App\Http\Controllers\Api\ReviewRatingController;
 use App\Http\Controllers\Api\GoalController;
 use App\Http\Controllers\Api\GoalProgressUpdateController;
+use App\Http\Controllers\Api\ResumeAnalysisController;
+use App\Http\Controllers\Api\AIChatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -84,8 +86,8 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
         )->middleware('auth:sanctum');
 
         // HR approval
-        // {id} = leave request id, {hrId} = HR user id
-        Route::post('{id}/hr-approve/{hrId}', [LeaveRequestController::class, 'hrApprove']);
+        // {id} = leave request id (hrId is now taken from authenticated user)
+        Route::post('{id}/hr-approve', [LeaveRequestController::class, 'hrApprove']);
 
         // Manager Dashboard: view all leave requests of team
         Route::get('/manager-dashboard/{managerId}', [LeaveRequestController::class, 'managerDashboard']);
@@ -244,6 +246,13 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     });
     Route::get('job-posts/{jobPostId}/applicants', [ApplicantController::class, 'getByJobPost']);
 
+    // Resume Analysis Routes (with rate limiting)
+    Route::prefix('applicants')->middleware('throttle:10,1')->group(function () {
+        Route::post('{applicant}/analyze-resume', [ResumeAnalysisController::class, 'analyze']);
+        Route::get('{applicant}/ai-analysis', [ResumeAnalysisController::class, 'getAnalysis']);
+        Route::post('{applicant}/re-analyze', [ResumeAnalysisController::class, 'reAnalyze']);
+    });
+
     // Interview
     Route::prefix('interviews')->group(function () {
         Route::get('/', [InterviewController::class, 'index']);
@@ -309,6 +318,14 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     });
 
     Route::get('/activity-log', [ActivityLogController::class, 'index']);
+
+    // AI Chat Assistant Routes (with rate limiting)
+    Route::prefix('chat')->middleware('throttle:20,1')->group(function () {
+        Route::post('ask', [AIChatController::class, 'ask']);
+        Route::get('history', [AIChatController::class, 'history']);
+        Route::get('session/{sessionId}', [AIChatController::class, 'getSession']);
+        Route::delete('history/{conversation}', [AIChatController::class, 'deleteConversation']);
+    });
 
     // Performance Evaluation Routes
 

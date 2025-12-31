@@ -15,5 +15,10 @@ interface LeaveBalanceRepositoryInterface
      * Update leave balance
      */
     public function update(LeaveBalance $leaveBalance, array $data): LeaveBalance;
+
+    /**
+     * Get all leave balances for an employee by year
+     */
+    public function getByEmployeeAndYear(int $employeeId, int $year): \Illuminate\Database\Eloquent\Collection;
 }
 

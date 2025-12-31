@@ -8,7 +8,9 @@ class UpdateEmployeeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // Authorization is handled by middleware (permission:edit-employee)
+        // This ensures user is authenticated
+        return $this->user() !== null;
     }
 
     public function rules(): array

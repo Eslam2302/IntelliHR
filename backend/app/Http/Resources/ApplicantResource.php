@@ -26,6 +26,18 @@ class ApplicantResource extends JsonResource
             'current_stage' => new HiringStageResource($this->whenLoaded('currentStage')),
             'resume_path' => $this->resume_path,
             'applied_at' => $this->applied_at,
+            // AI Analysis fields
+            'ai_score' => $this->ai_score,
+            'ai_recommendation' => $this->ai_recommendation,
+            'ai_analysis_status' => $this->ai_analysis_status,
+            'ai_analyzed_at' => $this->ai_analyzed_at,
+            'ai_summary' => $this->when($this->ai_analysis, function () {
+                return [
+                    'matched_skills' => $this->ai_matched_skills,
+                    'missing_skills' => $this->ai_missing_skills,
+                    'overall_assessment' => $this->ai_analysis['overall_assessment'] ?? null,
+                ];
+            }),
             // 'interviews' => InterviewResource::collection($this->whenLoaded('interviews')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

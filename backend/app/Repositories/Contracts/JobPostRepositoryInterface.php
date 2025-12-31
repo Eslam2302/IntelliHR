@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
-use App\DataTransferObjects\JobPostDto;
+use App\DataTransferObjects\JobPostDTO;
 use App\Models\JobPost;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -26,7 +26,7 @@ interface JobPostRepositoryInterface
     /**
      * Create a new job post.
      *
-     * @param  JobPostDto  $dto
+     * @param  JobPostDTO  $dto
      */
     public function create(array $data): JobPost;
 
@@ -34,7 +34,7 @@ interface JobPostRepositoryInterface
      * Update an existing job post.
      *
      * @param  int  $id
-     * @param  JobPostDto  $dto
+     * @param  JobPostDTO  $dto
      * @return JobPost|null
      */
     public function update(JobPost $jobPost, array $data): JobPost;

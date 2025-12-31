@@ -8,7 +8,9 @@ class StoreEmployeeRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        // Authorization is handled by middleware (permission:create-employee)
+        // This ensures user is authenticated
+        return $this->user() !== null;
     }
 
     public function rules(): array

@@ -47,11 +47,15 @@ class ApplicantDTO
                 ? ($request->validated('status') ?? $applicant->status)
                 : $request->validated('status'),
             source: $request->validated('source') ?? ($isUpdate ? $applicant->source : null),
-            experience_years: $request->validated('experience_years') ?? ($isUpdate ? $applicant->experience_years : null),
-            current_stage_id: $request->validated('current_stage_id') ?? ($isUpdate ? $applicant->current_stage_id : null),
+            experience_years: $request->has('experience_years') && $request->input('experience_years') !== ''
+                ? ($request->validated('experience_years') ?? ($isUpdate ? $applicant->experience_years : null))
+                : ($isUpdate ? $applicant->experience_years : null),
+            current_stage_id: $request->has('current_stage_id') && $request->input('current_stage_id') !== ''
+                ? ($request->validated('current_stage_id') ?? ($isUpdate ? $applicant->current_stage_id : null))
+                : ($isUpdate ? $applicant->current_stage_id : null),
             resume_path: $isUpdate
                 ? ($request->validated('resume_path') ?? $applicant->resume_path)
-                : $request->validated('resume_path'),
+                : ($request->validated('resume_path') ?? null), // Will be set in service if file uploaded
             applied_at: $request->validated('applied_at') ?? ($isUpdate ? ($applicant->applied_at ? $applicant->applied_at->toDateString() : null) : null)
         );
     }

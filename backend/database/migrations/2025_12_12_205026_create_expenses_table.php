@@ -41,7 +41,12 @@ return new class extends Migration
             $table->index('employee_id');
             $table->index('status');
             $table->index('category_id');
+            $table->index('expense_date');
             $table->index('created_at');
+            
+            // Composite index for common filter combinations
+            $table->index(['employee_id', 'status']);
+            $table->index(['employee_id', 'expense_date']);
         });
     }
 

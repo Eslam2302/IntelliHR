@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\DataTransferObjects\JobPostDto;
+use App\DataTransferObjects\JobPostDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\JobPostRequest;
 use App\Http\Resources\JobPostResource;
@@ -58,7 +58,7 @@ class JobPostController extends Controller implements HasMiddleware
      */
     public function store(jobPostRequest $request): JsonResponse
     {
-        $dto = JobPostDto::fromRequest($request);
+        $dto = JobPostDTO::fromRequest($request);
         $jobPost = $this->service->create($dto);
 
         return response()->json([
@@ -84,7 +84,7 @@ class JobPostController extends Controller implements HasMiddleware
      */
     public function update(JobPostRequest $request, JobPost $jobPost): JsonResponse
     {
-        $dto = JobPostDto::fromRequest($request);
+        $dto = JobPostDTO::fromRequest($request);
         $updatedJobPost = $this->service->update($jobPost, $dto);
 
         return response()->json([
