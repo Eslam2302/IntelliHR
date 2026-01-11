@@ -51,7 +51,7 @@ Route::post('login', [AuthController::class, 'store'])->middleware('throttle:5,1
 Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return $request->user()->load('employee');
     });
     Route::post('logout', [AuthController::class, 'destroy'])->middleware('throttle:10,1');
 
