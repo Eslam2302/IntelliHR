@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('employee_id')->unique();
-            $table->string('email')->unique();
+            $table->string('personal_email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Indexes for search and filtering
-            $table->index('email');
+            $table->index('personal_email');
             $table->index('employee_id');
             $table->index('created_at');
 
@@ -33,7 +33,7 @@ return new class extends Migration
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
+            $table->string('personal_email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });

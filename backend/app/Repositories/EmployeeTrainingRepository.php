@@ -20,7 +20,7 @@ class EmployeeTrainingRepository implements EmployeeTrainingRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'training_id', 'status', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'training.title'],
+            ['employee_id', 'training_id', 'status', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'training.title'],
             ['id', 'employee_id', 'training_id', 'status', 'created_at'],
             'created_at',
             'desc'

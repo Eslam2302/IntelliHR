@@ -26,10 +26,10 @@ class StoreEmployeeRequest extends FormRequest
                 'string',
                 'max:100',
             ],
-            'personal_email' => [
+            'work_email' => [
                 'nullable',
                 'email',
-                'unique:employees,personal_email',
+                'unique:employees,work_email',
             ],
             'phone' => [
                 'nullable',
@@ -74,7 +74,7 @@ class StoreEmployeeRequest extends FormRequest
                 'date',
             ],
 
-            'email' => ['required', 'email', 'unique:users,email'],
+            'personal_email' => ['required', 'email', 'unique:users,personal_email'],
 
             'password' => [
                 'required',

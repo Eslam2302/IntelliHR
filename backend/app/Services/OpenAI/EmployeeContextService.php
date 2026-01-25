@@ -28,7 +28,7 @@ class EmployeeContextService
             'employee' => [
                 'id' => $employee->id,
                 'name' => $employee->first_name . ' ' . $employee->last_name,
-                'email' => $employee->personal_email,
+                'email' => $employee->work_email,
                 'department' => $employee->department?->name,
                 'job_title' => $employee->job?->title,
                 'employee_status' => $employee->employee_status,

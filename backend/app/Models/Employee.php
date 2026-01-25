@@ -16,9 +16,10 @@ class Employee extends Model implements AuthorizableContract
     protected $guard_name = 'web';
 
     protected $fillable = [
+        'id',
         'first_name',
         'last_name',
-        'personal_email',
+        'work_email',
         'phone',
         'gender',
         'national_id',

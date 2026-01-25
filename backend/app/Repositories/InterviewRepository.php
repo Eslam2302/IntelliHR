@@ -23,7 +23,7 @@ class InterviewRepository implements InterviewRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['status', 'applicant.first_name', 'applicant.last_name', 'applicant.email', 'applicant.phone', 'applicant.status', 'interviewer.first_name', 'interviewer.last_name', 'interviewer.personal_email', 'interviewer.phone'],
+            ['status', 'applicant.first_name', 'applicant.last_name', 'applicant.email', 'applicant.phone', 'applicant.status', 'interviewer.first_name', 'interviewer.last_name', 'interviewer.work_email', 'interviewer.phone'],
             ['id', 'status', 'scheduled_at', 'created_at'],
             'scheduled_at',
             'desc'

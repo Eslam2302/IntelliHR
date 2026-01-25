@@ -26,7 +26,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'status', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'employee.manager.first_name', 'employee.manager.last_name'],
+            ['employee_id', 'status', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'employee.manager.first_name', 'employee.manager.last_name'],
             ['id', 'employee_id', 'status', 'created_at'],
             'created_at',
             'desc'

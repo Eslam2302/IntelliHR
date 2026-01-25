@@ -25,7 +25,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'date', 'status'],
+            ['employee_id', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'date', 'status'],
             ['id', 'employee_id', 'date', 'check_in', 'check_out', 'status', 'created_at'],
             'check_in',
             'desc'

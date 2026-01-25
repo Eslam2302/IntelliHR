@@ -22,7 +22,7 @@ class TrainingSessionRepository implements TrainingSessionRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['title', 'description', 'trainer.employee.first_name', 'trainer.employee.last_name', 'trainer.employee.personal_email', 'trainer.employee.phone', 'department.name'],
+            ['title', 'description', 'trainer.employee.first_name', 'trainer.employee.last_name', 'trainer.employee.work_email', 'trainer.employee.phone', 'department.name'],
             ['id', 'title', 'description', 'created_at'],
             'created_at',
             'desc'

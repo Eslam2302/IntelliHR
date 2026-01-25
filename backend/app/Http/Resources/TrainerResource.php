@@ -20,7 +20,7 @@ class TrainerResource extends JsonResource
                 return $this->employee ? [
                     'id' => $this->employee->id,
                     'name' => $this->employee->first_name.' '.$this->employee->last_name,
-                    'email' => $this->employee->personal_email,
+                    'email' => $this->employee->work_email,
                     'phone' => $this->employee->phone,
                     'department_id' => $this->employee->department_id,
                 ] : null;

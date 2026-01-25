@@ -36,13 +36,13 @@ class EmployeeService
 
             // Create Employee
             $employeeData = $dto->toArray();
-            unset($employeeData['email'], $employeeData['password']);
+            unset($employeeData['personal_email'], $employeeData['password']);
             $employee = $this->repository->create($employeeData);
 
             // Create associated User
             $this->userRepository->create([
                 'employee_id' => $employee->id,
-                'email' => $dto->email,
+                'personal_email' => $dto->personal_email,
                 'password' => Hash::make($dto->password),
             ]);
 
@@ -52,7 +52,7 @@ class EmployeeService
                 subject: $employee,
                 properties: [
                     'name' => $employee->first_name.$employee->last_name,
-                    'personal_email' => $employee->personal_email,
+                    'work_email' => $employee->work_email,
                     'phone' => $employee->phone,
                     'department_id' => $employee->department_id,
                     'job_id' => $employee->job_id,
@@ -69,7 +69,7 @@ class EmployeeService
             DB::rollBack();
             // Never log password - create safe log data without sensitive fields
             $logData = $dto->toArray();
-            unset($logData['password'], $logData['email']);
+            unset($logData['password'], $logData['personal_email']);
             Log::error('Error creating employee: '.$e->getMessage(), ['data' => $logData]);
             throw $e;
         }
@@ -100,7 +100,7 @@ class EmployeeService
                 throw new \Exception("User not found for employee {$employee->id}.");
             }
             
-            $userData = ['email' => $dto->email];
+            $userData = ['personal_email' => $dto->personal_email];
             if ($dto->password !== null) {
                 $userData['password'] = Hash::make($dto->password);
             }
@@ -134,7 +134,7 @@ class EmployeeService
             DB::rollBack();
             // Never log password - create safe log data without sensitive fields
             $logData = $dto->toArray();
-            unset($logData['password'], $logData['email']);
+            unset($logData['password'], $logData['personal_email']);
             Log::error("Error updating employee {$employee->id}: ".$e->getMessage(), ['data' => $logData]);
             throw $e;
         }

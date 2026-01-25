@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
 
-            $table->string('personal_email')->nullable();
+            $table->string('work_email')->nullable();
             $table->string('phone')->nullable();
             $table->enum('gender', ['male', 'female']);
             $table->string('national_id');
@@ -35,7 +35,7 @@ return new class extends Migration
             // Indexes for search and filtering
             $table->index('first_name');
             $table->index('last_name');
-            $table->index('personal_email');
+            $table->index('work_email');
             $table->index('phone');
             $table->index('employee_status');
             $table->index('department_id');

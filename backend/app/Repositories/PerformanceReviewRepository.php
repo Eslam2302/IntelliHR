@@ -25,7 +25,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             'overall_rating',
             'employee.first_name',
             'employee.last_name',
-            'employee.personal_email',
+            'employee.work_email',
             'reviewer.first_name',
             'reviewer.last_name',
             'evaluationCycle.name',

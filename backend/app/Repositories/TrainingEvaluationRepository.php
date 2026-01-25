@@ -20,7 +20,7 @@ class TrainingEvaluationRepository implements TrainingEvaluationRepositoryInterf
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'training_id', 'rating', 'feedback', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'training.title'],
+            ['employee_id', 'training_id', 'rating', 'feedback', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'training.title'],
             ['id', 'rating', 'feedback', 'created_at'],
             'created_at',
             'desc'

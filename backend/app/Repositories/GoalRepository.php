@@ -28,7 +28,7 @@ class GoalRepository implements GoalRepositoryInterface
             'status',
             'employee.first_name',
             'employee.last_name',
-            'employee.personal_email',
+            'employee.work_email',
         ];
 
         // Define allowed sort columns

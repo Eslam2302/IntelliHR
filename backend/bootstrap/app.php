@@ -18,8 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
 
-        // Enable CSRF protection for stateful API requests
-        $middleware->statefulApi();
+        // Disabled statefulApi() for token-based authentication (Bearer tokens)
+        // CSRF protection is not needed for token-based auth, only for session-based SPA auth
+        // $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

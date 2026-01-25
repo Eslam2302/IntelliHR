@@ -17,24 +17,19 @@ class EmployeeRepository implements EmployeeRepositoryInterface
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with(['department', 'manager', 'user']);
+        $query = $this->model->with(['department', 'job', 'manager', 'user']);
 
         // Define searchable fields
         $searchableFields = [
             'first_name',
-            'last_name',
-            'personal_email',
+            'work_email',
             'phone',
             'national_id',
             'employee_status',
             'department_id',
             'manager_id',
             'job_id',
-            'user.email',
             'department.name',
-            'manager.first_name',
-            'manager.last_name',
-            'manager.personal_email',
         ];
 
         // Define allowed sort columns for security
@@ -42,7 +37,7 @@ class EmployeeRepository implements EmployeeRepositoryInterface
             'id',
             'first_name',
             'last_name',
-            'personal_email',
+            'work_email',
             'phone',
             'national_id',
             'employee_status',

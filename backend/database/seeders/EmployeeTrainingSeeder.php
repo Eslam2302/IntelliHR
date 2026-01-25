@@ -15,11 +15,5 @@ class EmployeeTrainingSeeder extends Seeder
             'status' => 'completed',
             'completion_date' => '2025-01-05'
         ]);
-
-        EmployeeTraining::create([
-            'employee_id' => 2,
-            'training_id' => 1,
-            'status' => 'enrolled'
-        ]);
     }
 }

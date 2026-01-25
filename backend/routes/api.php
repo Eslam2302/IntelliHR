@@ -51,7 +51,15 @@ Route::post('login', [AuthController::class, 'store'])->middleware('throttle:5,1
 Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
     Route::get('/user', function (Request $request) {
-        return $request->user()->load('employee');
+        $user = $request->user()->load('employee');
+        $employee = $user->employee;
+        
+        // Add permissions to the response
+        if ($employee) {
+            $user->permissions = $employee->getAllPermissions()->pluck('name');
+        }
+        
+        return $user;
     });
     Route::post('logout', [AuthController::class, 'destroy'])->middleware('throttle:10,1');
 

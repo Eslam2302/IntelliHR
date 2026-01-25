@@ -19,38 +19,31 @@ class EvaluationCycleDTO
         public readonly string $finalReviewDeadline,
         public readonly ?string $status,
         public readonly ?array $ratingScale,
-        public readonly ?bool $includeSelfAssessment,
-        public readonly ?bool $includeGoals,
+        public readonly bool $includeSelfAssessment,
+        public readonly bool $includeGoals,
         public readonly ?string $description,
         public readonly int $createdBy,
     ) {}
 
     public static function fromRequest(EvaluationCycleRequest $request): self
     {
-        // Check if this is an update request
-        $isUpdate = !empty($request->route('evaluation_cycle'));
-        
         return new self(
-            name: $request->validated('name') ?? '',
-            type: $request->validated('type') ?? '',
-            year: $request->validated('year') ?? 0,
-            period: $request->validated('period'),
-            startDate: $request->validated('start_date') ?? '',
-            endDate: $request->validated('end_date') ?? '',
-            selfAssessmentDeadline: $request->validated('self_assessment_deadline') ?? '',
-            managerReviewDeadline: $request->validated('manager_review_deadline') ?? '',
-            calibrationDeadline: $request->validated('calibration_deadline'),
-            finalReviewDeadline: $request->validated('final_review_deadline') ?? '',
-            status: $request->validated('status'),
-            ratingScale: $request->validated('rating_scale'),
-            includeSelfAssessment: $request->has('include_self_assessment') 
-                ? $request->boolean('include_self_assessment') 
-                : ($isUpdate ? null : true), // null for update (don't change), true for create (default)
-            includeGoals: $request->has('include_goals') 
-                ? $request->boolean('include_goals') 
-                : ($isUpdate ? null : true), // null for update (don't change), true for create (default)
-            description: $request->validated('description'),
-            createdBy: $isUpdate ? 0 : ($request->user()->employee_id ?? 0),
+            name: $request->input('name'),
+            type: $request->input('type'),
+            year: $request->input('year'),
+            period: $request->input('period'),
+            startDate: $request->input('start_date'),
+            endDate: $request->input('end_date'),
+            selfAssessmentDeadline: $request->input('self_assessment_deadline'),
+            managerReviewDeadline: $request->input('manager_review_deadline'),
+            calibrationDeadline: $request->input('calibration_deadline'),
+            finalReviewDeadline: $request->input('final_review_deadline'),
+            status: $request->input('status', 'draft'),
+            ratingScale: $request->input('rating_scale'),
+            includeSelfAssessment: $request->boolean('include_self_assessment', true),
+            includeGoals: $request->boolean('include_goals', true),
+            description: $request->input('description'),
+            createdBy: $request->user()->employee->id,
         );
     }
 
@@ -74,16 +67,5 @@ class EvaluationCycleDTO
             'description' => $this->description,
             'created_by' => $this->createdBy,
         ];
-    }
-
-    public function toUpdateArray(): array
-    {
-        $data = $this->toArray();
-        // Remove created_by from updates (shouldn't change)
-        unset($data['created_by']);
-        // Filter out empty strings and null values for partial updates
-        return array_filter($data, function($value) {
-            return $value !== null && $value !== '';
-        });
     }
 }

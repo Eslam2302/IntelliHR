@@ -23,7 +23,7 @@ class TrainingCertificateRepository implements TrainingCertificateRepositoryInte
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_training_id', 'employeeTraining.employee.first_name', 'employeeTraining.employee.last_name', 'employeeTraining.employee.personal_email', 'employeeTraining.training.title'],
+            ['employee_training_id', 'employeeTraining.employee.first_name', 'employeeTraining.employee.last_name', 'employeeTraining.employee.work_email', 'employeeTraining.training.title'],
             ['id', 'employee_training_id', 'issued_at', 'created_at'],
             'created_at',
             'desc'

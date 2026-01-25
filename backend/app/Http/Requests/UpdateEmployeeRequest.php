@@ -30,10 +30,10 @@ class UpdateEmployeeRequest extends FormRequest
                 'string',
                 'max:100',
             ],
-            'personal_email' => [
+            'work_email' => [
                 'nullable',
                 'email',
-                'unique:employees,personal_email,' . $employeeId,
+                'unique:employees,work_email,' . $employeeId,
             ],
 
             'phone' => [
@@ -79,10 +79,10 @@ class UpdateEmployeeRequest extends FormRequest
                 'date',
             ],
 
-            'email' => [
+            'personal_email' => [
                 'required',
                 'email',
-                'unique:users,email,' . $userId,
+                'unique:users,personal_email,' . $userId,
             ],
             'password' => [
                 'nullable',

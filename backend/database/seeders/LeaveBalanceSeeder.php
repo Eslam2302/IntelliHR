@@ -39,30 +39,5 @@ class LeaveBalanceSeeder extends Seeder
             'remaining_days' => 7,
             'year' => date('Y'),
         ]);
-        LeaveBalance::create([
-            'employee_id' => 2,
-            'leave_type_id' => 1,
-             'total_entitlement' => 14,
-            'used_days' => 0,
-            'remaining_days' => 14,
-            'year' => date('Y'),
-        ]);
-
-        LeaveBalance::create([
-            'employee_id' => 2,
-            'leave_type_id' => 2,
-             'total_entitlement' => 30,
-            'used_days' => 0,
-            'remaining_days' => 30,
-            'year' => date('Y'),
-        ]);
-        LeaveBalance::create([
-            'employee_id' => 2,
-            'leave_type_id' => 3,
-             'total_entitlement' => 7,
-            'used_days' => 0,
-            'remaining_days' => 7,
-            'year' => date('Y'),
-        ]);
     }
 }

@@ -22,7 +22,7 @@ class AssetAssignmentRepository implements AssetAssignmentRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['asset_id', 'employee_id', 'asset.name', 'asset.serial_number', 'asset.status', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone'],
+            ['asset_id', 'employee_id', 'asset.name', 'asset.serial_number', 'asset.status', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone'],
             ['id', 'asset_id', 'employee_id', 'created_at'],
             'created_at',
             'desc'

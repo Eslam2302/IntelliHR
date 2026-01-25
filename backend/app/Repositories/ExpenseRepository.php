@@ -25,7 +25,7 @@ class ExpenseRepository implements ExpenseRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'amount', 'status', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'category.name'],
+            ['employee_id', 'amount', 'status', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'category.name'],
             ['id', 'amount', 'status', 'created_at', 'updated_at'],
             'created_at',
             'desc'

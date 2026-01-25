@@ -28,7 +28,7 @@ class AssetAssignmentResource extends JsonResource
                 return [
                     'id' => $this->employee->id,
                     'name' => $this->employee->first_name . ' ' . $this->employee->last_name,
-                    'email' => $this->employee->personal_email,
+                    'email' => $this->employee->work_email,
                     'phone' => $this->employee->phone,
                 ];
             }),

@@ -23,7 +23,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'payment_status', 'month', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'employee.employee_status'],
+            ['employee_id', 'payment_status', 'month', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'employee.employee_status'],
             ['id', 'employee_id', 'payment_status', 'month', 'year', 'created_at', 'deleted_at'],
             'created_at',
             'desc'

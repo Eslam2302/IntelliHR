@@ -22,7 +22,7 @@ class DeductionRepository implements DeductionRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['employee_id', 'type', 'amount', 'employee.first_name', 'employee.last_name', 'employee.personal_email', 'employee.phone', 'payroll.year', 'payroll.month', 'payroll.payment_status'],
+            ['employee_id', 'type', 'amount', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'payroll.year', 'payroll.month', 'payroll.payment_status'],
             ['id', 'type', 'amount', 'created_at', 'updated_at'],
             'created_at',
             'desc'

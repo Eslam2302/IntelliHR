@@ -28,7 +28,7 @@ class TrainingSessionResource extends JsonResource
                     'employee' => $this->trainer->type === 'internal' && $this->trainer->employee ? [
                         'id' => $this->trainer->employee->id,
                         'name' => $this->trainer->employee->first_name . ' ' . $this->trainer->employee->last_name,
-                        'email' => $this->trainer->employee->personal_email,
+                        'email' => $this->trainer->employee->work_email,
                     ] : null,
                     'name' => $this->trainer->type === 'external' ? $this->trainer->name : null,
                     'email' => $this->trainer->type === 'external' ? $this->trainer->email : null,
