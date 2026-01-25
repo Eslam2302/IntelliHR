@@ -1,21 +1,15 @@
 "use client";
+
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
+import { PermissionGuard } from "@/components/common/PermissionGuard";
+import { PERMISSIONS } from "@/lib/constants/permissions";
 
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { user, isLoading, logout } = useAuth();
-  const router = useRouter();
-
-  const handleAvatarClick = () => {
-    router.push("/dashboard/profile");
-  };
-
-  const handleBrandClick = () => {
-    router.push("/dashboard");
-  };
+  const { logout, user, isLoading: authLoading } = useAuth();
 
   const getInitial = (firstName: string) => {
     return firstName.charAt(0).toUpperCase();
@@ -29,13 +23,15 @@ export default function Sidebar() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-4 left-4 z-40 p-2 bg-indigo-600 text-white rounded-lg lg:hidden"
+        className="fixed top-4 left-4 z-40 p-2 bg-indigo-600 text-white rounded-lg shadow-lg hover:bg-indigo-700 transition-colors lg:hidden"
+        aria-label="Open menu"
       >
         <svg
           className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -52,28 +48,29 @@ export default function Sidebar() {
           onClick={() => setIsOpen(false)}
         />
       )}
+
       <aside
         className={`
-        fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:static lg:translate-x-0
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-        ${isCollapsed ? "lg:w-20" : "lg:w-64"}
-        w-64 bg-gradient-to-b from-indigo-700 to-indigo-900 flex flex-col
-      `}
+          fixed inset-y-0 left-0 z-50 transition-all duration-300 ease-in-out lg:static lg:translate-x-0
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          ${isCollapsed ? "lg:w-20" : "lg:w-64"}
+          w-64 bg-gradient-to-b from-indigo-700 to-indigo-900 flex flex-col
+        `}
       >
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`absolute -right-3 top-12 z-50 h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-white shadow-md border-2 border-white transition-all duration-300 group
-            hidden lg:flex 
-          `}
+          className={`absolute -right-3 top-12 z-50 h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-white shadow-md border-2 border-white transition-all duration-300 group hover:bg-indigo-700 hover:scale-110 hidden lg:flex`}
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           <svg
-            className={`h-4 w-4 transition-transform duration-500 ${
-              isCollapsed ? "rotate-180" : ""
-            }`}
+            className={`h-4 w-4 transition-transform duration-500 ${isCollapsed ? "rotate-180" : ""
+              }`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"
@@ -83,24 +80,27 @@ export default function Sidebar() {
             />
           </svg>
         </button>
+
         {/* Decorative Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_1px_1px,_white_1px,_transparent_0)] bg-[length:20px_20px]"></div>
         </div>
+
         {/* Logo Section */}
         <div className="relative h-20 flex items-center px-4 border-b border-indigo-600/30 backdrop-blur-sm overflow-hidden">
-          <button
-            onClick={handleBrandClick}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer group"
             title="Go to Dashboard"
           >
-            <div className="flex h-10 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm shadow-lg">
+            <div className="flex h-10 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-sm shadow-lg group-hover:bg-white/20 transition-colors">
               <svg
                 className="h-6 w-6 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-label="IntelliHR Logo"
               >
                 <path
                   strokeLinecap="round"
@@ -114,25 +114,81 @@ export default function Sidebar() {
               <span className="text-xl font-bold text-white tracking-tight whitespace-nowrap opacity-100 transition-opacity duration-300">
                 IntelliHR
               </span>
-            )}{" "}
-          </button>
+            )}
+          </Link>
         </div>
+
         {/* Navigation Section */}
-        <nav className="relative flex-1 p-4 overflow-y-auto">
-          <p className="text-xs font-semibold text-indigo-200 uppercase tracking-wider px-3 mb-4">
-            Menu
-          </p>
-          <div className="space-y-1"></div>
+        <nav className="relative flex-1 p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-600/30 scrollbar-track-transparent">
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mb-4">
+              Menu
+            </p>
+          )}
+
+          {/* Departments */}
+          <PermissionGuard permission={PERMISSIONS.DEPARTMENTS.VIEW_ALL}>
+            <Link
+              href="/dashboard/departments"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="View Departments"
+            >
+              <svg
+                className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-label="Departments icon"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
+              {!isCollapsed && (
+                <span className="truncate">Departments</span>
+              )}
+            </Link>
+          </PermissionGuard>
+
+          {/* Employees */}
+          <PermissionGuard permission={PERMISSIONS.EMPLOYEES.VIEW_ALL}>
+            <Link
+              href="/dashboard/employees"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="View Employees"
+            >
+              <svg
+                className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-label="Employees icon"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+                />
+              </svg>
+              {!isCollapsed && (
+                <span className="truncate">Employees</span>
+              )}
+            </Link>
+          </PermissionGuard>
         </nav>
+
         {/* User Profile Section */}
         <div className="relative p-3 border-t border-indigo-600/30 backdrop-blur-sm bg-indigo-900/50">
           <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
             <button
-              onClick={handleAvatarClick}
               className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
               title="View Profile"
             >
-              {isLoading ? (
+              {authLoading ? (
                 <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
                 <span className="text-white font-semibold text-sm">
@@ -142,12 +198,10 @@ export default function Sidebar() {
                 </span>
               )}
             </button>
+
             {!isCollapsed && (
-              <button
-                onClick={handleAvatarClick}
-                className="flex-1 min-w-0 transition-opacity duration-300 text-left hover:opacity-80 cursor-pointer"
-              >
-                {isLoading ? (
+              <button className="flex-1 min-w-0 transition-opacity duration-300 text-left hover:opacity-80 cursor-pointer">
+                {authLoading ? (
                   <div className="space-y-1">
                     <div className="h-4 w-20 bg-white/20 rounded animate-pulse"></div>
                     <div className="h-3 w-16 bg-white/10 rounded animate-pulse"></div>
@@ -157,26 +211,28 @@ export default function Sidebar() {
                     <p className="text-sm font-medium text-white truncate">
                       {user?.employee
                         ? getFullName(
-                            user.employee.first_name,
-                            user.employee.last_name
-                          )
+                          user.employee.first_name,
+                          user.employee.last_name,
+                        )
                         : "User"}
                     </p>
-                    {user?.employee?.personal_email && (
+                    {user?.employee?.work_email && (
                       <p className="text-xs text-indigo-200 truncate">
-                        {user.employee.personal_email}
+                        {user.employee.work_email}
                       </p>
                     )}
                   </>
                 )}
               </button>
             )}
+
             {/* Logout Button */}
             {!isCollapsed && (
               <button
                 onClick={logout}
-                className="p-2 rounded-md text-indigo-300 hover:text-red-400 hover:bg-red-400/10 transition-colors flex-shrink-0"
+                className="p-2 rounded-md text-indigo-300 hover:text-red-400 hover:bg-red-400/10 transition-all duration-200 flex-shrink-0 hover:scale-110"
                 title="Logout"
+                aria-label="Logout"
               >
                 <svg
                   className="h-5 w-5"
@@ -184,6 +240,7 @@ export default function Sidebar() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -196,15 +253,19 @@ export default function Sidebar() {
             )}
           </div>
         </div>
+
         <button
           onClick={() => setIsOpen(false)}
-          className="lg:hidden absolute top-4 right-4 text-white"
+          className="lg:hidden absolute top-4 right-4 text-white hover:bg-white/10 p-1 rounded-md transition-colors"
+          aria-label="Close menu"
+          title="Close menu"
         >
           <svg
             className="h-6 w-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"

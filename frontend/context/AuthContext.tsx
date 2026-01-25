@@ -1,100 +1,147 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import Cookies from "js-cookie";
+/**
+ * Auth Context
+ * Manages authentication state across the entire app
+ */
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { useRouter } from "next/navigation";
+import {
+  getToken,
+  setToken,
+  getPermissions,
+  setPermissions,
+  logout as removeToken,
+  getCurrentUser,
+} from "@/services/api/auth";
+import type { User } from "@/lib/types";
 
-type UserResponse = {
-  id: number;
-  email: string;
-  employee_id: number;
-  employee: Record<string, any>; // All employee data from API
-};
-
+// Define the shape of our auth context
 interface AuthContextType {
-  user: UserResponse | null;
-  isLoading: boolean;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  permissions: string[];
+  user: User | null;
+  login: (token: string, permissions?: string[], redirectTo?: string) => void;
   logout: () => void;
-  refreshUser: () => Promise<void>;
 }
 
+// Create the context with undefined as default
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserResponse | null>(null);
+/**
+ * AuthProvider Component
+ * Wraps the app and provides authentication state
+ */
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [permissions, setPermissionsState] = useState<string[]>([]);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  const pathname = usePathname();
 
-  const fetchUserProfile = useCallback(async () => {
-    try {
-      const token = Cookies.get("token");
-      if (!token) {
-        setIsLoading(false);
-        return;
+  // Check if user is logged in when app loads and fetch user data
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const token = getToken();
+      const savedPermissions = getPermissions();
+
+      if (token) {
+        setIsAuthenticated(true);
+        // Set permissions from cookies initially (for fast initial render)
+        setPermissionsState(savedPermissions);
+
+        // Fetch user data from backend
+        try {
+          const userData = await getCurrentUser();
+          setUser(userData);
+
+          // Backend /user endpoint returns permissions at userData.permissions
+          // Use these permissions (they're more up-to-date than cookies)
+          if (userData.permissions && Array.isArray(userData.permissions) && userData.permissions.length > 0) {
+            setPermissionsState(userData.permissions);
+            setPermissions(userData.permissions); // Update cookies with latest permissions
+          } else if (savedPermissions.length > 0) {
+            // Fallback to cookie permissions if user endpoint doesn't return them
+            setPermissionsState(savedPermissions);
+          }
+        } catch (error) {
+          // If fetching user fails (invalid token), clear auth state
+          console.error("Failed to fetch user data:", error);
+          removeToken();
+          setIsAuthenticated(false);
+          setPermissionsState([]);
+          setUser(null);
+        }
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      setIsLoading(false);
+    };
 
-      if (response.ok) {
-        const data = await response.json();
-        // Store ALL data from API - use what you need where you need it
-        if (data && data.employee) {
-          setUser(data);
-        }
-      } else {
-        if (response.status === 401 || response.status === 403) {
-          Cookies.remove("token");
-          setUser(null);
-          router.push("/login");
-        }
+    initializeAuth();
+  }, []);
+
+  // Login function - saves token and permissions to cookie and updates state
+  const login = async (
+    token: string,
+    permissions?: string[],
+    redirectTo: string = "/dashboard",
+  ) => {
+    setToken(token);
+    if (permissions) {
+      setPermissions(permissions);
+      setPermissionsState(permissions);
+    }
+    setIsAuthenticated(true);
+
+    // Fetch user data after login
+    try {
+      const userData = await getCurrentUser();
+
+
+      setUser(userData);
+
+      // Backend /user endpoint returns permissions at userData.permissions
+      // Use these permissions if available (they're more up-to-date)
+      if (userData.permissions && Array.isArray(userData.permissions) && userData.permissions.length > 0) {
+        setPermissionsState(userData.permissions);
+        setPermissions(userData.permissions); // Update cookies
+      } else if (permissions && permissions.length > 0) {
+        // Keep using permissions from login response
+        setPermissionsState(permissions);
       }
     } catch (error) {
-      console.error("Error fetching user profile:", error);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
+      console.error("Failed to fetch user data after login:", error);
+      // Continue anyway - user is authenticated, data might load later
     }
-  }, [router]);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, [fetchUserProfile]);
+    router.push(redirectTo);
+  };
 
-  // Refetch user data when navigating to dashboard (after login)
-  useEffect(() => {
-    if (pathname?.startsWith("/dashboard")) {
-      const token = Cookies.get("token");
-      if (token && !user && !isLoading) {
-        fetchUserProfile();
-      }
-    }
-  }, [pathname, user, isLoading, fetchUserProfile]);
-
-  const logout = useCallback(() => {
-    Cookies.remove("token");
+  // Logout function - removes token, permissions and redirects to login
+  const logout = () => {
+    removeToken();
+    setIsAuthenticated(false);
+    setPermissionsState([]);
     setUser(null);
     router.push("/login");
-  }, [router]);
-
-  const isAuthenticated = !!user;
+  };
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isLoading,
         isAuthenticated,
+        isLoading,
+        permissions,
+        user,
+        login,
         logout,
-        refreshUser: fetchUserProfile,
       }}
     >
       {children}
@@ -102,10 +149,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useAuth = () => {
+/**
+ * useAuth Hook
+ * Easy way to access auth context in any component
+ */
+export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
-};
+}

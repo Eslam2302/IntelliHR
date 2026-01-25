@@ -1,56 +1,51 @@
 "use client";
 
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { login as loginApi } from "@/services/api/auth";
+import type { LoginCredentials } from "@/lib/types";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function LoginPage() {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{
-    employee_id?: string;
-    password?: string;
-    general?: string;
-  }>({});
+  const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
 
-  const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setErrors({});
+    setError(null);
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ employee_id: employeeId, password: password }),
-      });
+      // Call the API to login
+      const credentials: LoginCredentials = {
+        employee_id: employeeId,
+        password: password,
+      };
 
-      const data = await response.json();
+      const response = await loginApi(credentials);
 
-      if (response.ok) {
-        Cookies.set("token", data.token, { expires: 7 });
-        router.push("/dashboard");
-      } else {
-        if (response.status === 422 && data.errors) {
-          setErrors({
-            employee_id: data.errors.employee_id?.[0],
-            password: data.errors.password?.[0],
-          });
-        } else {
-          setErrors({
-            general: data.message || "Invalid login credentials",
-          });
-        }
-      }
+      // If successful, save token, permissions and redirect
+      // Backend returns permissions in response.user.permissions (not response.permissions)
+      const permissions = response.user?.permissions || [];
+
+
+      await login(
+        response.token,
+        permissions,
+        redirectTo || "/dashboard",
+      );
     } catch (err) {
-      setErrors({ general: "Server connection error" });
-    } finally {
+      // Handle errors
+      const errorMessage =
+        err instanceof Error ? err.message : "Invalid login credentials";
+      setError(errorMessage);
       setIsLoading(false);
     }
   };
@@ -93,9 +88,10 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {errors.general && (
+          {/* Error Message */}
+          {error && (
             <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600 border border-red-200">
-              {errors.general}{" "}
+              {error}
             </div>
           )}
 
@@ -134,13 +130,9 @@ export default function LoginPage() {
                   placeholder="Enter your employee ID"
                   className="w-full rounded-lg border-2 border-gray-200 bg-white pl-12 pr-4 py-3.5 text-base text-gray-900 placeholder-gray-400 transition-all focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100"
                   required
+                  disabled={isLoading}
                 />
               </div>
-              {errors.employee_id && (
-                <p className="mt-1 text-xs text-red-500 font-medium">
-                  {errors.employee_id}
-                </p>
-              )}{" "}
             </div>
 
             {/* Password Field */}
@@ -176,13 +168,9 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   className="w-full rounded-lg border-2 border-gray-200 bg-white pl-12 pr-4 py-3.5 text-base text-gray-900 placeholder-gray-400 transition-all focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100"
                   required
+                  disabled={isLoading}
                 />
               </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-500 font-medium">
-                  {errors.password}
-                </p>
-              )}
               <div className="flex justify-end">
                 <a
                   href="#"
@@ -198,36 +186,14 @@ export default function LoginPage() {
               type="submit"
               disabled={isLoading}
               className={`group relative w-full overflow-hidden rounded-lg px-5 py-3.5 text-base font-semibold text-white shadow-lg transition-all 
-                ${
-                  isLoading
-                    ? "bg-indigo-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800"
+                ${isLoading
+                  ? "bg-indigo-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800"
                 }`}
             >
               <span className="relative flex items-center justify-center gap-2">
-                {isLoading ? (
-                  <svg
-                    className="h-5 w-5 animate-spin text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                ) : null}
-                {isLoading ? "Signing in..." : "Sign In"}{" "}
+                {isLoading && <LoadingSpinner size="sm" inline />}
+                {isLoading ? "Signing in..." : "Sign In"}
               </span>
             </button>
           </form>
