@@ -22,9 +22,8 @@ class AttendanceController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('auth:sanctum'),
-            // All employees can check-in/check-out (no permission required)
-            // Only HR/Admin can view all, create, update, delete attendances
             new Middleware('permission:view-all-attendances', only: ['index']),
+            new Middleware('permission:view-employees-leave-request', only: ['teamIndex']),
             new Middleware('permission:create-attendance', only: ['store']),
             new Middleware('permission:edit-attendance', only: ['update']),
             new Middleware('permission:delete-attendance', only: ['destroy']),
@@ -33,7 +32,7 @@ class AttendanceController extends Controller implements HasMiddleware
 
     public function index(Request $request): JsonResponse
     {
-        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search', 'employee_id', 'date', 'status']);
+        $filters = request()->only(['per_page', 'page', 'sort', 'direction', 'search', 'deleted', 'employee_id', 'date', 'status']);
         $attendances = $this->service->getAll($filters);
 
         return response()->json([
@@ -145,6 +144,54 @@ class AttendanceController extends Controller implements HasMiddleware
             'status' => 'success',
             'message' => 'Checked out successfully',
             'data' => new AttendanceResource($attendance),
+        ]);
+    }
+
+    /**
+     * Team attendances: manager views their team's records. GET /attendances/team
+     */
+    public function teamIndex(Request $request): JsonResponse
+    {
+        $managerId = $request->user()->employee_id ?? 0;
+        if (!$managerId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User must be linked to an employee.',
+            ], 403);
+        }
+        $filters = $request->only(['per_page', 'page', 'sort', 'direction', 'search', 'deleted', 'employee_id', 'date', 'status']);
+        $attendances = $this->service->getTeamAttendances($managerId, $filters);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => AttendanceResource::collection($attendances),
+            'meta' => [
+                'current_page' => $attendances->currentPage(),
+                'per_page' => $attendances->perPage(),
+                'total' => $attendances->total(),
+                'last_page' => $attendances->lastPage(),
+            ],
+        ]);
+    }
+
+    /**
+     * Get current user's last N attendances (for check-in page). No permission required.
+     */
+    public function myRecent(Request $request): JsonResponse
+    {
+        $employeeId = $request->user()->employee_id ?? 0;
+        if (!$employeeId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User must be linked to an employee.',
+            ], 403);
+        }
+        $limit = (int) $request->query('limit', 5);
+        $limit = min(max(1, $limit), 50);
+        $attendances = $this->service->getRecentByEmployee($employeeId, $limit);
+        return response()->json([
+            'status' => 'success',
+            'data' => AttendanceResource::collection($attendances),
         ]);
     }
 }

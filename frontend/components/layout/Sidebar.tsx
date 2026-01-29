@@ -130,6 +130,7 @@ export default function Sidebar() {
           <PermissionGuard permission={PERMISSIONS.DEPARTMENTS.VIEW_ALL}>
             <Link
               href="/dashboard/departments"
+              onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
               title="View Departments"
             >
@@ -157,6 +158,7 @@ export default function Sidebar() {
           <PermissionGuard permission={PERMISSIONS.EMPLOYEES.VIEW_ALL}>
             <Link
               href="/dashboard/employees"
+              onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
               title="View Employees"
             >
@@ -179,12 +181,141 @@ export default function Sidebar() {
               )}
             </Link>
           </PermissionGuard>
+
+          {/* Attendance – check-in/check-out, last 5. No permission. */}
+          <Link
+            href="/dashboard/attendance"
+            onClick={() => setIsOpen(false)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+            title="Check in / Check out"
+          >
+            <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Attendance icon">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {!isCollapsed && <span className="truncate">Attendance</span>}
+          </Link>
+
+          {/* Attendances – full list (HR). */}
+          <PermissionGuard permission={PERMISSIONS.ATTENDANCES.VIEW_ALL}>
+            <Link
+              href="/dashboard/attendances"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Attendances"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Attendances icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Attendances</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Job positions */}
+          <PermissionGuard permission={PERMISSIONS.JOB_POSITIONS.VIEW_ALL}>
+            <Link
+              href="/dashboard/job-positions"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Job positions"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Job positions icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Job positions</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Leave types */}
+          <PermissionGuard permission={PERMISSIONS.LEAVE_TYPES.VIEW_ALL}>
+            <Link
+              href="/dashboard/leave-types"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Leave types"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Leave types icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Leave types</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Leave requests – my list + create button. All users. */}
+          <Link
+            href="/dashboard/leave-requests"
+            onClick={() => setIsOpen(false)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+            title="My leave requests"
+          >
+            <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Leave requests icon">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            {!isCollapsed && <span className="truncate">Leave requests</span>}
+          </Link>
+
+          {/* Team leave requests (manager dashboard) */}
+          <PermissionGuard permission={PERMISSIONS.LEAVE_REQUESTS.VIEW_EMPLOYEES}>
+            <Link
+              href="/dashboard/leave-requests/manager"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Team leave requests"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Team leave requests icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Team leave requests</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Team attendance (manager) */}
+          <PermissionGuard permission={PERMISSIONS.LEAVE_REQUESTS.VIEW_EMPLOYEES}>
+            <Link
+              href="/dashboard/attendances/team"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Team attendance"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Team attendance icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Team attendance</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Profile */}
+          <Link
+            href="/dashboard/profile"
+            onClick={() => setIsOpen(false)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+            title="My Profile"
+          >
+            <svg
+              className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-label="Profile icon"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            {!isCollapsed && (
+              <span className="truncate">Profile</span>
+            )}
+          </Link>
         </nav>
 
         {/* User Profile Section */}
         <div className="relative p-3 border-t border-indigo-600/30 backdrop-blur-sm bg-indigo-900/50">
           <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-            <button
+            <Link
+              href="/dashboard/profile"
+              onClick={() => setIsOpen(false)}
               className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all cursor-pointer"
               title="View Profile"
             >
@@ -197,10 +328,14 @@ export default function Sidebar() {
                     : "U"}
                 </span>
               )}
-            </button>
+            </Link>
 
             {!isCollapsed && (
-              <button className="flex-1 min-w-0 transition-opacity duration-300 text-left hover:opacity-80 cursor-pointer">
+              <Link
+                href="/dashboard/profile"
+                onClick={() => setIsOpen(false)}
+                className="flex-1 min-w-0 transition-opacity duration-300 text-left hover:opacity-80 cursor-pointer"
+              >
                 {authLoading ? (
                   <div className="space-y-1">
                     <div className="h-4 w-20 bg-white/20 rounded animate-pulse"></div>
@@ -223,7 +358,7 @@ export default function Sidebar() {
                     )}
                   </>
                 )}
-              </button>
+              </Link>
             )}
 
             {/* Logout Button */}

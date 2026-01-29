@@ -30,6 +30,14 @@ class LeaveTypeService
     }
 
     /**
+     * Get active leave types for dropdowns (create leave request). No permission required beyond auth.
+     */
+    public function getActiveForDropdown()
+    {
+        return $this->repository->getActive();
+    }
+
+    /**
      * Create a new leave type
      */
     public function create(LeaveTypeDTO $dto): LeaveType

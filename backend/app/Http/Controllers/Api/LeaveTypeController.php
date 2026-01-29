@@ -103,4 +103,18 @@ class LeaveTypeController extends Controller implements HasMiddleware
             'message' => 'Leave type deleted successfully.',
         ], 200);
     }
+
+    /**
+     * Active leave types for dropdowns (e.g. create leave request). Auth only, no permission.
+     * GET /leave-types/active
+     */
+    public function activeForDropdown(): JsonResponse
+    {
+        $leaveTypes = $this->leaveTypeService->getActiveForDropdown();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => LeaveTypeResource::collection($leaveTypes),
+        ]);
+    }
 }

@@ -32,7 +32,7 @@ class LeaveTypeSeeder extends Seeder
                 'carry_over_limit' => 0, // no carryover
                 'min_request_days' => 1,
                 'max_request_days' => 14,
-                'requires_hr_approval' => true,
+                'requires_hr_approval' => false, // manager approves → deduct immediately (hr_approved)
                 'payment_type' => 'paid',
                 'requires_attachment' => true,
                 'is_active' => true,

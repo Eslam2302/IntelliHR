@@ -8,8 +8,9 @@ import type { Employee } from "./employee";
 // Note: User table references Employee table through employee_id
 export interface User {
   id: number;
-  employee_id: string;
+  employee_id: number;
   employee: Employee;
+  personal_email?: string;
   email?: string;
   permissions?: string[]; // Backend /user endpoint returns permissions here
   created_at?: string;

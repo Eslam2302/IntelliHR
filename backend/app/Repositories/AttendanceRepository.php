@@ -17,10 +17,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     {
         $query = $this->model->with('employee');
 
-        // Apply authorization scope if user is authenticated
-        if (auth()->check() && method_exists($this->model, 'scopeVisibleToUser')) {
-            $query = $query->visibleToUser(auth()->user());
-        }
+        // HR Attendances page: always return all company attendances (index is permission-gated to view-all-attendances).
 
         $query = $this->applyFilters(
             $query,
@@ -95,5 +92,33 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function find(int $id): ?Attendance
     {
         return $this->model->find($id);
+    }
+
+    public function getRecentByEmployee(int $employeeId, int $limit = 5)
+    {
+        return $this->model
+            ->where('employee_id', $employeeId)
+            ->with('employee')
+            ->orderBy('date', 'desc')
+            ->orderBy('check_in', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    public function getAllForManager(int $managerId, array $filters = []): LengthAwarePaginator
+    {
+        $query = $this->model->with('employee')
+            ->whereHas('employee', fn ($q) => $q->where('manager_id', $managerId));
+
+        $query = $this->applyFilters(
+            $query,
+            $filters,
+            ['employee_id', 'employee.first_name', 'employee.last_name', 'employee.work_email', 'employee.phone', 'date', 'status'],
+            ['id', 'employee_id', 'date', 'check_in', 'check_out', 'status', 'created_at'],
+            'check_in',
+            'desc'
+        );
+
+        return $query->paginate($this->getPaginationLimit($filters, 15));
     }
 }

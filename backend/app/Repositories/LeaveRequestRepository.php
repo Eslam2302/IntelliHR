@@ -83,7 +83,8 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
     public function getByEmployee(int $employeeId, array $filters = []): Collection
     {
         $query = $this->model->where('employee_id', $employeeId)
-            ->with(['type', 'manager', 'hr']);
+            ->with(['type', 'manager', 'hr'])
+            ->orderBy('created_at', 'desc');
 
         if (! empty($filters['year'])) {
             $query->whereYear('start_date', $filters['year']);

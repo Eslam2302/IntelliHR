@@ -134,35 +134,36 @@ class LeaveRequestService
 
         $oldStatus = $request->status;
 
-        if ($request->type->requires_hr_approval) {
-            $updatedRequest = $this->repository->updateStatus($request, [
-                'status' => 'manager_approved',
-                'manager_id' => $managerId,
-                'manager_approved_at' => now(),
-            ]);
-
-            $this->activityLogger->log(
-                logName: 'leaveRequest',
-                description: 'leave_request_manager_approved',
-                subject: $updatedRequest,
-                properties: [
-                    'before_status' => $oldStatus,
-                    'after_status' => $updatedRequest->status,
-                    'approved_by_manager_id' => $managerId,
-                    'approved_at' => $updatedRequest->manager_approved_at,
-                ]
-            );
-
-            Log::info("Leave request manager approved", [
-                'id' => $updatedRequest->id,
-                'manager_id' => $managerId,
-            ]);
-
-            return $updatedRequest;
+        // requires_hr_approval = false (e.g. sick): manager approves → hr_approved directly.
+        // requires_hr_approval = true (e.g. annual): manager approves → manager_approved, then HR must approve.
+        if (!$request->type->requires_hr_approval) {
+            return $this->approveAndDeduct($request, 'manager', $managerId);
         }
 
-        // Otherwise, direct approval + balance deduction
-        return $this->approveAndDeduct($request, 'manager', $managerId);
+        $updatedRequest = $this->repository->updateStatus($request, [
+            'status' => 'manager_approved',
+            'manager_id' => $managerId,
+            'manager_approved_at' => now(),
+        ]);
+
+        $this->activityLogger->log(
+            logName: 'leaveRequest',
+            description: 'leave_request_manager_approved',
+            subject: $updatedRequest,
+            properties: [
+                'before_status' => $oldStatus,
+                'after_status' => $updatedRequest->status,
+                'approved_by_manager_id' => $managerId,
+                'approved_at' => $updatedRequest->manager_approved_at,
+            ]
+        );
+
+        Log::info("Leave request manager approved", [
+            'id' => $updatedRequest->id,
+            'manager_id' => $managerId,
+        ]);
+
+        return $updatedRequest;
     }
 
     /**
@@ -244,7 +245,18 @@ class LeaveRequestService
      */
     public function getLeavesForManager(int $managerId, array $filters = [])
     {
-        // Call repository method to fetch leave requests under manager
         return $this->repository->getByManager($managerId, $filters);
+    }
+
+    /**
+     * Get leave requests for an employee (e.g. "my" list).
+     *
+     * @param int $employeeId
+     * @param array $filters
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getLeavesForEmployee(int $employeeId, array $filters = [])
+    {
+        return $this->repository->getByEmployee($employeeId, $filters);
     }
 }

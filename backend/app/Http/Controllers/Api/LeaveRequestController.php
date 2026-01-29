@@ -8,6 +8,7 @@ use App\DataTransferObjects\LeaveRequestDTO;
 use App\Services\LeaveRequestService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -126,11 +127,34 @@ class LeaveRequestController extends Controller implements HasMiddleware
         // Fetch leave requests using Service
         $leaveRequests = $this->service->getLeavesForManager($managerId, $filters);
 
-        // Return JSON Resource collection
         return response()->json([
             'success' => true,
             'data'    => LeaveRequestResource::collection($leaveRequests),
             'message' => 'Leave requests under your team fetched successfully.'
+        ]);
+    }
+
+    /**
+     * My leave requests – list for logged-in user's employee. No permission required.
+     * GET /api/leave-requests/my?status=...&year=...
+     */
+    public function myRequests(Request $request): JsonResponse
+    {
+        $employeeId = Auth::user()->employee_id ?? 0;
+        if (!$employeeId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User must be linked to an employee.',
+            ], 403);
+        }
+        $filters = [
+            'status' => $request->query('status'),
+            'year'   => $request->query('year'),
+        ];
+        $leaveRequests = $this->service->getLeavesForEmployee($employeeId, $filters);
+        return response()->json([
+            'success' => true,
+            'data'    => LeaveRequestResource::collection($leaveRequests),
         ]);
     }
 }

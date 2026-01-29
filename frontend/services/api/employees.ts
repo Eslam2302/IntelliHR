@@ -17,6 +17,9 @@ export interface CreateEmployeeData {
     job_id?: number;
     hire_date: string;
     employee_status?: "active" | "probation" | "resigned" | "terminated";
+    personal_email: string;
+    password: string;
+    password_confirmation: string;
 }
 
 export interface UpdateEmployeeData {
@@ -33,6 +36,8 @@ export interface UpdateEmployeeData {
     job_id?: number;
     hire_date?: string;
     employee_status?: "active" | "probation" | "resigned" | "terminated";
+    personal_email?: string;
+    password?: string;
 }
 
 export interface GetEmployeesParams {

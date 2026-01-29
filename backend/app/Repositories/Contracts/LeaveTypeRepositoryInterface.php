@@ -31,4 +31,11 @@ interface LeaveTypeRepositoryInterface
      * Find leave type by ID
      */
     public function find(int $id): ?LeaveType;
+
+    /**
+     * Get active leave types for dropdowns (e.g. create leave request). No pagination.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, LeaveType>
+     */
+    public function getActive();
 }

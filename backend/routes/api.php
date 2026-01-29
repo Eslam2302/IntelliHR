@@ -68,20 +68,26 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     Route::apiResource('departments', DepartmentController::class);
     Route::apiResource('employees', EmployeeController::class);
 
-    // Attendance routes - CRUD operations
+    // Team attendances (manager) – before resource so /team is not matched as {id}
+    Route::get('attendances/team', [AttendanceController::class, 'teamIndex']);
     Route::apiResource('attendances', AttendanceController::class);
     
-    // Attendance check-in/check-out routes
+    // Attendance check-in/check-out and my-recent (no list permission)
     Route::controller(AttendanceController::class)->prefix('attendance')->group(function () {
+        Route::get('my-recent', 'myRecent');
         Route::post('check-in', 'checkIn');
         Route::post('check-out', 'checkOut');
     });
 
+    Route::get('leave-types/active', [LeaveTypeController::class, 'activeForDropdown']);
     Route::apiResource('leave-types', LeaveTypeController::class);
     Route::apiResource('job-positions', JobPositionController::class);
     Route::apiResource('contracts', ContractController::class);
 
     Route::prefix('leave-requests')->group(function () {
+
+        // My leave requests (logged-in user) – no permission
+        Route::get('my', [LeaveRequestController::class, 'myRequests']);
 
         // Create leave request
         Route::post('/', [LeaveRequestController::class, 'store']);

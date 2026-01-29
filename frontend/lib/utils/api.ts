@@ -32,6 +32,26 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 }
 
 /**
+ * Fetch with auth using FormData (e.g. file upload). Do not set Content-Type;
+ * browser sets multipart/form-data with boundary.
+ */
+export async function fetchWithAuthFormData(url: string, formData: FormData, method: string = "POST") {
+    const token = getToken();
+    if (!token) throw new Error("No authentication token found");
+    const response = await fetch(url, {
+        method,
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Request failed");
+    return data;
+}
+
+/**
  * Transform Laravel pagination response to PaginatedResponse format
  * Laravel returns: { data: [...], meta: { current_page, per_page, total, last_page } }
  * We transform to: { data: [...], current_page, per_page, total, last_page }

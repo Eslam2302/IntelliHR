@@ -36,6 +36,22 @@ class AttendanceService
         }
     }
 
+    /**
+     * Get recent attendances for an employee (e.g. last 5 for check-in page).
+     */
+    public function getRecentByEmployee(int $employeeId, int $limit = 5)
+    {
+        return $this->repository->getRecentByEmployee($employeeId, $limit);
+    }
+
+    /**
+     * Get attendances for a manager's team (subordinates only).
+     */
+    public function getTeamAttendances(int $managerId, array $filters = []): LengthAwarePaginator
+    {
+        return $this->repository->getAllForManager($managerId, $filters);
+    }
+
     public function checkIn(AttendanceDTO $dto): Attendance
     {
         DB::beginTransaction();

@@ -22,4 +22,22 @@ interface AttendanceRepositoryInterface
     public function delete(Attendance $attendance): bool;
 
     public function find(int $id): ?Attendance;
+
+    /**
+     * Get most recent attendances for an employee (for check-in page).
+     *
+     * @param int $employeeId
+     * @param int $limit
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getRecentByEmployee(int $employeeId, int $limit = 5);
+
+    /**
+     * Get attendances for a manager's team (employees where manager_id = $managerId).
+     *
+     * @param int $managerId
+     * @param array $filters
+     * @return LengthAwarePaginator
+     */
+    public function getAllForManager(int $managerId, array $filters = []): LengthAwarePaginator;
 }

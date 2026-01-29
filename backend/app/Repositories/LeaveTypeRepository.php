@@ -64,4 +64,16 @@ class LeaveTypeRepository implements LeaveTypeRepositoryInterface
     {
         return $this->model->find($id);
     }
+
+    /**
+     * Get active leave types for dropdowns (create leave request, etc.). Excludes trashed.
+     */
+    public function getActive()
+    {
+        return $this->model->newQuery()
+            ->withoutTrashed()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+    }
 }
