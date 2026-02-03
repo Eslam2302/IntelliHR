@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ContractController;
 use App\Http\Controllers\Api\DeductionController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\DocumentController;
+use App\Http\Controllers\Api\DocumentFileController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeRoleController;
 use App\Http\Controllers\Api\EmployeeTrainingController;
@@ -46,6 +47,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('home', [HomeController::class, 'index']);
 
 Route::post('login', [AuthController::class, 'store'])->middleware('throttle:5,1');
+
+// Document file via signed URL (no auth - signature validates access, valid 30 min)
+Route::get('documents/{document}/file', DocumentFileController::class)
+    ->middleware('signed')
+    ->name('api.documents.file');
 
 // (Protected Routes)
 Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
@@ -109,11 +115,11 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
     // Document Routes
     Route::prefix('documents')->group(function () {
-        Route::get('/', [DocumentController::class, 'index']);            // All documents (paginated)
-        Route::get('/{document}', [DocumentController::class, 'show']);         // Single document by ID
-        Route::post('/', [DocumentController::class, 'store']);           // Create document
-        Route::put('/{document}', [DocumentController::class, 'update']);       // Update document
-        Route::delete('/{document}', [DocumentController::class, 'destroy']);  // Delete document
+        Route::get('/', [DocumentController::class, 'index']);
+        Route::get('/{document}', [DocumentController::class, 'show']);
+        Route::post('/', [DocumentController::class, 'store']);
+        Route::put('/{document}', [DocumentController::class, 'update']);
+        Route::delete('/{document}', [DocumentController::class, 'destroy']);
     });
     // Custom route: Get all documents for a specific employee
     Route::get('/employees/{employeeId}/documents', [DocumentController::class, 'getByEmployee']);

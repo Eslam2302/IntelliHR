@@ -3,6 +3,7 @@
 namespace App\DataTransferObjects;
 
 use App\Http\Requests\ContractRequest;
+use Carbon\Carbon;
 
 class ContractDTO
 {
@@ -32,9 +33,9 @@ class ContractDTO
             salary: $request->validated('salary') ? (float) $request->validated('salary') : null,
             terms: $request->validated('terms'),
             start_date: $isUpdate
-                ? ($request->validated('start_date') ?? ($contract->start_date ? $contract->start_date->toDateString() : null))
+                ? ($request->validated('start_date') ?? ($contract->start_date ? self::toDateStringValue($contract->start_date) : null))
                 : $request->validated('start_date'),
-            end_date: $request->validated('end_date') ?? ($isUpdate && $contract->end_date ? $contract->end_date->toDateString() : null),
+            end_date: $request->validated('end_date') ?? ($isUpdate && $contract->end_date ? self::toDateStringValue($contract->end_date) : null),
             probation_period_days: $request->validated('probation_period_days') ?? ($isUpdate ? $contract->probation_period_days : null),
         );
     }
@@ -61,5 +62,16 @@ class ContractDTO
         return array_filter($data, function ($value) {
             return $value !== null && $value !== '';
         });
+    }
+
+    private static function toDateStringValue(mixed $value): string
+    {
+        if ($value instanceof Carbon) {
+            return $value->toDateString();
+        }
+        if (is_string($value)) {
+            return Carbon::parse($value)->toDateString();
+        }
+        return (string) $value;
     }
 }

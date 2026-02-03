@@ -49,10 +49,13 @@ export default function AttendanceCheckInPage() {
         fetchRecent();
     }, [fetchRecent]);
 
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     const todayRecord = list.find((a) => (a.date || "").toString().slice(0, 10) === today);
+    const mostRecentIncomplete = list[0]?.check_in && !list[0]?.check_out ? list[0] : null;
+    const activeRecord = todayRecord ?? mostRecentIncomplete;
     const canCheckIn = !todayRecord;
-    const canCheckOut = !!todayRecord && !todayRecord.check_out;
+    const canCheckOut = !!activeRecord && !activeRecord.check_out;
 
     const handleCheckIn = async () => {
         if (!employeeId) return;
@@ -127,11 +130,11 @@ export default function AttendanceCheckInPage() {
                             Check out
                         </button>
                     </div>
-                    {todayRecord && (
+                    {activeRecord && (
                         <div className="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-700">
-                            <p>Check-in: {todayRecord.check_in ? new Date(todayRecord.check_in).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—"}</p>
-                            <p>Check-out: {todayRecord.check_out ? new Date(todayRecord.check_out).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—"}</p>
-                            {todayRecord.worked_hours != null && <p>Hours: {todayRecord.worked_hours}h</p>}
+                            <p>Check-in: {activeRecord.check_in ? new Date(activeRecord.check_in).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—"}</p>
+                            <p>Check-out: {activeRecord.check_out ? new Date(activeRecord.check_out).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "—"}</p>
+                            {activeRecord.worked_hours != null && <p>Hours: {activeRecord.worked_hours}h</p>}
                         </div>
                     )}
                 </div>

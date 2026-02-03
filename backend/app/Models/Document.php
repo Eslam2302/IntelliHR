@@ -17,10 +17,11 @@ class Document extends Model
     ];
 
     /**
-     * Relation: Each document belongs to one employee
+     * Relation: Each document belongs to one employee.
+     * Use withTrashed() so deleted documents still show employee first/last name.
      */
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class)->withTrashed();
     }
 }

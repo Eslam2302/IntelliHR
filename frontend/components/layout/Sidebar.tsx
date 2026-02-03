@@ -182,6 +182,36 @@ export default function Sidebar() {
             </Link>
           </PermissionGuard>
 
+          {/* Contracts */}
+          <PermissionGuard permission={PERMISSIONS.CONTRACTS.VIEW_ALL}>
+            <Link
+              href="/dashboard/contracts"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Contracts"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Contracts icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Contracts</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Documents */}
+          <PermissionGuard permission={PERMISSIONS.DOCUMENTS.VIEW_ALL}>
+            <Link
+              href="/dashboard/documents"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Documents"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Documents icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Documents</span>}
+            </Link>
+          </PermissionGuard>
+
           {/* Attendance – check-in/check-out, last 5. No permission. */}
           <Link
             href="/dashboard/attendance"
@@ -237,6 +267,65 @@ export default function Sidebar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               {!isCollapsed && <span className="truncate">Leave types</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Payroll section */}
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
+              Payroll
+            </p>
+          )}
+          <PermissionGuard permission={PERMISSIONS.BENEFITS.VIEW_ALL}>
+            <Link
+              href="/dashboard/benefits"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Benefits"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Benefits icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Benefits</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.ALLOWANCES.VIEW_ALL}>
+            <Link
+              href="/dashboard/allowances"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Allowances"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Allowances icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Allowances</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.DEDUCTIONS.VIEW_ALL}>
+            <Link
+              href="/dashboard/deductions"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Deductions"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Deductions icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4m8 4v4m0-8v4" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Deductions</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.PAYROLLS.VIEW_ALL}>
+            <Link
+              href="/dashboard/payrolls"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Payrolls"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Payrolls icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5 5l6-6m2 3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Payrolls</span>}
             </Link>
           </PermissionGuard>
 

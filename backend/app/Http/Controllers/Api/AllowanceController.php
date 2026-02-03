@@ -85,6 +85,7 @@ class AllowanceController extends Controller implements HasMiddleware
     {
         $dto = AllowanceDTO::fromRequest($request);
         $allowance = $this->service->create($dto);
+        $allowance->load(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
 
         return response()->json([
             'status' => 'success',
@@ -98,6 +99,8 @@ class AllowanceController extends Controller implements HasMiddleware
      */
     public function show(Allowance $allowance): JsonResponse
     {
+        $allowance->load(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
+
         return response()->json([
             'status' => 'success',
             'data' => new AllowanceResource($allowance),
@@ -111,6 +114,7 @@ class AllowanceController extends Controller implements HasMiddleware
     {
         $dto = AllowanceDTO::fromRequest($request);
         $updatedAllowance = $this->service->update($allowance, $dto);
+        $updatedAllowance->load(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
 
         return response()->json([
             'status' => 'success',

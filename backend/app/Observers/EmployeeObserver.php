@@ -55,25 +55,40 @@ class EmployeeObserver
 
     /**
      * Handle the Employee "deleted" event.
+     * Soft delete the employee's contract, benefits, allowances, deductions and payrolls.
      */
     public function deleted(Employee $employee): void
     {
-        //
+        $employee->contract?->delete();
+        $employee->benefits->each->delete();
+        $employee->allowances->each->delete();
+        $employee->deductions->each->delete();
+        $employee->payrolls->each->delete();
     }
 
     /**
      * Handle the Employee "restored" event.
+     * Restore the employee's contract, benefits, allowances, deductions and payrolls.
      */
     public function restored(Employee $employee): void
     {
-        //
+        $employee->contract()->withTrashed()->first()?->restore();
+        $employee->benefits()->onlyTrashed()->get()->each->restore();
+        $employee->allowances()->onlyTrashed()->get()->each->restore();
+        $employee->deductions()->onlyTrashed()->get()->each->restore();
+        $employee->payrolls()->onlyTrashed()->get()->each->restore();
     }
 
     /**
      * Handle the Employee "force deleted" event.
+     * Force delete the employee's contract, benefits, allowances, deductions and payrolls.
      */
     public function forceDeleted(Employee $employee): void
     {
-        //
+        $employee->contract()->withTrashed()->first()?->forceDelete();
+        $employee->benefits()->withTrashed()->get()->each->forceDelete();
+        $employee->allowances()->withTrashed()->get()->each->forceDelete();
+        $employee->deductions()->withTrashed()->get()->each->forceDelete();
+        $employee->payrolls()->withTrashed()->get()->each->forceDelete();
     }
 }

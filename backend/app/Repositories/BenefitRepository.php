@@ -18,7 +18,7 @@ class BenefitRepository implements BenefitRepositoryInterface
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->query();
+        $query = $this->model->query()->with(['employee' => fn ($q) => $q->withTrashed()]);
 
         $query = $this->applyFilters(
             $query,
@@ -35,6 +35,7 @@ class BenefitRepository implements BenefitRepositoryInterface
     public function showEmployeeBenefits(int $employeeId, int $perpage = 10): LengthAwarePaginator
     {
         return $this->model
+            ->with(['employee' => fn ($q) => $q->withTrashed()])
             ->where('employee_id', $employeeId)
             ->latest()
             ->paginate($perpage);

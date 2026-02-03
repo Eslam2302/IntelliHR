@@ -17,7 +17,7 @@ class DeductionRepository implements DeductionRepositoryInterface
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with(['employee', 'payroll']);
+        $query = $this->model->with(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
 
         $query = $this->applyFilters(
             $query,
@@ -34,7 +34,7 @@ class DeductionRepository implements DeductionRepositoryInterface
     public function showEmployeeDeductions(int $employeeId, int $perpage = 10): LengthAwarePaginator
     {
         return $this->model
-            ->with(['employee', 'payroll'])
+            ->with(['employee' => fn ($q) => $q->withTrashed(), 'payroll'])
             ->where('employee_id', $employeeId)
             ->latest()
             ->paginate($perpage);
@@ -43,7 +43,7 @@ class DeductionRepository implements DeductionRepositoryInterface
     public function showPayrollDeductions(int $payrollId, int $perpage = 10): LengthAwarePaginator
     {
         return $this->model
-            ->with(['employee', 'payroll'])
+            ->with(['employee' => fn ($q) => $q->withTrashed(), 'payroll'])
             ->where('payroll_id', $payrollId)
             ->latest()
             ->paginate($perpage);

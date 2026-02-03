@@ -18,10 +18,22 @@ class AllowanceResource extends JsonResource
             'id' => $this->id,
 
             'employee_id' => $this->employee_id,
-            'employee' => new EmployeeResource($this->whenLoaded('employee')),
+            'employee' => $this->whenLoaded('employee', function () {
+                return $this->employee ? [
+                    'id' => $this->employee->id,
+                    'name' => trim($this->employee->first_name . ' ' . $this->employee->last_name),
+                    'deleted_at' => $this->employee->deleted_at?->format('Y-m-d H:i:s'),
+                ] : null;
+            }),
 
             'payroll_id' => $this->payroll_id,
-            'payroll' => new PayrollResource($this->whenLoaded('payroll')),
+            'payroll' => $this->whenLoaded('payroll', function () {
+                return $this->payroll ? [
+                    'id' => $this->payroll->id,
+                    'year' => (int) $this->payroll->year,
+                    'month' => (int) $this->payroll->month,
+                ] : null;
+            }),
 
             'type' => $this->type,
             'amount' => (float) $this->amount,

@@ -60,6 +60,7 @@ class PayrollController extends Controller implements HasMiddleware
     {
         $dto = PayrollDTO::fromRequest($request);
         $payroll = $this->service->create($dto);
+        $payroll->load(['employee' => fn ($q) => $q->withTrashed()]);
 
         return response()->json([
             'status' => 'success',
@@ -69,10 +70,12 @@ class PayrollController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display the specified allowance.
+     * Display the specified payroll.
      */
     public function show(Payroll $payroll): JsonResponse
     {
+        $payroll->load(['employee' => fn ($q) => $q->withTrashed()]);
+
         return response()->json([
             'status' => 'success',
             'data' => new PayrollResource($payroll),
@@ -86,6 +89,7 @@ class PayrollController extends Controller implements HasMiddleware
     {
         $dto = PayrollDTO::fromRequest($request);
         $updatedPayroll = $this->service->update($payroll, $dto);
+        $updatedPayroll->load(['employee' => fn ($q) => $q->withTrashed()]);
 
         return response()->json([
             'status' => 'success',

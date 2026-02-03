@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { login as loginApi } from "@/services/api/auth";
 import type { LoginCredentials } from "@/lib/types";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
-export default function LoginPage() {
+function LoginForm() {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -214,5 +214,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-tl from-white via-indigo-50 to-indigo-50">
+        <LoadingSpinner size="lg" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

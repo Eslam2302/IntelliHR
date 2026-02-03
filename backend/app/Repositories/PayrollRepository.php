@@ -18,7 +18,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with('employee');
+        $query = $this->model->with(['employee' => fn ($q) => $q->withTrashed()]);
 
         $query = $this->applyFilters(
             $query,
@@ -64,6 +64,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function getByEmployee(int $employeeId): Collection
     {
         return $this->model
+            ->with(['employee' => fn ($q) => $q->withTrashed()])
             ->where('employee_id', $employeeId)
             ->orderByDesc('year')
             ->orderByDesc('month')
@@ -76,6 +77,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function getByMonth(int $year, int $month): Collection
     {
         return $this->model
+            ->with(['employee' => fn ($q) => $q->withTrashed()])
             ->where('year', $year)
             ->where('month', $month)
             ->get();

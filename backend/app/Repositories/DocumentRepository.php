@@ -17,13 +17,13 @@ class DocumentRepository implements DocumentRepositoryInterface
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->query();
+        $query = $this->model->with('employee');
 
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['doc_type'],
-            ['id', 'doc_type', 'created_at', 'updated_at', 'deleted_at'],
+            ['doc_type', 'employee.first_name', 'employee.last_name', 'employee.work_email'],
+            ['id', 'employee_id', 'doc_type', 'created_at', 'updated_at', 'deleted_at'],
             'created_at',
             'desc'
         );

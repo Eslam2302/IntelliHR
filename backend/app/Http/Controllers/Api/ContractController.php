@@ -69,6 +69,8 @@ class ContractController extends Controller implements HasMiddleware
      */
     public function show(Contract $contract)
     {
+        $contract->load(['employee' => fn ($q) => $q->withTrashed()]);
+
         return response()->json([
             'status' => 'success',
             'data' => new ContractResource($contract),

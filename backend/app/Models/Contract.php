@@ -21,9 +21,9 @@ class Contract extends Model
     ];
 
     protected $casts = [
-        'start_date',
-        'end_date',
-        'salary',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'salary' => 'float',
     ];
 
     public function employee()

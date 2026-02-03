@@ -71,6 +71,7 @@ class BenefitController extends Controller implements HasMiddleware
     {
         $dto = BenefitDTO::fromRequest($request);
         $benefit = $this->service->create($dto);
+        $benefit->load(['employee' => fn ($q) => $q->withTrashed()]);
 
         return response()->json([
             'status' => 'success',
@@ -84,6 +85,8 @@ class BenefitController extends Controller implements HasMiddleware
      */
     public function show(Benefit $benefit): JsonResponse
     {
+        $benefit->load(['employee' => fn ($q) => $q->withTrashed()]);
+
         return response()->json([
             'status' => 'success',
             'data' => new BenefitResource($benefit),
@@ -97,6 +100,7 @@ class BenefitController extends Controller implements HasMiddleware
     {
         $dto = BenefitDTO::fromRequest($request);
         $updatedBenefit = $this->service->update($benefit, $dto);
+        $updatedBenefit->load(['employee' => fn ($q) => $q->withTrashed()]);
 
         return response()->json([
             'status' => 'success',

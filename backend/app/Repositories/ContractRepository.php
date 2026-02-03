@@ -17,13 +17,13 @@ class ContractRepository implements ContractRepositoryInterface
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->query();
+        $query = $this->model->with(['employee' => fn ($q) => $q->withTrashed()]);
 
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['contract_type'],
-            ['id', 'employee_id', 'start_date', 'end_date', 'created_at', 'deleted_at'],
+            ['contract_type', 'employee.first_name', 'employee.last_name', 'employee.work_email'],
+            ['id', 'employee_id', 'start_date', 'end_date', 'contract_type', 'created_at', 'deleted_at'],
             'created_at',
             'desc'
         );

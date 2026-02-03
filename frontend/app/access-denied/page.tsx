@@ -1,9 +1,10 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function AccessDeniedPage() {
+function AccessDeniedContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const from = searchParams.get("from") || "this page";
@@ -164,6 +165,18 @@ export default function AccessDeniedPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function AccessDeniedPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="animate-pulse text-gray-500">Loading...</div>
+            </div>
+        }>
+            <AccessDeniedContent />
+        </Suspense>
     );
 }
 

@@ -85,6 +85,7 @@ class DeductionController extends Controller implements HasMiddleware
     {
         $dto = DeductionDTO::fromRequest($request);
         $deduction = $this->service->create($dto);
+        $deduction->load(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
 
         return response()->json([
             'status' => 'success',
@@ -98,6 +99,8 @@ class DeductionController extends Controller implements HasMiddleware
      */
     public function show(Deduction $deduction): JsonResponse
     {
+        $deduction->load(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
+
         return response()->json([
             'status' => 'success',
             'data' => new DeductionResource($deduction),
@@ -111,6 +114,7 @@ class DeductionController extends Controller implements HasMiddleware
     {
         $dto = DeductionDTO::fromRequest($request);
         $updatedDeduction = $this->service->update($deduction, $dto);
+        $updatedDeduction->load(['employee' => fn ($q) => $q->withTrashed(), 'payroll']);
 
         return response()->json([
             'status' => 'success',
