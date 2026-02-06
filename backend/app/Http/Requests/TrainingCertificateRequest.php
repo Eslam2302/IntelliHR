@@ -30,7 +30,7 @@ class TrainingCertificateRequest extends FormRequest
             ],
             'issued_at' => ['nullable', 'date'],
             'certificate_path' => [
-                $isUpdate ? 'sometimes' : 'required',
+                'nullable',
                 'string',
                 'max:255'
             ],
@@ -45,7 +45,7 @@ class TrainingCertificateRequest extends FormRequest
         return [
             'employee_training_id.required' => 'Employee training ID is required.',
             'employee_training_id.exists' => 'Employee training not found.',
-            'certificate_path.required' => 'Certificate path is required.',
+            'certificate_path.max' => 'Certificate path must not exceed 255 characters.',
         ];
     }
 }

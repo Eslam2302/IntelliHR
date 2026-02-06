@@ -28,3 +28,18 @@ export type { Deduction, DeductionListResponse } from "./deduction";
 
 // Payroll types
 export type { Payroll, PayrollListResponse } from "./payroll";
+
+// Trainer types
+export type { Trainer, TrainerListResponse } from "./trainer";
+
+// Training session types
+export type { TrainingSession, TrainingSessionListResponse } from "./training-session";
+
+// Employee training types
+export type { EmployeeTraining, EmployeeTrainingListResponse } from "./employee-training";
+
+// Training certificate types
+export type { TrainingCertificate, TrainingCertificateListResponse } from "./training-certificate";
+
+// Training evaluation types
+export type { TrainingEvaluation, TrainingEvaluationListResponse } from "./training-evaluation";

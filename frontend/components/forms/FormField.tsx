@@ -65,8 +65,8 @@ export function FormField({
                         className={`${baseInputClasses} ${errorClasses} ${className}`}
                     >
                         <option value="">Select {label}</option>
-                        {options?.map((option) => (
-                            <option key={option.value} value={option.value}>
+                        {options?.map((option, index) => (
+                            <option key={`${name}-opt-${index}-${option.value ?? ""}`} value={option.value}>
                                 {option.label}
                             </option>
                         ))}

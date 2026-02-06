@@ -18,7 +18,7 @@ class TrainingCertificateRepository implements TrainingCertificateRepositoryInte
 
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with('employeeTraining');
+        $query = $this->model->with(['employeeTraining.employee', 'employeeTraining.training']);
 
         $query = $this->applyFilters(
             $query,
@@ -37,7 +37,7 @@ class TrainingCertificateRepository implements TrainingCertificateRepositoryInte
      */
     public function show(int $id): TrainingCertificate
     {
-        return $this->model->with('employeeTraining')->findOrFail($id);
+        return $this->model->with(['employeeTraining.employee', 'employeeTraining.training'])->findOrFail($id);
     }
 
     /**

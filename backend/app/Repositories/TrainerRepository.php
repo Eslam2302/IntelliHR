@@ -55,7 +55,7 @@ class TrainerRepository implements TrainerRepositoryInterface
     {
         $trainer->update($data);
 
-        return $trainer->fresh();
+        return $trainer->fresh()->load('employee');
     }
 
     /**

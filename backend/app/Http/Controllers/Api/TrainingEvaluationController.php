@@ -68,6 +68,8 @@ class TrainingEvaluationController extends Controller implements HasMiddleware
      */
     public function show(TrainingEvaluation $evaluation): JsonResponse
     {
+        $evaluation->load(['employee', 'training']);
+
         return response()->json([
             'status' => 'success',
             'data' => new TrainingEvaluationResource($evaluation),

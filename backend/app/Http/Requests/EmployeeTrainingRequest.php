@@ -36,7 +36,7 @@ class EmployeeTrainingRequest extends FormRequest
             ],
             'status' => [
                 $isUpdate ? 'sometimes' : 'required',
-                'in:enrolled,completed,cancelled'
+                'in:enrolled,in_progress,completed,cancelled'
             ],
             'completion_date' => ['nullable', 'date'],
         ];

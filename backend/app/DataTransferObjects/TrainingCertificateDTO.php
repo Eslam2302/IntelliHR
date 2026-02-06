@@ -30,7 +30,7 @@ class TrainingCertificateDTO
             issued_at: $request->validated('issued_at') ?? ($isUpdate && $certificate->issued_at ? $certificate->issued_at->toDateString() : null),
             certificate_path: $isUpdate
                 ? ($request->validated('certificate_path') ?? $certificate->certificate_path)
-                : $request->validated('certificate_path')
+                : $request->validated('certificate_path', null)
         );
     }
 

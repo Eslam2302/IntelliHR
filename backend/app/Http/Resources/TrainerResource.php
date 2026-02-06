@@ -15,17 +15,17 @@ class TrainerResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'type' => $this->type,
-            'employee' => $this->when($this->type === 'internal', function () {
+            'employee_id' => $this->employee_id,
+            'employee' => $this->whenLoaded('employee', function () {
                 return $this->employee ? [
                     'id' => $this->employee->id,
-                    'name' => $this->employee->first_name.' '.$this->employee->last_name,
-                    'email' => $this->employee->work_email,
-                    'phone' => $this->employee->phone,
-                    'department_id' => $this->employee->department_id,
+                    'name' => trim($this->employee->first_name . ' ' . $this->employee->last_name),
+                    'email' => $this->employee->work_email ?? null,
+                    'phone' => $this->employee->phone ?? null,
                 ] : null;
             }),
-
             'name' => $this->when($this->type === 'external', $this->name),
             'email' => $this->when($this->type === 'external', $this->email),
             'phone' => $this->when($this->type === 'external', $this->phone),

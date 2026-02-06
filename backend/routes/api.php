@@ -205,27 +205,28 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     Route::prefix('training-sessions')->group(function () {
         Route::get('/', [TrainingSessionController::class, 'index']);          // List all sessions (paginated)
         Route::post('/', [TrainingSessionController::class, 'store']);         // Create a new session
-        Route::get('{trainingSession}', [TrainingSessionController::class, 'show']);   // Show single session
-        Route::put('{trainingSession}', [TrainingSessionController::class, 'update']); // Update session
-        Route::delete('{trainingSession}', [TrainingSessionController::class, 'destroy']); // Delete session
+        Route::get('/{trainingSession}', [TrainingSessionController::class, 'show']);   // Show single session
+        Route::put('/{trainingSession}', [TrainingSessionController::class, 'update']); // Update session
+        Route::delete('/{trainingSession}', [TrainingSessionController::class, 'destroy']); // Delete session
     });
 
     // Employee Training Routes
     Route::prefix('employee-trainings')->group(function () {
         Route::get('/', [EmployeeTrainingController::class, 'index']);
         Route::post('/', [EmployeeTrainingController::class, 'store']);
-        Route::get('{employeeTraining}', [EmployeeTrainingController::class, 'show']);
-        Route::put('{employeeTraining}', [EmployeeTrainingController::class, 'update']);
-        Route::delete('{employeeTraining}', [EmployeeTrainingController::class, 'destroy']);
+        Route::get('/{employeeTraining}', [EmployeeTrainingController::class, 'show']);
+        Route::put('/{employeeTraining}', [EmployeeTrainingController::class, 'update']);
+        Route::delete('/{employeeTraining}', [EmployeeTrainingController::class, 'destroy']);
     });
 
     // Training Certificates
     Route::prefix('training-certificates')->group(function () {
         Route::get('/', [TrainingCertificateController::class, 'index']);
+        Route::post('/upload', [TrainingCertificateController::class, 'upload']);
         Route::post('/', [TrainingCertificateController::class, 'store']);
-        Route::get('{certificate}', [TrainingCertificateController::class, 'show']);
-        Route::put('{certificate}', [TrainingCertificateController::class, 'update']);
-        Route::delete('{certificate}', [TrainingCertificateController::class, 'destroy']);
+        Route::get('/{certificate}', [TrainingCertificateController::class, 'show']);
+        Route::put('/{certificate}', [TrainingCertificateController::class, 'update']);
+        Route::delete('/{certificate}', [TrainingCertificateController::class, 'destroy']);
     });
 
     // Training Evaluation

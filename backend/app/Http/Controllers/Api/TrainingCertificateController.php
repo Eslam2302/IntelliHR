@@ -9,6 +9,7 @@ use App\Http\Resources\TrainingCertificateResource;
 use App\Models\TrainingCertificate;
 use App\Services\TrainingCertificateService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -25,10 +26,34 @@ class TrainingCertificateController extends Controller implements HasMiddleware
             new Middleware('auth:sanctum'),
             new Middleware('permission:view-all-training-certificates', only: ['index']),
             new Middleware('permission:view-training-certificate', only: ['show']),
-            new Middleware('permission:create-training-certificate', only: ['store']),
-            new Middleware('permission:edit-training-certificate', only: ['update']),
+            new Middleware('permission:create-training-certificate', only: ['store', 'upload']),
+            new Middleware('permission:edit-training-certificate', only: ['update', 'upload']),
             new Middleware('permission:delete-training-certificate', only: ['destroy']),
         ];
+    }
+
+    /**
+     * Upload a certificate file. Returns the stored path for use in create/update.
+     */
+    public function upload(Request $request): JsonResponse
+    {
+        $request->validate([
+            'certificate_file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        ], [
+            'certificate_file.required' => 'Please select a file to upload.',
+            'certificate_file.file' => 'The uploaded value must be a file.',
+            'certificate_file.mimes' => 'The file must be a PDF or image (jpg, jpeg, png).',
+            'certificate_file.max' => 'The file must not exceed 5 MB.',
+        ]);
+
+        $file = $request->file('certificate_file');
+        $path = $file->store('certificates', 'public');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Certificate file uploaded.',
+            'path' => $path,
+        ], 200);
     }
 
     /**
@@ -72,7 +97,7 @@ class TrainingCertificateController extends Controller implements HasMiddleware
      */
     public function show(TrainingCertificate $certificate): JsonResponse
     {
-        $certificate->load('employeeTraining');
+        $certificate->load(['employeeTraining.employee', 'employeeTraining.training']);
 
         return response()->json([
             'status' => 'success',
