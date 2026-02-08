@@ -178,7 +178,8 @@ class EmployeeContextService
         if (!empty($context['recent_payrolls'])) {
             $text .= "Recent Payroll History (Last 6 months):\n";
             foreach ($context['recent_payrolls'] as $payroll) {
-                $text .= "- {$payroll['month']}/{$payroll['year']}: Net Pay $" . number_format($payroll['net_pay'], 2) . " (Status: {$payroll['payment_status']})\n";
+                $text .= "- {$payroll['month']}/{$payroll['year']}: Basic Salary $" . number_format($payroll['basic_salary'], 2)
+                    . ", Net Pay $" . number_format($payroll['net_pay'], 2) . " (Status: {$payroll['payment_status']})\n";
             }
         }
 

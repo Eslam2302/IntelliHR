@@ -46,7 +46,7 @@ export default function NewAllowancePage() {
         createFunction: async (data) => {
             const res = await createAllowance({
                 employee_id: Number(data.employee_id)!,
-                payroll_id: data.payroll_id != null && data.payroll_id !== "" ? Number(data.payroll_id) : undefined,
+                payroll_id: data.payroll_id != null ? Number(data.payroll_id) : undefined,
                 type: data.type!,
                 amount: Number(data.amount)!,
             });

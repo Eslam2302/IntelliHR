@@ -62,7 +62,7 @@ class EmployeeController extends Controller implements HasMiddleware
     {
         return response()->json([
             'status' => 'success',
-            'data' => new EmployeeResource($employee->load(['department', 'manager', 'user', 'job'])),
+            'data' => new EmployeeResource($employee->load(['department', 'manager', 'user', 'job', 'roles'])),
         ], 200);
     }
 

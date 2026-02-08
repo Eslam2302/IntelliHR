@@ -188,8 +188,9 @@ export default function NewCompetencyPage() {
                         label="Active"
                         name="is_active"
                         type="checkbox"
+                        value={formData.is_active ?? true}
                         checked={formData.is_active ?? true}
-                        onChange={(e) => updateField("is_active", e.target.checked)}
+                        onChange={(e) => updateField("is_active", (e.target as HTMLInputElement).checked)}
                         disabled={isSubmitting}
                     />
                     <ActionButtons submitLabel="Create competency" isSubmitting={isSubmitting} />

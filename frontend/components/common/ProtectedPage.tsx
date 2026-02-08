@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import { usePermissions } from "@/hooks/usePermissions";
 
 interface ProtectedPageProps {
@@ -23,6 +24,7 @@ export function ProtectedPage({
   errorComponent,
   redirectOnDenied = true,
 }: ProtectedPageProps) {
+  const { isAuthenticated } = useAuth();
   const {
     hasPermission,
     hasAllPermissions,
@@ -31,44 +33,43 @@ export function ProtectedPage({
   } = usePermissions();
   const router = useRouter();
 
-  if (isLoadingPermissions) {
-    return <>{loadingComponent || null}</>;
-  }
-
   let hasAccess = false;
-
   if (permission) {
     hasAccess = hasPermission(permission);
   } else if (permissions && permissions.length > 0) {
-    if (requireAll) {
-      hasAccess = hasAllPermissions(permissions);
-    } else {
-      hasAccess = hasAnyPermission(permissions);
-    }
+    hasAccess = requireAll
+      ? hasAllPermissions(permissions)
+      : hasAnyPermission(permissions);
   } else {
-    return <>{children}</>;
+    hasAccess = true;
+  }
+
+  const shouldRedirect = !isLoadingPermissions && !hasAccess && redirectOnDenied && !errorComponent;
+
+  useEffect(() => {
+    if (!shouldRedirect) return;
+    const currentPath = window.location.pathname;
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${encodeURIComponent(currentPath)}`);
+    } else {
+      const required = permission ? permission : permissions?.join(",") || "";
+      router.push(
+        `/access-denied?from=${encodeURIComponent(currentPath)}&required=${encodeURIComponent(required)}`
+      );
+    }
+  }, [shouldRedirect, isAuthenticated, permission, permissions, router]);
+
+  if (isLoadingPermissions) {
+    return <>{loadingComponent || null}</>;
   }
 
   if (!hasAccess) {
     if (errorComponent) {
       return <>{errorComponent}</>;
     }
-
     if (redirectOnDenied) {
-      useEffect(() => {
-        const currentPath = window.location.pathname;
-        const required = permission
-          ? permission
-          : permissions?.join(",") || "";
-        const accessDeniedUrl = `/access-denied?from=${encodeURIComponent(
-          currentPath
-        )}&required=${encodeURIComponent(required)}`;
-        router.push(accessDeniedUrl);
-      }, [permission, permissions, router]);
-
       return <>{loadingComponent || null}</>;
     }
-
     return null;
   }
 

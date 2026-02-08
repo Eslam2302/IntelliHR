@@ -38,6 +38,7 @@ export interface Employee {
   department?: Department | null;
   job?: JobPosition | null;
   manager?: Employee | null; // Self-referencing relationship
+  roles?: string[]; // Role names when loaded
 }
 
 // For API responses with pagination

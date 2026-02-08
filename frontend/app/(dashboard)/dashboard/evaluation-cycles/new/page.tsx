@@ -223,16 +223,18 @@ export default function NewEvaluationCyclePage() {
                             label="Include self assessment"
                             name="include_self_assessment"
                             type="checkbox"
+                            value={formData.include_self_assessment ?? true}
                             checked={formData.include_self_assessment ?? true}
-                            onChange={(e) => updateField("include_self_assessment", e.target.checked)}
+                            onChange={(e) => updateField("include_self_assessment", (e.target as HTMLInputElement).checked)}
                             disabled={isSubmitting}
                         />
                         <FormField
                             label="Include goals"
                             name="include_goals"
                             type="checkbox"
+                            value={formData.include_goals ?? true}
                             checked={formData.include_goals ?? true}
-                            onChange={(e) => updateField("include_goals", e.target.checked)}
+                            onChange={(e) => updateField("include_goals", (e.target as HTMLInputElement).checked)}
                             disabled={isSubmitting}
                         />
                     </div>

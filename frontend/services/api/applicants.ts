@@ -175,3 +175,60 @@ export async function updateApplicant(id: number, payload: UpdateApplicantData):
 export async function deleteApplicant(id: number): Promise<void> {
     await fetchWithAuth(`${API_URL}/applicants/${id}`, { method: "DELETE" });
 }
+
+/** Response from analyze or re-analyze resume */
+export interface ResumeAnalysisResult {
+    ai_score?: number | null;
+    ai_recommendation?: string | null;
+    ai_analysis_status?: string | null;
+}
+
+/** Response from get AI analysis (may be processing) */
+export interface ApplicantAiAnalysisResponse {
+    status?: "success" | "processing" | "error";
+    message?: string;
+    data?: {
+        ai_score?: number | null;
+        ai_recommendation?: string | null;
+        ai_matched_skills?: string[] | null;
+        ai_missing_skills?: string[] | null;
+        ai_analysis?: string | null;
+        ai_analyzed_at?: string | null;
+    };
+}
+
+export async function analyzeResume(id: number): Promise<ResumeAnalysisResult> {
+    const res = await fetchWithAuth(`${API_URL}/applicants/${id}/analyze-resume`, {
+        method: "POST",
+        body: JSON.stringify({}),
+    });
+    return (res.data ?? res) as ResumeAnalysisResult;
+}
+
+export async function getApplicantAiAnalysis(id: number): Promise<ApplicantAiAnalysisResponse> {
+    const { getToken } = await import("@/services/api/auth");
+    const token = getToken();
+    if (!token) throw new Error("No authentication token found");
+    const response = await fetch(`${API_URL}/applicants/${id}/ai-analysis`, {
+        headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    const data = await response.json();
+    if (response.status === 202) {
+        return { status: "processing", message: data.message ?? "Analysis in progress.", data: data.data };
+    }
+    if (!response.ok) {
+        throw new Error(data.message ?? "Request failed");
+    }
+    return { status: "success", data: data.data ?? data };
+}
+
+export async function reAnalyzeResume(id: number): Promise<ResumeAnalysisResult> {
+    const res = await fetchWithAuth(`${API_URL}/applicants/${id}/re-analyze`, {
+        method: "POST",
+        body: JSON.stringify({}),
+    });
+    return (res.data ?? res) as ResumeAnalysisResult;
+}

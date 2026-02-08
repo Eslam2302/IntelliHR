@@ -1,9 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useEntity } from "@/hooks/useEntity";
-import { getApplicant } from "@/services/api/applicants";
+import {
+    getApplicant,
+    analyzeResume,
+    getApplicantAiAnalysis,
+    reAnalyzeResume,
+} from "@/services/api/applicants";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -45,7 +51,7 @@ function statusBadge(status: string | null | undefined) {
 export default function ApplicantViewPage() {
     const params = useParams();
     const id = parseId(params.id);
-    const { data: applicant, isLoading, error } = useEntity<Applicant>({
+    const { data: applicant, isLoading, error, refetch } = useEntity<Applicant>({
         fetchFunction: getApplicant,
         entityId: id,
     });
@@ -140,65 +146,222 @@ export default function ApplicantViewPage() {
                     </dl>
                 </div>
             </div>
-            {applicant.ai_summary && (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">AI Analysis</h3>
-                        <dl className="divide-y divide-gray-100">
+
+            <ResumeAiAnalysisSection applicant={applicant} onRefetch={refetch} />
+        </div>
+    );
+}
+
+function ResumeAiAnalysisSection({
+    applicant,
+    onRefetch,
+}: {
+    applicant: Applicant;
+    onRefetch: () => Promise<void>;
+}) {
+    const [loading, setLoading] = useState<"analyze" | "reanalyze" | null>(null);
+    const [viewModal, setViewModal] = useState(false);
+    const [viewData, setViewData] = useState<Awaited<ReturnType<typeof getApplicantAiAnalysis>> | null>(null);
+    const [viewLoading, setViewLoading] = useState(false);
+    const [actionError, setActionError] = useState<string | null>(null);
+
+    const hasResume = !!(applicant.resume_path || (applicant as any).file_path);
+    const hasAnalysis = applicant.ai_analysis_status === "completed" || applicant.ai_score != null;
+
+    const handleAnalyze = async () => {
+        setActionError(null);
+        setLoading("analyze");
+        try {
+            await analyzeResume(applicant.id);
+            await onRefetch();
+        } catch (e) {
+            setActionError(e instanceof Error ? e.message : "Analyze failed");
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleReAnalyze = async () => {
+        setActionError(null);
+        setLoading("reanalyze");
+        try {
+            await reAnalyzeResume(applicant.id);
+            await onRefetch();
+        } catch (e) {
+            setActionError(e instanceof Error ? e.message : "Re-analyze failed");
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const handleViewAnalysis = async () => {
+        setViewModal(true);
+        setViewLoading(true);
+        setViewData(null);
+        try {
+            const res = await getApplicantAiAnalysis(applicant.id);
+            setViewData(res);
+        } catch (e) {
+            setViewData({
+                status: "error",
+                message: e instanceof Error ? e.message : "Failed to load analysis",
+            });
+        } finally {
+            setViewLoading(false);
+        }
+    };
+
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Resume / AI analysis</h3>
+                {actionError && (
+                    <p className="text-sm text-red-600 mb-4">{actionError}</p>
+                )}
+
+                {(applicant.ai_score != null || applicant.ai_recommendation || applicant.ai_analysis_status || applicant.ai_analyzed_at || applicant.ai_summary) && (
+                    <dl className="divide-y divide-gray-100 mb-6">
+                        <DetailRow
+                            label="AI Score"
+                            value={applicant.ai_score != null ? `${applicant.ai_score}%` : null}
+                        />
+                        <DetailRow label="Recommendation" value={applicant.ai_recommendation} />
+                        <DetailRow label="Analysis Status" value={applicant.ai_analysis_status} />
+                        <DetailRow
+                            label="Analyzed at"
+                            value={applicant.ai_analyzed_at ? new Date(applicant.ai_analyzed_at).toLocaleString() : null}
+                        />
+                        {applicant.ai_summary?.matched_skills && applicant.ai_summary.matched_skills.length > 0 && (
                             <DetailRow
-                                label="AI Score"
-                                value={applicant.ai_score != null ? `${applicant.ai_score}%` : null}
+                                label="Matched Skills"
+                                value={
+                                    <div className="flex flex-wrap gap-2">
+                                        {applicant.ai_summary.matched_skills.map((skill, idx) => (
+                                            <span key={idx} className="inline-flex px-2 py-1 text-xs font-medium rounded-md bg-green-100 text-green-800">
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                }
                             />
+                        )}
+                        {applicant.ai_summary?.missing_skills && applicant.ai_summary.missing_skills.length > 0 && (
                             <DetailRow
-                                label="Recommendation"
-                                value={applicant.ai_recommendation}
+                                label="Missing Skills"
+                                value={
+                                    <div className="flex flex-wrap gap-2">
+                                        {applicant.ai_summary.missing_skills.map((skill, idx) => (
+                                            <span key={idx} className="inline-flex px-2 py-1 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800">
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                }
                             />
+                        )}
+                        {applicant.ai_summary?.overall_assessment && (
                             <DetailRow
-                                label="Analysis Status"
-                                value={applicant.ai_analysis_status}
+                                label="Overall Assessment"
+                                value={<div className="whitespace-pre-wrap">{applicant.ai_summary.overall_assessment}</div>}
                             />
-                            <DetailRow
-                                label="Analyzed at"
-                                value={applicant.ai_analyzed_at ? new Date(applicant.ai_analyzed_at).toLocaleString() : null}
-                            />
-                            {applicant.ai_summary.matched_skills && applicant.ai_summary.matched_skills.length > 0 && (
-                                <DetailRow
-                                    label="Matched Skills"
-                                    value={
-                                        <div className="flex flex-wrap gap-2">
-                                            {applicant.ai_summary.matched_skills.map((skill, idx) => (
-                                                <span key={idx} className="inline-flex px-2 py-1 text-xs font-medium rounded-md bg-green-100 text-green-800">
-                                                    {skill}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    }
-                                />
-                            )}
-                            {applicant.ai_summary.missing_skills && applicant.ai_summary.missing_skills.length > 0 && (
-                                <DetailRow
-                                    label="Missing Skills"
-                                    value={
-                                        <div className="flex flex-wrap gap-2">
-                                            {applicant.ai_summary.missing_skills.map((skill, idx) => (
-                                                <span key={idx} className="inline-flex px-2 py-1 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800">
-                                                    {skill}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    }
-                                />
-                            )}
-                            {applicant.ai_summary.overall_assessment && (
-                                <DetailRow
-                                    label="Overall Assessment"
-                                    value={<div className="whitespace-pre-wrap">{applicant.ai_summary.overall_assessment}</div>}
-                                />
-                            )}
-                        </dl>
-                    </div>
+                        )}
+                    </dl>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                    <PermissionGuard permission={PERMISSIONS.APPLICANTS.EDIT}>
+                        {hasResume && (
+                            <>
+                                {!hasAnalysis && (
+                                    <button
+                                        type="button"
+                                        onClick={handleAnalyze}
+                                        disabled={!!loading}
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium disabled:opacity-50"
+                                    >
+                                        {loading === "analyze" ? "Analyzing…" : "Analyze resume"}
+                                    </button>
+                                )}
+                                {hasAnalysis && (
+                                    <button
+                                        type="button"
+                                        onClick={handleReAnalyze}
+                                        disabled={!!loading}
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium disabled:opacity-50"
+                                    >
+                                        {loading === "reanalyze" ? "Re-analyzing…" : "Re-analyze"}
+                                    </button>
+                                )}
+                            </>
+                        )}
+                        {!hasResume && (
+                            <span className="text-sm text-gray-500">No resume file to analyze.</span>
+                        )}
+                    </PermissionGuard>
+                    <PermissionGuard permission={PERMISSIONS.APPLICANTS.VIEW}>
+                        {(hasAnalysis || applicant.ai_analysis_status) && (
+                            <button
+                                type="button"
+                                onClick={handleViewAnalysis}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 text-sm font-medium"
+                            >
+                                View AI analysis
+                            </button>
+                        )}
+                    </PermissionGuard>
                 </div>
-            )}
+
+                {viewModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setViewModal(false)}>
+                        <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[80vh] overflow-auto p-6" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="text-lg font-semibold text-gray-900">AI Analysis</h4>
+                                <button type="button" onClick={() => setViewModal(false)} className="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+                            </div>
+                            {viewLoading ? (
+                                <p className="text-gray-500">Loading…</p>
+                            ) : viewData?.status === "processing" ? (
+                                <p className="text-amber-600">{viewData.message ?? "Analysis in progress."}</p>
+                            ) : viewData?.status === "error" ? (
+                                <p className="text-red-600">{viewData.message}</p>
+                            ) : viewData?.data ? (
+                                <dl className="divide-y divide-gray-100">
+                                    <DetailRow label="AI Score" value={viewData.data.ai_score != null ? `${viewData.data.ai_score}%` : null} />
+                                    <DetailRow label="Recommendation" value={viewData.data.ai_recommendation} />
+                                    <DetailRow label="Analyzed at" value={viewData.data.ai_analyzed_at ? new Date(viewData.data.ai_analyzed_at).toLocaleString() : null} />
+                                    {viewData.data.ai_matched_skills && viewData.data.ai_matched_skills.length > 0 && (
+                                        <DetailRow
+                                            label="Matched skills"
+                                            value={
+                                                <div className="flex flex-wrap gap-2">
+                                                    {viewData.data.ai_matched_skills.map((s, i) => (
+                                                        <span key={i} className="inline-flex px-2 py-1 text-xs font-medium rounded-md bg-green-100 text-green-800">{s}</span>
+                                                    ))}
+                                                </div>
+                                            }
+                                        />
+                                    )}
+                                    {viewData.data.ai_missing_skills && viewData.data.ai_missing_skills.length > 0 && (
+                                        <DetailRow
+                                            label="Missing skills"
+                                            value={
+                                                <div className="flex flex-wrap gap-2">
+                                                    {viewData.data.ai_missing_skills.map((s, i) => (
+                                                        <span key={i} className="inline-flex px-2 py-1 text-xs font-medium rounded-md bg-yellow-100 text-yellow-800">{s}</span>
+                                                    ))}
+                                                </div>
+                                            }
+                                        />
+                                    )}
+                                    {viewData.data.ai_analysis && (
+                                        <DetailRow label="Analysis" value={<div className="whitespace-pre-wrap">{viewData.data.ai_analysis}</div>} />
+                                    )}
+                                </dl>
+                            ) : null}
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

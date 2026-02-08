@@ -96,3 +96,17 @@ export async function deleteEmployee(id: number): Promise<void> {
         method: "DELETE",
     });
 }
+
+/**
+ * Assign a role to an employee (replaces any existing role).
+ * Requires permission: assign-roles
+ */
+export async function assignRoleToEmployee(
+    employeeId: number,
+    roleName: string
+): Promise<ApiResponse<{ employee_id: number; roles: string[]; permissions: string[] }>> {
+    return fetchWithAuth(`${API_URL}/employees/${employeeId}/assign-role`, {
+        method: "POST",
+        body: JSON.stringify({ role: roleName }),
+    });
+}

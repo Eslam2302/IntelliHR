@@ -53,6 +53,9 @@ class EmployeeResource extends JsonResource
                     'personal_email' => $this->user->personal_email,
                 ] : null;
             }),
+            'roles' => $this->whenLoaded('roles', function () {
+                return $this->roles?->pluck('name')->values()->all() ?? [];
+            }),
             'created_at' => $this->created_at?->format('Y-m-d H:i'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i'),
             'deleted_at' => $this->deleted_at?->format('Y-m-d H:i'),

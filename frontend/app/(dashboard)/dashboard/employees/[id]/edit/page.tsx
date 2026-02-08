@@ -8,7 +8,9 @@ import { getJobPositions } from "@/services/api/job-positions";
 import { useEntity } from "@/hooks/useEntity";
 import { useEntityForm } from "@/hooks/useEntityForm";
 import { ProtectedPage } from "@/components/common/ProtectedPage";
+import { PermissionGuard } from "@/components/common/PermissionGuard";
 import { PERMISSIONS } from "@/lib/constants/permissions";
+import { AssignRoleSection } from "@/components/employees/AssignRoleSection";
 import { FormContainer } from "@/components/forms/FormContainer";
 import { FormField } from "@/components/forms/FormField";
 import { ActionButtons } from "@/components/forms/ActionButtons";
@@ -382,6 +384,14 @@ export default function EditEmployeePage() {
 
                     <ActionButtons submitLabel="Update Employee" isSubmitting={isSubmitting} />
                 </FormContainer>
+
+                <PermissionGuard permission={PERMISSIONS.ROLES.ASSIGN}>
+                    <AssignRoleSection
+                        employeeId={employee.id}
+                        employeeName={`${employee.first_name} ${employee.last_name}`}
+                        currentRoleNames={employee.roles}
+                    />
+                </PermissionGuard>
             </div>
         </ProtectedPage>
     );

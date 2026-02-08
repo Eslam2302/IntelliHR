@@ -3,7 +3,7 @@
 import { useEntityList } from "@/hooks/useEntityList";
 import { useState } from "react";
 import Link from "next/link";
-import { getDocuments, deleteDocument } from "@/services/api/documents";
+import { getDocuments, deleteDocument, getDocumentFileUrl } from "@/services/api/documents";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
 import { PermissionButton } from "@/components/common/PermissionButton";
 import { PERMISSIONS } from "@/lib/constants/permissions";
@@ -30,6 +30,19 @@ const sortOptions: { field: SortField; label: string; icon: string }[] = [
 
 export default function DocumentsPage() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
+    const handleDownload = async (id: number) => {
+        try {
+            setDownloadingId(id);
+            const { url } = await getDocumentFileUrl(id);
+            window.open(url, "_blank");
+        } catch (err) {
+            alert(err instanceof Error ? err.message : "Failed to get download link");
+        } finally {
+            setDownloadingId(null);
+        }
+    };
 
     const {
         data: documents,
@@ -160,6 +173,16 @@ export default function DocumentsPage() {
                             >
                                 View
                             </Link>
+                            {(d.file_path ?? d.file_url) && (
+                                <button
+                                    type="button"
+                                    onClick={() => handleDownload(d.id)}
+                                    disabled={downloadingId === d.id}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md font-medium disabled:opacity-50"
+                                >
+                                    {downloadingId === d.id ? "Opening…" : "Download"}
+                                </button>
+                            )}
                         </PermissionGuard>
                         <PermissionGuard permission={PERMISSIONS.DOCUMENTS.EDIT}>
                             <Link

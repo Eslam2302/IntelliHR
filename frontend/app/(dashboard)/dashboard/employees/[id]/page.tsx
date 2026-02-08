@@ -8,6 +8,7 @@ import { ProtectedPage } from "@/components/common/ProtectedPage";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
+import { AssignRoleSection } from "@/components/employees/AssignRoleSection";
 import type { Employee } from "@/lib/types/employee";
 
 type EmployeeWithUser = Employee & { user?: { id: number; personal_email: string } | null };
@@ -161,6 +162,14 @@ export default function EmployeeViewPage() {
                         <DetailRow label="Hire date" value={formatDate(employee.hire_date)} />
                     </dl>
                 </div>
+
+                <PermissionGuard permission={PERMISSIONS.ROLES.ASSIGN}>
+                    <AssignRoleSection
+                        employeeId={employee.id}
+                        employeeName={`${employee.first_name} ${employee.last_name}`}
+                        currentRoleNames={employee.roles}
+                    />
+                </PermissionGuard>
             </div>
         </ProtectedPage>
     );

@@ -39,16 +39,31 @@ class HRChatAssistantService
             // Get employee if user is authenticated
             $employee = null;
             $context = null;
+            $requestedEmployeeContext = null;
+            $requestedEmployeeId = null;
+
             if ($user && $user->employee) {
                 $employee = $user->employee;
                 $context = $this->contextService->getContext($employee);
+
+                // If the user has permission to view other employees' data, allow querying by employee id
+                if ($this->userCanQueryOtherEmployees($user)) {
+                    $requestedId = $this->parseRequestedEmployeeId($message);
+                    if ($requestedId !== null && $requestedId !== $employee->id) {
+                        $requestedEmployee = Employee::find($requestedId);
+                        if ($requestedEmployee) {
+                            $requestedEmployeeContext = $this->contextService->getContext($requestedEmployee);
+                            $requestedEmployeeId = $requestedId;
+                        }
+                    }
+                }
             }
 
             // Get conversation history
             $history = $this->getConversationHistory($sessionId, $user?->id, $employee?->id);
 
-            // Build prompt
-            $prompt = $this->buildPrompt($context);
+            // Build prompt (include requested employee context when admin asks about another employee)
+            $prompt = $this->buildPrompt($context, $requestedEmployeeContext, $requestedEmployeeId);
 
             // Build messages from history
             $messages = $this->buildMessagesFromHistory($history, $message);
@@ -167,18 +182,80 @@ class HRChatAssistantService
     }
 
     /**
+     * Permissions that allow the user to query other employees' data in chat (e.g. leave balance, attendance).
+     * If the logged-in user's employee has any of these, they can ask about another employee by id.
+     *
+     * @var array<string>
+     */
+    protected static array $permissionsToQueryOtherEmployees = [
+        'view-all-employees',
+        'view-employee',
+        'view-employees-leave-request',
+        'view-all-payrolls',
+        'view-all-attendances',
+    ];
+
+    /**
+     * Check whether the logged-in user has permission to view other employees' data (so we can inject it in chat).
+     */
+    protected function userCanQueryOtherEmployees(?User $user): bool
+    {
+        if (! $user || ! $user->employee) {
+            return false;
+        }
+
+        $employee = $user->employee;
+
+        foreach (static::$permissionsToQueryOtherEmployees as $permission) {
+            if ($employee->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Parse employee ID from message (e.g. "employee 3", "balance of employee 3", "employee id 3")
+     *
+     * @param string $message
+     * @return int|null
+     */
+    protected function parseRequestedEmployeeId(string $message): ?int
+    {
+        // Match "employee 3", "employee id 3", "employee #3", "employee 3's", "employee 3 balance"
+        if (preg_match('/employee\s*(?:id\s*)?#?\s*(\d+)/i', $message, $m)) {
+            $id = (int) $m[1];
+            return $id > 0 ? $id : null;
+        }
+        // Match "balance of 3", "leave balance for 3" (only if preceded by context suggesting employee)
+        if (preg_match('/(?:balance|leave|data|info)\s+(?:of|for)\s+(\d+)\b/i', $message, $m)) {
+            $id = (int) $m[1];
+            return $id > 0 ? $id : null;
+        }
+        return null;
+    }
+
+    /**
      * Build system prompt for chat assistant
      *
      * @param array|null $context
+     * @param array|null $requestedEmployeeContext
+     * @param int|null $requestedEmployeeId
      * @return string
      */
-    protected function buildPrompt(?array $context = null): string
+    protected function buildPrompt(?array $context = null, ?array $requestedEmployeeContext = null, ?int $requestedEmployeeId = null): string
     {
         $prompt = "You are an HR assistant for IntelliHR, a comprehensive Human Resources Management System. ";
 
-        if ($context) {
+        // User with permission asking about another employee: inject that employee's data and instruct to use it
+        if ($requestedEmployeeContext !== null && $requestedEmployeeId !== null) {
+            $prompt .= "\n\nThe user has permission to view other employees' data. They are asking about another employee (Employee ID: {$requestedEmployeeId}). Use the following data to answer their question.";
+            $prompt .= "\n\n" . $this->contextService->formatContextForPrompt($requestedEmployeeContext);
+            $prompt .= "\n\nAnswer the user's question using the above employee data. You may and should provide leave balance, attendance, salary (basic salary, net pay), payroll details, and other HR information when it appears in the context above. The user is authorized to see this information—do not refuse or redirect them to HR.";
+        } elseif ($context) {
             $prompt .= "\n\n" . $this->contextService->formatContextForPrompt($context);
-            $prompt .= "\n\nYou have access to this employee's personal data. Use it to answer questions about their leave balance, attendance, and other HR-related queries.";
+            $prompt .= "\n\nYou have access to this employee's personal data. Use it to answer questions about their leave balance, attendance, salary/payroll, and other HR-related queries. When salary or payroll figures appear above, provide them in your answer—the user is authorized to see this information.";
         } else {
             $prompt .= "\n\nYou can answer general HR questions about:\n";
             $prompt .= "- Leave types and policies\n";

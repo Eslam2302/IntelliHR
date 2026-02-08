@@ -1,14 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useEntity } from "@/hooks/useEntity";
 import { getGoal } from "@/services/api/goals";
+import { getGoalProgressUpdates, createGoalProgressUpdate } from "@/services/api/goal-progress-updates";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getEmployeeDisplayLabel } from "@/lib/utils/display";
 import type { Goal } from "@/lib/types/goal";
+import type { GoalProgressUpdate } from "@/lib/types/goal-progress-update";
 
 function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
     return (
@@ -26,6 +29,13 @@ function parseId(param: string | string[] | undefined): number | null {
     return Number.isFinite(n) ? n : null;
 }
 
+const PROGRESS_STATUS_OPTIONS = [
+    { value: "on_track", label: "On track" },
+    { value: "at_risk", label: "At risk" },
+    { value: "blocked", label: "Blocked" },
+    { value: "completed", label: "Completed" },
+];
+
 function statusBadge(status: string | null | undefined) {
     if (!status) return <span className="text-gray-500">—</span>;
     const map: Record<string, { bg: string; text: string }> = {
@@ -34,6 +44,8 @@ function statusBadge(status: string | null | undefined) {
         at_risk: { bg: "bg-yellow-100", text: "text-yellow-800" },
         completed: { bg: "bg-green-100", text: "text-green-800" },
         cancelled: { bg: "bg-red-100", text: "text-red-800" },
+        on_track: { bg: "bg-green-100", text: "text-green-800" },
+        blocked: { bg: "bg-red-100", text: "text-red-800" },
     };
     const s = map[status] ?? { bg: "bg-gray-100", text: "text-gray-800" };
     return (
@@ -41,6 +53,10 @@ function statusBadge(status: string | null | undefined) {
             {status.replace(/_/g, " ")}
         </span>
     );
+}
+
+function progressUpdateStatusBadge(status: string) {
+    return statusBadge(status);
 }
 
 export default function GoalViewPage() {
@@ -152,6 +168,183 @@ export default function GoalViewPage() {
                         <DetailRow label="Updated" value={goal.updated_at ? new Date(goal.updated_at).toLocaleString() : null} />
                     </dl>
                 </div>
+            </div>
+
+            <GoalProgressUpdatesSection goalId={goal.id} />
+        </div>
+    );
+}
+
+function GoalProgressUpdatesSection({ goalId }: { goalId: number }) {
+    const [updates, setUpdates] = useState<GoalProgressUpdate[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showForm, setShowForm] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [form, setForm] = useState({
+        update_note: "",
+        progress_percentage: 0,
+        status: "on_track" as "on_track" | "at_risk" | "blocked" | "completed",
+        update_date: new Date().toISOString().slice(0, 10),
+    });
+
+    const loadUpdates = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await getGoalProgressUpdates({ goal_id: goalId, perPage: 50 });
+            setUpdates(res.data ?? []);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Failed to load progress updates");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadUpdates();
+    }, [goalId]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubmitting(true);
+        setError(null);
+        try {
+            await createGoalProgressUpdate(goalId, {
+                update_note: form.update_note,
+                progress_percentage: form.progress_percentage,
+                status: form.status,
+                update_date: form.update_date || undefined,
+            });
+            setForm({ update_note: "", progress_percentage: 0, status: "on_track", update_date: new Date().toISOString().slice(0, 10) });
+            setShowForm(false);
+            await loadUpdates();
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Failed to add progress update");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const updatedByLabel = (u: GoalProgressUpdate) => {
+        const by = u.updated_by;
+        if (!by) return "—";
+        return (by.name ?? [by.first_name, by.last_name].filter(Boolean).join(" ")) || `#${by.id}`;
+    };
+
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Progress updates</h2>
+                {error && (
+                    <p className="text-sm text-red-600 mb-4">{error}</p>
+                )}
+                <PermissionGuard permission={PERMISSIONS.GOAL_PROGRESS_UPDATES.CREATE}>
+                    {!showForm ? (
+                        <button
+                            type="button"
+                            onClick={() => setShowForm(true)}
+                            className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
+                        >
+                            Add progress update
+                        </button>
+                    ) : (
+                        <form onSubmit={handleSubmit} className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Update note</label>
+                                <textarea
+                                    value={form.update_note}
+                                    onChange={(e) => setForm((f) => ({ ...f, update_note: e.target.value }))}
+                                    rows={3}
+                                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    required
+                                />
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Progress %</label>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        max={100}
+                                        value={form.progress_percentage}
+                                        onChange={(e) => setForm((f) => ({ ...f, progress_percentage: Number(e.target.value) || 0 }))}
+                                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <select
+                                        value={form.status}
+                                        onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as GoalProgressUpdate["status"] }))}
+                                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    >
+                                        {PROGRESS_STATUS_OPTIONS.map((o) => (
+                                            <option key={o.value} value={o.value}>{o.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Update date</label>
+                                    <input
+                                        type="date"
+                                        value={form.update_date}
+                                        onChange={(e) => setForm((f) => ({ ...f, update_date: e.target.value }))}
+                                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    type="submit"
+                                    disabled={submitting}
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium disabled:opacity-50"
+                                >
+                                    {submitting ? "Saving…" : "Save"}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForm(false)}
+                                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 text-sm font-medium"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </PermissionGuard>
+                <PermissionGuard permission={PERMISSIONS.GOAL_PROGRESS_UPDATES.VIEW_ALL}>
+                    {loading ? (
+                        <p className="text-sm text-gray-500">Loading progress updates…</p>
+                    ) : updates.length === 0 ? (
+                        <p className="text-sm text-gray-500">No progress updates yet.</p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase">Note</th>
+                                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+                                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase">Updated by</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {updates.map((u) => (
+                                        <tr key={u.id}>
+                                            <td className="py-2 text-sm text-gray-900">{u.update_date ? new Date(u.update_date).toLocaleDateString() : "—"}</td>
+                                            <td className="py-2 text-sm text-gray-700 max-w-xs truncate">{u.update_note || "—"}</td>
+                                            <td className="py-2 text-sm text-gray-900">{u.progress_percentage}%</td>
+                                            <td className="py-2">{progressUpdateStatusBadge(u.status)}</td>
+                                            <td className="py-2 text-sm text-gray-600">{updatedByLabel(u)}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </PermissionGuard>
             </div>
         </div>
     );

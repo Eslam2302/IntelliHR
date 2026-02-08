@@ -49,7 +49,7 @@ export default function EditDeductionPage() {
         entityId: id,
         updateFunction: async (entityId, data) => {
             const res = await updateDeduction(entityId, {
-                payroll_id: data.payroll_id != null && data.payroll_id !== "" ? Number(data.payroll_id) : undefined,
+                payroll_id: data.payroll_id != null ? Number(data.payroll_id) : undefined,
                 type: data.type?.trim(),
                 amount: data.amount != null ? Number(data.amount) : undefined,
             });

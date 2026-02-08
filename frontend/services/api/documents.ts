@@ -74,3 +74,15 @@ export async function updateDocument(id: number, payload: UpdateDocumentData): P
 export async function deleteDocument(id: number): Promise<void> {
     await fetchWithAuth(`${API_URL}/documents/${id}`, { method: "DELETE" });
 }
+
+/**
+ * Get a temporary signed URL to download/view the document file.
+ */
+export async function getDocumentFileUrl(id: number): Promise<{ url: string }> {
+    const data = await fetchWithAuth(`${API_URL}/documents/${id}/file-url`);
+    const url = data.url ?? (data.data && (data.data as { url?: string }).url);
+    if (!url || typeof url !== "string") {
+        throw new Error("Failed to get document download URL");
+    }
+    return { url };
+}

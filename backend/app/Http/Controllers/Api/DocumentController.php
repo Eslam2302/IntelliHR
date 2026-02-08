@@ -11,6 +11,7 @@ use App\Services\DocumentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\URL;
 
 class DocumentController extends Controller implements HasMiddleware
 {
@@ -23,7 +24,7 @@ class DocumentController extends Controller implements HasMiddleware
         return [
             new Middleware('auth:sanctum'),
             new Middleware('permission:view-all-documents', only: ['index']),
-            new Middleware('permission:view-document', only: ['show']),
+            new Middleware('permission:view-document', only: ['show', 'fileUrl']),
             new Middleware('permission:create-document', only: ['store']),
             new Middleware('permission:edit-document', only: ['update']),
             new Middleware('permission:delete-document', only: ['destroy']),
@@ -50,6 +51,30 @@ class DocumentController extends Controller implements HasMiddleware
     public function show(Document $document): JsonResponse
     {
         return response()->json(new DocumentResource($document));
+    }
+
+    /**
+     * Get a temporary signed URL to download/view the document file.
+     */
+    public function fileUrl(Document $document): JsonResponse
+    {
+        if (! $document->file_path) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No file attached to this document.',
+            ], 404);
+        }
+
+        $url = URL::temporarySignedRoute(
+            'api.documents.file',
+            now()->addMinutes(30),
+            ['document' => $document->id]
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'url' => $url,
+        ]);
     }
 
     public function getByEmployee(int $employeeId): JsonResponse

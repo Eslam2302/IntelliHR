@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useEntity } from "@/hooks/useEntity";
-import { getDocument } from "@/services/api/documents";
+import { getDocument, getDocumentFileUrl } from "@/services/api/documents";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
 import { PERMISSIONS } from "@/lib/constants/permissions";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -29,10 +30,24 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 export default function DocumentViewPage() {
     const params = useParams();
     const id = Number(params.id);
+    const [downloading, setDownloading] = useState(false);
     const { data: document, isLoading, error } = useEntity<Document>({
         fetchFunction: getDocument,
         entityId: id,
     });
+
+    const handleDownload = async () => {
+        if (!document?.id) return;
+        try {
+            setDownloading(true);
+            const { url } = await getDocumentFileUrl(document.id);
+            window.open(url, "_blank");
+        } catch (err) {
+            alert(err instanceof Error ? err.message : "Failed to get download link");
+        } finally {
+            setDownloading(false);
+        }
+    };
 
     if (isLoading && !document) {
         return (
@@ -61,14 +76,28 @@ export default function DocumentViewPage() {
                 title={`Document #${document.id}`}
                 description={document.doc_type}
                 action={
-                    <PermissionGuard permission={PERMISSIONS.DOCUMENTS.EDIT}>
-                        <Link
-                            href={`/dashboard/documents/${document.id}/edit`}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
-                        >
-                            Edit
-                        </Link>
-                    </PermissionGuard>
+                    <div className="flex items-center gap-3">
+                        {(document.file_path ?? document.file_url) && (
+                            <PermissionGuard permission={PERMISSIONS.DOCUMENTS.VIEW}>
+                                <button
+                                    type="button"
+                                    onClick={handleDownload}
+                                    disabled={downloading}
+                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 font-medium disabled:opacity-50"
+                                >
+                                    {downloading ? "Opening…" : "Download"}
+                                </button>
+                            </PermissionGuard>
+                        )}
+                        <PermissionGuard permission={PERMISSIONS.DOCUMENTS.EDIT}>
+                            <Link
+                                href={`/dashboard/documents/${document.id}/edit`}
+                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium"
+                            >
+                                Edit
+                            </Link>
+                        </PermissionGuard>
+                    </div>
                 }
             />
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

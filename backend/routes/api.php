@@ -116,6 +116,7 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
     // Document Routes
     Route::prefix('documents')->group(function () {
         Route::get('/', [DocumentController::class, 'index']);
+        Route::get('/{document}/file-url', [DocumentController::class, 'fileUrl']);
         Route::get('/{document}', [DocumentController::class, 'show']);
         Route::post('/', [DocumentController::class, 'store']);
         Route::put('/{document}', [DocumentController::class, 'update']);

@@ -3,8 +3,9 @@ import React from "react";
 export interface FormFieldProps {
     label: string;
     name: string;
-    type?: "text" | "email" | "password" | "number" | "textarea" | "select" | "date" | "time";
-    value: string | number;
+    type?: "text" | "email" | "password" | "number" | "textarea" | "select" | "date" | "time" | "tel" | "datetime-local" | "checkbox";
+    value: string | number | boolean;
+    checked?: boolean;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     placeholder?: string;
     required?: boolean;
@@ -32,6 +33,7 @@ export function FormField({
     className = "",
     min,
     max,
+    checked,
 }: FormFieldProps) {
     const baseInputClasses = "w-full px-4 py-2 text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed";
     const errorClasses = error ? "border-red-300 focus:ring-red-500 focus:border-red-500" : "";
@@ -50,6 +52,19 @@ export function FormField({
                         disabled={disabled}
                         rows={rows}
                         className={`${baseInputClasses} ${errorClasses} ${className}`}
+                    />
+                );
+
+            case "checkbox":
+                return (
+                    <input
+                        type="checkbox"
+                        id={name}
+                        name={name}
+                        checked={checked ?? Boolean(value)}
+                        onChange={onChange}
+                        disabled={disabled}
+                        className={`h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 ${errorClasses} ${className}`}
                     />
                 );
 

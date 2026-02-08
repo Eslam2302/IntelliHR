@@ -43,3 +43,15 @@ export type { TrainingCertificate, TrainingCertificateListResponse } from "./tra
 
 // Training evaluation types
 export type { TrainingEvaluation, TrainingEvaluationListResponse } from "./training-evaluation";
+
+// Role types
+export type { Role, RolePermission, RoleListResponse } from "./role";
+
+// Activity log types
+export type { Activity, ActivityListResponse } from "./activity";
+
+// Goal progress update types
+export type { GoalProgressUpdate, GoalProgressUpdateListResponse } from "./goal-progress-update";
+
+// Chat types
+export type { ChatConversation, ChatAskResponse, ChatHistoryResponse } from "./chat";
