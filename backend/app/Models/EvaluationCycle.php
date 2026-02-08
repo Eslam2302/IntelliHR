@@ -105,8 +105,15 @@ class EvaluationCycle extends Model
 
     public function canSubmitManagerReview(): bool
     {
-        return in_array($this->status, ['self_assessment_open', 'manager_review_open']) &&
-               now() <= $this->manager_review_deadline;
+        // Allow manager review if:
+        // 1. Cycle is not cancelled
+        // 2. Deadline hasn't passed
+        // This allows manager reviews even if cycle is in 'draft' or 'published' status,
+        // as long as individual reviews have reached the manager review stage
+        $isNotCancelled = $this->status !== 'cancelled';
+        $deadlineNotPassed = now() <= $this->manager_review_deadline;
+        
+        return $isNotCancelled && $deadlineNotPassed;
     }
 
     public function getCompletionPercentage(): float

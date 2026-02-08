@@ -24,7 +24,9 @@ class ExpenseRequest extends FormRequest
     public function rules(): array
     {
         // Check if it's an update request
-        $isUpdate = $this->method() === 'PUT' || $this->method() === 'PATCH';
+        // If route has 'expense' parameter, it's an update (not create)
+        $isUpdate = $this->method() === 'PUT' || $this->method() === 'PATCH' || 
+                   ($this->method() === 'POST' && $this->route()->hasParameter('expense'));
 
         return [
             'employee_id'  => $isUpdate ? ['sometimes', 'exists:employees,id'] : ['required', 'exists:employees,id'],
@@ -61,6 +63,9 @@ class ExpenseRequest extends FormRequest
             'category_id.exists'   => 'Expense category does not exist.',
 
             'receipt_path.string'  => 'Receipt path must be a valid string.',
+
+            'notes.required'       => 'The notes field is required.',
+            'notes.string'         => 'The notes field must be a string.',
 
             'status.in'            => 'Status must be pending, approved, or rejected.',
         ];

@@ -13,7 +13,11 @@ class ReviewRatingRepository implements ReviewRatingRepositoryInterface
 
     public function getAll(array $filters = []): \Illuminate\Database\Eloquent\Collection
     {
-        $query = $this->model->with(['performanceReview', 'competency']);
+        $query = $this->model->with([
+            'performanceReview.employee',
+            'performanceReview.evaluationCycle',
+            'competency'
+        ]);
 
         // Filter by performance_review_id if provided
         if (isset($filters['performance_review_id'])) {

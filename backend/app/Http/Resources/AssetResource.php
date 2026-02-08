@@ -21,11 +21,27 @@ class AssetResource extends JsonResource
             'condition' => $this->condition,
             'status' => $this->status,
             'current_assignment' => $this->whenLoaded('currentAssignment', function () {
-                return $this->currentAssignment ? [
+                if (!$this->currentAssignment) {
+                    return null;
+                }
+                
+                $assignment = [
                     'employee_id' => $this->currentAssignment->employee_id,
                     'assigned_date' => $this->currentAssignment->assigned_date?->format('Y-m-d'),
                     'return_date' => $this->currentAssignment->return_date?->format('Y-m-d'),
-                ] : null;
+                ];
+                
+                // Check if employee relationship is loaded
+                if ($this->currentAssignment->relationLoaded('employee') && $this->currentAssignment->employee) {
+                    $assignment['employee'] = [
+                        'id' => $this->currentAssignment->employee->id,
+                        'first_name' => $this->currentAssignment->employee->first_name,
+                        'last_name' => $this->currentAssignment->employee->last_name,
+                        'name' => trim(($this->currentAssignment->employee->first_name ?? '') . ' ' . ($this->currentAssignment->employee->last_name ?? '')),
+                    ];
+                }
+                
+                return $assignment;
             }),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),

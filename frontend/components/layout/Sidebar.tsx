@@ -126,13 +126,18 @@ export default function Sidebar() {
             </p>
           )}
 
-          {/* Departments */}
+          {/* Core HR */}
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
+              Core HR
+            </p>
+          )}
           <PermissionGuard permission={PERMISSIONS.DEPARTMENTS.VIEW_ALL}>
             <Link
               href="/dashboard/departments"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="View Departments"
+              title="Departments"
             >
               <svg
                 className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform"
@@ -148,19 +153,15 @@ export default function Sidebar() {
                   d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                 />
               </svg>
-              {!isCollapsed && (
-                <span className="truncate">Departments</span>
-              )}
+              {!isCollapsed && <span className="truncate">Departments</span>}
             </Link>
           </PermissionGuard>
-
-          {/* Employees */}
           <PermissionGuard permission={PERMISSIONS.EMPLOYEES.VIEW_ALL}>
             <Link
               href="/dashboard/employees"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="View Employees"
+              title="Employees"
             >
               <svg
                 className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform"
@@ -176,13 +177,9 @@ export default function Sidebar() {
                   d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
                 />
               </svg>
-              {!isCollapsed && (
-                <span className="truncate">Employees</span>
-              )}
+              {!isCollapsed && <span className="truncate">Employees</span>}
             </Link>
           </PermissionGuard>
-
-          {/* Contracts */}
           <PermissionGuard permission={PERMISSIONS.CONTRACTS.VIEW_ALL}>
             <Link
               href="/dashboard/contracts"
@@ -196,8 +193,6 @@ export default function Sidebar() {
               {!isCollapsed && <span className="truncate">Contracts</span>}
             </Link>
           </PermissionGuard>
-
-          {/* Documents */}
           <PermissionGuard permission={PERMISSIONS.DOCUMENTS.VIEW_ALL}>
             <Link
               href="/dashboard/documents"
@@ -211,21 +206,37 @@ export default function Sidebar() {
               {!isCollapsed && <span className="truncate">Documents</span>}
             </Link>
           </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.JOB_POSITIONS.VIEW_ALL}>
+            <Link
+              href="/dashboard/job-positions"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Job Positions"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Job positions icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Job Positions</span>}
+            </Link>
+          </PermissionGuard>
 
-          {/* Attendance – check-in/check-out, last 5. No permission. */}
+          {/* Attendance & Leave */}
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
+              Attendance & Leave
+            </p>
+          )}
           <Link
             href="/dashboard/attendance"
             onClick={() => setIsOpen(false)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-            title="Check in / Check out"
+            title="Attendance"
           >
             <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Attendance icon">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             {!isCollapsed && <span className="truncate">Attendance</span>}
           </Link>
-
-          {/* Attendances – full list (HR). */}
           <PermissionGuard permission={PERMISSIONS.ATTENDANCES.VIEW_ALL}>
             <Link
               href="/dashboard/attendances"
@@ -239,38 +250,58 @@ export default function Sidebar() {
               {!isCollapsed && <span className="truncate">Attendances</span>}
             </Link>
           </PermissionGuard>
-
-          {/* Job positions */}
-          <PermissionGuard permission={PERMISSIONS.JOB_POSITIONS.VIEW_ALL}>
+          <PermissionGuard permission={PERMISSIONS.LEAVE_REQUESTS.VIEW_EMPLOYEES}>
             <Link
-              href="/dashboard/job-positions"
+              href="/dashboard/attendances/team"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Job positions"
+              title="Team Attendance"
             >
-              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Job positions icon">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Team attendance icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              {!isCollapsed && <span className="truncate">Job positions</span>}
+              {!isCollapsed && <span className="truncate">Team Attendance</span>}
             </Link>
           </PermissionGuard>
-
-          {/* Leave types */}
           <PermissionGuard permission={PERMISSIONS.LEAVE_TYPES.VIEW_ALL}>
             <Link
               href="/dashboard/leave-types"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Leave types"
+              title="Leave Types"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Leave types icon">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {!isCollapsed && <span className="truncate">Leave types</span>}
+              {!isCollapsed && <span className="truncate">Leave Types</span>}
+            </Link>
+          </PermissionGuard>
+          <Link
+            href="/dashboard/leave-requests"
+            onClick={() => setIsOpen(false)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+            title="Leave Requests"
+          >
+            <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Leave requests icon">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            {!isCollapsed && <span className="truncate">Leave Requests</span>}
+          </Link>
+          <PermissionGuard permission={PERMISSIONS.LEAVE_REQUESTS.VIEW_EMPLOYEES}>
+            <Link
+              href="/dashboard/leave-requests/manager"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Team Leave Requests"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Team leave requests icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Team Leave Requests</span>}
             </Link>
           </PermissionGuard>
 
-          {/* Payroll section */}
+          {/* Payroll */}
           {!isCollapsed && (
             <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
               Payroll
@@ -329,50 +360,7 @@ export default function Sidebar() {
             </Link>
           </PermissionGuard>
 
-          {/* Leave requests – my list + create button. All users. */}
-          <Link
-            href="/dashboard/leave-requests"
-            onClick={() => setIsOpen(false)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-            title="My leave requests"
-          >
-            <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Leave requests icon">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            {!isCollapsed && <span className="truncate">Leave requests</span>}
-          </Link>
-
-          {/* Team leave requests (manager dashboard) */}
-          <PermissionGuard permission={PERMISSIONS.LEAVE_REQUESTS.VIEW_EMPLOYEES}>
-            <Link
-              href="/dashboard/leave-requests/manager"
-              onClick={() => setIsOpen(false)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Team leave requests"
-            >
-              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Team leave requests icon">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {!isCollapsed && <span className="truncate">Team leave requests</span>}
-            </Link>
-          </PermissionGuard>
-
-          {/* Team attendance (manager) */}
-          <PermissionGuard permission={PERMISSIONS.LEAVE_REQUESTS.VIEW_EMPLOYEES}>
-            <Link
-              href="/dashboard/attendances/team"
-              onClick={() => setIsOpen(false)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Team attendance"
-            >
-              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Team attendance icon">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {!isCollapsed && <span className="truncate">Team attendance</span>}
-            </Link>
-          </PermissionGuard>
-
-          {/* Training section */}
+          {/* Training */}
           {!isCollapsed && (
             <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
               Training
@@ -396,12 +384,12 @@ export default function Sidebar() {
               href="/dashboard/training-sessions"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Training sessions"
+              title="Training Sessions"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Training sessions icon">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {!isCollapsed && <span className="truncate">Training sessions</span>}
+              {!isCollapsed && <span className="truncate">Training Sessions</span>}
             </Link>
           </PermissionGuard>
           <PermissionGuard permission={PERMISSIONS.EMPLOYEE_TRAININGS.VIEW_ALL}>
@@ -409,12 +397,12 @@ export default function Sidebar() {
               href="/dashboard/employee-trainings"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Employee trainings"
+              title="Employee Trainings"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Employee trainings icon">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2H9 5a2 2 0 012-2h2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              {!isCollapsed && <span className="truncate">Employee trainings</span>}
+              {!isCollapsed && <span className="truncate">Employee Trainings</span>}
             </Link>
           </PermissionGuard>
           <PermissionGuard permission={PERMISSIONS.TRAINING_CERTIFICATES.VIEW_ALL}>
@@ -422,12 +410,12 @@ export default function Sidebar() {
               href="/dashboard/training-certificates"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Training certificates"
+              title="Training Certificates"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Training certificates icon">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 00-4.438 0 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
-              {!isCollapsed && <span className="truncate">Training certificates</span>}
+              {!isCollapsed && <span className="truncate">Training Certificates</span>}
             </Link>
           </PermissionGuard>
           <PermissionGuard permission={PERMISSIONS.TRAINING_EVALUATIONS.VIEW_ALL}>
@@ -435,16 +423,16 @@ export default function Sidebar() {
               href="/dashboard/training-evaluations"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Training evaluations"
+              title="Training Evaluations"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Training evaluations icon">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
-              {!isCollapsed && <span className="truncate">Training evaluations</span>}
+              {!isCollapsed && <span className="truncate">Training Evaluations</span>}
             </Link>
           </PermissionGuard>
 
-          {/* Hiring section */}
+          {/* Hiring */}
           {!isCollapsed && (
             <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
               Hiring
@@ -455,12 +443,12 @@ export default function Sidebar() {
               href="/dashboard/job-posts"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Job posts"
+              title="Job Posts"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Job posts icon">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              {!isCollapsed && <span className="truncate">Job posts</span>}
+              {!isCollapsed && <span className="truncate">Job Posts</span>}
             </Link>
           </PermissionGuard>
           <PermissionGuard permission={PERMISSIONS.HIRING_STAGES.VIEW_ALL}>
@@ -468,12 +456,12 @@ export default function Sidebar() {
               href="/dashboard/hiring-stages"
               onClick={() => setIsOpen(false)}
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-              title="Hiring stages"
+              title="Hiring Stages"
             >
               <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Hiring stages icon">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
-              {!isCollapsed && <span className="truncate">Hiring stages</span>}
+              {!isCollapsed && <span className="truncate">Hiring Stages</span>}
             </Link>
           </PermissionGuard>
           <PermissionGuard permission={PERMISSIONS.APPLICANTS.VIEW_ALL}>
@@ -503,12 +491,148 @@ export default function Sidebar() {
             </Link>
           </PermissionGuard>
 
+          {/* Assets & Expenses */}
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
+              Assets & Expenses
+            </p>
+          )}
+          <PermissionGuard permission={PERMISSIONS.ASSETS.VIEW_ALL}>
+            <Link
+              href="/dashboard/assets"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Assets"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Assets icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Assets</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.ASSET_ASSIGNMENTS.VIEW_ALL}>
+            <Link
+              href="/dashboard/asset-assignments"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Asset Assignments"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Asset assignments icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Asset Assignments</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.EXPENSE_CATEGORIES.VIEW_ALL}>
+            <Link
+              href="/dashboard/expense-categories"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Expense Categories"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Expense categories icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Expense Categories</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.EXPENSES.VIEW_ALL}>
+            <Link
+              href="/dashboard/expenses"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Expenses"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Expenses icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Expenses</span>}
+            </Link>
+          </PermissionGuard>
+
+          {/* Performance Evaluation */}
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
+              Performance Evaluation
+            </p>
+          )}
+          <PermissionGuard permission={PERMISSIONS.EVALUATION_CYCLES.VIEW_ALL}>
+            <Link
+              href="/dashboard/evaluation-cycles"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Evaluation Cycles"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Evaluation cycles icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Evaluation Cycles</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.COMPETENCIES.VIEW_ALL}>
+            <Link
+              href="/dashboard/competencies"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Competencies"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Competencies icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Competencies</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.PERFORMANCE_REVIEWS.VIEW_ALL}>
+            <Link
+              href="/dashboard/performance-reviews"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Performance Reviews"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Performance reviews icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Performance Reviews</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.REVIEW_RATINGS.VIEW_ALL}>
+            <Link
+              href="/dashboard/review-ratings"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Review Ratings"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Review ratings icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Review Ratings</span>}
+            </Link>
+          </PermissionGuard>
+          <PermissionGuard permission={PERMISSIONS.GOALS.VIEW_ALL}>
+            <Link
+              href="/dashboard/goals"
+              onClick={() => setIsOpen(false)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
+              title="Goals"
+            >
+              <svg className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Goals icon">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m0 0l-7 7-7-7M19 10v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              {!isCollapsed && <span className="truncate">Goals</span>}
+            </Link>
+          </PermissionGuard>
+
           {/* Profile */}
+          {!isCollapsed && (
+            <p className="text-xs font-semibold text-indigo-200/80 uppercase tracking-wider px-3 mt-6 mb-2">
+              Account
+            </p>
+          )}
           <Link
             href="/dashboard/profile"
             onClick={() => setIsOpen(false)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-indigo-800/50 hover:text-white transition-all duration-200 group active:scale-[0.98]"
-            title="My Profile"
+            title="Profile"
           >
             <svg
               className="h-5 w-5 flex-shrink-0 group-hover:scale-110 transition-transform"
@@ -524,9 +648,7 @@ export default function Sidebar() {
                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
-            {!isCollapsed && (
-              <span className="truncate">Profile</span>
-            )}
+            {!isCollapsed && <span className="truncate">Profile</span>}
           </Link>
         </nav>
 

@@ -73,6 +73,9 @@ class AssetAssignmentController extends Controller implements HasMiddleware
      */
     public function show(AssetAssignment $asset_assignment): JsonResponse
     {
+        // Load relationships for the resource
+        $asset_assignment->load(['asset', 'employee']);
+        
         return response()->json([
             'status' => 'success',
             'data' => new AssetAssignmentResource($asset_assignment),

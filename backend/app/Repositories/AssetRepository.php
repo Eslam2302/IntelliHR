@@ -20,7 +20,7 @@ class AssetRepository implements AssetRepositoryInterface
      */
     public function getAll(array $filters = []): LengthAwarePaginator
     {
-        $query = $this->model->with('currentAssignment');
+        $query = $this->model->with('currentAssignment.employee');
 
         $query = $this->applyFilters(
             $query,
@@ -39,7 +39,7 @@ class AssetRepository implements AssetRepositoryInterface
      */
     public function show(int $assetId): Asset
     {
-        return $this->model->with('currentAssignment')->findOrFail($assetId);
+        return $this->model->with('currentAssignment.employee')->findOrFail($assetId);
     }
 
     /**
@@ -48,7 +48,7 @@ class AssetRepository implements AssetRepositoryInterface
     public function create(array $data): Asset
     {
         return $this->model->create($data)
-            ->load('currentAssignment');
+            ->load('currentAssignment.employee');
     }
 
     /**

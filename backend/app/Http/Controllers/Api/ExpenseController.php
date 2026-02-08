@@ -85,6 +85,17 @@ class ExpenseController extends Controller implements HasMiddleware
      */
     public function update(ExpenseRequest $request, Expense $expense): JsonResponse
     {
+        // Debug: Log what we're receiving (remove in production)
+        if (config('app.debug')) {
+            \Log::info('Expense update request', [
+                'method' => $request->method(),
+                'all_input' => $request->all(),
+                'notes_input' => $request->input('notes'),
+                'notes_validated' => $request->validated('notes'),
+                'has_notes' => $request->has('notes'),
+            ]);
+        }
+        
         $dto = ExpenseDTO::fromRequest($request);
         $updatedExpense = $this->service->update($expense, $dto);
 

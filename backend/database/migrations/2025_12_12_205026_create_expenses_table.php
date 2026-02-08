@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('receipt_path')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('employee_id')
                 ->references('id')

@@ -60,8 +60,12 @@ class PerformanceReviewResource extends JsonResource
             'metadata' => [
                 'can_employee_edit' => $this->canEmployeeEdit(),
                 'can_manager_edit' => $this->canManagerEdit(),
+                'can_employee_acknowledge' => $this->canEmployeeAcknowledge(),
+                'can_complete' => $this->canComplete(),
                 'is_overdue' => $this->isOverdue(),
                 'days_until_deadline' => $this->getDaysUntilDeadline(),
+                'is_current_user_employee' => $request->user() && $request->user()->relationLoaded('employee') && $request->user()->employee && $request->user()->employee->id === $this->employee_id,
+                'is_current_user_reviewer' => $request->user() && $request->user()->relationLoaded('employee') && $request->user()->employee && $this->reviewer_id && $request->user()->employee->id === $this->reviewer_id,
             ],
 
             'completed_at' => $this->completed_at?->toIso8601String(),

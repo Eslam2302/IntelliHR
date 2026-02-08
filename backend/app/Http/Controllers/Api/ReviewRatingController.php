@@ -55,7 +55,11 @@ class ReviewRatingController extends Controller implements HasMiddleware
     {
         return response()->json([
             'status' => 'success',
-            'data' => new ReviewRatingResource($reviewRating->load(['performanceReview', 'competency'])),
+            'data' => new ReviewRatingResource($reviewRating->load([
+                'performanceReview.employee',
+                'performanceReview.evaluationCycle',
+                'competency'
+            ])),
         ], 200);
     }
 

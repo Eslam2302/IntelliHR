@@ -16,6 +16,7 @@ class AssetAssignmentResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'asset_id' => $this->asset_id,
             'asset' => $this->whenLoaded('asset', function () {
                 return [
                     'id' => $this->asset->id,
@@ -24,6 +25,7 @@ class AssetAssignmentResource extends JsonResource
                     'status' => $this->asset->status,
                 ];
             }),
+            'employee_id' => $this->employee_id,
             'employee' => $this->whenLoaded('employee', function () {
                 return [
                     'id' => $this->employee->id,

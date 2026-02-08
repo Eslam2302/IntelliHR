@@ -315,7 +315,7 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
         Route::get('/', [ExpenseController::class, 'index']);
         Route::post('/', [ExpenseController::class, 'store']);
         Route::get('{expense}', [ExpenseController::class, 'show']);
-        Route::put('{expense}', [ExpenseController::class, 'update']);
+        Route::match(['post', 'put'], '{expense}', [ExpenseController::class, 'update']); // Allow both POST and PUT for updates (POST for FormData)
         Route::delete('{expense}', [ExpenseController::class, 'destroy']);
     });
     Route::get('employees/{employee}/expenses', [ExpenseController::class, 'employeeExpenses']);
@@ -358,6 +358,12 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
 
     // Performance Reviews
     Route::apiResource('performance-reviews', PerformanceReviewController::class);
+    Route::post('performance-reviews/{performance_review}/start-self-assessment', [PerformanceReviewController::class, 'startSelfAssessment']);
+    Route::post('performance-reviews/{performance_review}/submit-self-assessment', [PerformanceReviewController::class, 'submitSelfAssessment']);
+    Route::post('performance-reviews/{performance_review}/start-manager-review', [PerformanceReviewController::class, 'startManagerReview']);
+    Route::post('performance-reviews/{performance_review}/submit-manager-review', [PerformanceReviewController::class, 'submitManagerReview']);
+    Route::post('performance-reviews/{performance_review}/acknowledge', [PerformanceReviewController::class, 'acknowledgeReview']);
+    Route::post('performance-reviews/{performance_review}/complete', [PerformanceReviewController::class, 'completeReview']);
 
     // Review Ratings
     Route::apiResource('review-ratings', ReviewRatingController::class);

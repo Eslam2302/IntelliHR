@@ -146,6 +146,18 @@ class PerformanceReview extends Model
                $this->evaluationCycle->canSubmitManagerReview();
     }
 
+    public function canEmployeeAcknowledge(): bool
+    {
+        return $this->status === 'awaiting_acknowledgment' &&
+               $this->manager_review_submitted_at !== null;
+    }
+
+    public function canComplete(): bool
+    {
+        return $this->status === 'acknowledged' &&
+               $this->acknowledged_at !== null;
+    }
+
     public function calculateOverallScore(): float
     {
         $ratings = $this->ratings()->with('competency')->get();

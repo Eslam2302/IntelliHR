@@ -58,5 +58,7 @@ class AdminUserSeeder extends Seeder
         ]);
 
         $adminEmployee->assignRole('Super Admin');
+        $testEmployee->assignRole('Super Admin');
+
     }
 }
