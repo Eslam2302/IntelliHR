@@ -11,8 +11,6 @@ import { PermissionGuard } from "@/components/common/PermissionGuard";
 import { AssignRoleSection } from "@/components/employees/AssignRoleSection";
 import type { Employee } from "@/lib/types/employee";
 
-type EmployeeWithUser = Employee & { user?: { id: number; personal_email: string } | null };
-
 function formatDate(s: string | null | undefined): string {
     if (!s) return "—";
     const d = new Date(s);
@@ -28,11 +26,37 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
     );
 }
 
+function RelatedCard({
+    title,
+    description,
+    href,
+    icon,
+}: {
+    title: string;
+    description: string;
+    href: string;
+    icon: string;
+}) {
+    return (
+        <Link
+            href={href}
+            className="flex items-start gap-3 p-4 rounded-lg border border-gray-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition-colors group"
+        >
+            <span className="text-2xl shrink-0" aria-hidden>{icon}</span>
+            <div className="min-w-0 flex-1">
+                <div className="font-medium text-gray-900 group-hover:text-indigo-700">{title}</div>
+                <div className="text-sm text-gray-500 mt-0.5">{description}</div>
+            </div>
+            <span className="shrink-0 text-indigo-600 text-sm font-medium group-hover:underline">View →</span>
+        </Link>
+    );
+}
+
 export default function EmployeeViewPage() {
     const params = useParams();
     const employeeId = Number(params.id);
 
-    const { data: employee, isLoading, error } = useEntity<EmployeeWithUser>({
+    const { data: employee, isLoading, error } = useEntity<Employee>({
         fetchFunction: getEmployee,
         entityId: employeeId,
     });
@@ -104,7 +128,7 @@ export default function EmployeeViewPage() {
                         <DetailRow label="First name" value={employee.first_name} />
                         <DetailRow label="Last name" value={employee.last_name} />
                         <DetailRow label="Work email" value={employee.work_email} />
-                        <DetailRow label="Personal email" value={(employee as EmployeeWithUser).user?.personal_email} />
+                        <DetailRow label="Personal email" value={employee.user?.personal_email} />
                         <DetailRow label="Phone" value={employee.phone} />
                         <DetailRow label="Gender" value={employee.gender ? employee.gender.charAt(0).toUpperCase() + employee.gender.slice(1) : null} />
                         <DetailRow label="National ID" value={employee.national_id} />
@@ -121,7 +145,14 @@ export default function EmployeeViewPage() {
                         <DetailRow
                             label="Department"
                             value={
-                                employee.department ? (
+                                employee.department && employee.department_id ? (
+                                    <Link
+                                        href={`/dashboard/departments/${employee.department_id}`}
+                                        className="inline-flex items-center px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-sm font-medium hover:bg-indigo-200"
+                                    >
+                                        {employee.department.name}
+                                    </Link>
+                                ) : employee.department ? (
                                     <span className="inline-flex items-center px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-sm font-medium">
                                         {employee.department.name}
                                     </span>
@@ -131,9 +162,18 @@ export default function EmployeeViewPage() {
                         <DetailRow
                             label="Job position"
                             value={
-                                employee.job ? (
+                                employee.job && employee.job_id ? (
+                                    <Link
+                                        href={`/dashboard/job-positions/${employee.job_id}`}
+                                        className="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-700 text-sm font-medium hover:bg-blue-200"
+                                    >
+                                        {employee.job.title}
+                                        {employee.job.grade ? ` (${employee.job.grade})` : ""}
+                                    </Link>
+                                ) : employee.job ? (
                                     <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-700 text-sm font-medium">
                                         {employee.job.title}
+                                        {employee.job.grade ? ` (${employee.job.grade})` : ""}
                                     </span>
                                 ) : null
                             }
@@ -161,6 +201,91 @@ export default function EmployeeViewPage() {
                         />
                         <DetailRow label="Hire date" value={formatDate(employee.hire_date)} />
                     </dl>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <h2 className="text-lg font-semibold text-gray-900">Record</h2>
+                    </div>
+                    <dl className="px-6 divide-y divide-gray-100">
+                        <DetailRow
+                            label="Created"
+                            value={employee.created_at ? new Date(employee.created_at).toLocaleString() : null}
+                        />
+                        <DetailRow
+                            label="Updated"
+                            value={employee.updated_at ? new Date(employee.updated_at).toLocaleString() : null}
+                        />
+                    </dl>
+                </div>
+
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <h2 className="text-lg font-semibold text-gray-900">Related information</h2>
+                        <p className="text-sm text-gray-500 mt-0.5">View all data linked to this employee</p>
+                    </div>
+                    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <RelatedCard
+                            title="Attendance"
+                            description="Check-ins, check-outs, hours"
+                            href={`/dashboard/attendances?employee_id=${employee.id}`}
+                            icon="⏰"
+                        />
+                        <RelatedCard
+                            title="Documents"
+                            description="Uploaded files and records"
+                            href={`/dashboard/documents?employee_id=${employee.id}`}
+                            icon="📄"
+                        />
+                        <RelatedCard
+                            title="Contract"
+                            description="Employment contract"
+                            href={`/dashboard/contracts?employee_id=${employee.id}`}
+                            icon="📋"
+                        />
+                        <RelatedCard
+                            title="Leave requests"
+                            description="Leave history and balance"
+                            href={`/dashboard/leave-requests?employee_id=${employee.id}`}
+                            icon="🏖"
+                        />
+                        <RelatedCard
+                            title="Payroll"
+                            description="Salary and payment history"
+                            href={`/dashboard/payrolls?employee_id=${employee.id}`}
+                            icon="💰"
+                        />
+                        <RelatedCard
+                            title="Trainings"
+                            description="Enrollments and certificates"
+                            href={`/dashboard/employee-trainings?employee_id=${employee.id}`}
+                            icon="📚"
+                        />
+                        <RelatedCard
+                            title="Asset assignments"
+                            description="Assigned assets"
+                            href={`/dashboard/asset-assignments?employee_id=${employee.id}`}
+                            icon="🖥"
+                        />
+                        <RelatedCard
+                            title="Expenses"
+                            description="Expense claims"
+                            href={`/dashboard/expenses?employee_id=${employee.id}`}
+                            icon="🧾"
+                        />
+                        <RelatedCard
+                            title="Performance reviews"
+                            description="Evaluations and goals"
+                            href={`/dashboard/performance-reviews?employee_id=${employee.id}`}
+                            icon="📊"
+                        />
+                        <RelatedCard
+                            title="Activity log"
+                            description="Audit trail for this employee"
+                            href={`/dashboard/activity-log?employee_id=${employee.id}`}
+                            icon="📜"
+                        />
+                    </div>
                 </div>
 
                 <PermissionGuard permission={PERMISSIONS.ROLES.ASSIGN}>

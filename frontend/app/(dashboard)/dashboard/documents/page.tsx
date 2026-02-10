@@ -1,7 +1,8 @@
 "use client";
 
 import { useEntityList } from "@/hooks/useEntityList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getDocuments, deleteDocument, getDocumentFileUrl } from "@/services/api/documents";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
@@ -31,6 +32,10 @@ const sortOptions: { field: SortField; label: string; icon: string }[] = [
 export default function DocumentsPage() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
+    const searchParams = useSearchParams();
+    const employeeIdFromUrl = searchParams.get("employee_id");
+    const employeeId = employeeIdFromUrl ? parseInt(employeeIdFromUrl, 10) : undefined;
+    const validEmployeeId = Number.isFinite(employeeId) ? employeeId : undefined;
 
     const handleDownload = async (id: number) => {
         try {
@@ -70,6 +75,7 @@ export default function DocumentsPage() {
                 sortBy: params.sortBy as SortField,
                 sortOrder: params.sortOrder,
                 deleted: params.deleted,
+                employee_id: validEmployeeId,
             }),
         initialParams: {
             page: 1,
@@ -79,6 +85,11 @@ export default function DocumentsPage() {
             deleted: "without",
         },
     });
+
+    useEffect(() => {
+        setCurrentPage(1);
+        refetch();
+    }, [validEmployeeId, setCurrentPage, refetch]);
 
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this document?")) return;

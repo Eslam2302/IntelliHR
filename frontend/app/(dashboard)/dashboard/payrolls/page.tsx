@@ -2,6 +2,7 @@
 
 import { useEntityList } from "@/hooks/useEntityList";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getPayrolls, deletePayroll, processPayroll, payPayroll } from "@/services/api/payrolls";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
@@ -65,6 +66,10 @@ export default function PayrollsPage() {
     const [processSuccess, setProcessSuccess] = useState<string | null>(null);
     const [yearFilter, setYearFilter] = useState<number | "">("");
     const [monthFilter, setMonthFilter] = useState<string>("");
+    const searchParams = useSearchParams();
+    const employeeIdFromUrl = searchParams.get("employee_id");
+    const employeeId = employeeIdFromUrl ? parseInt(employeeIdFromUrl, 10) : undefined;
+    const validEmployeeId = Number.isFinite(employeeId) ? employeeId : undefined;
 
     const {
         data: payrolls,
@@ -94,6 +99,7 @@ export default function PayrollsPage() {
                 deleted: params.deleted,
                 year: yearFilter !== "" ? yearFilter : undefined,
                 month: monthFilter ? Number(monthFilter) : undefined,
+                employee_id: validEmployeeId,
             }),
         initialParams: {
             page: 1,
@@ -110,6 +116,11 @@ export default function PayrollsPage() {
     useEffect(() => {
         refetch();
     }, [effectiveYear, effectiveMonth, refetch]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+        refetch();
+    }, [validEmployeeId, setCurrentPage, refetch]);
 
     const handleProcessPayroll = async () => {
         if (!confirm("Process payroll for the current month? This will create/update payroll records for eligible employees.")) return;

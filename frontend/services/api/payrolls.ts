@@ -28,6 +28,7 @@ export interface GetPayrollsParams {
     deleted?: "without" | "only" | "with";
     year?: number;
     month?: number;
+    employee_id?: number;
 }
 
 export async function getPayrolls(params: GetPayrollsParams = {}): Promise<PayrollListResponse> {
@@ -40,6 +41,7 @@ export async function getPayrolls(params: GetPayrollsParams = {}): Promise<Payro
         deleted = "without",
         year,
         month,
+        employee_id,
     } = params;
     const url = buildQueryParams(`${API_URL}/payrolls`, {
         page,
@@ -50,6 +52,7 @@ export async function getPayrolls(params: GetPayrollsParams = {}): Promise<Payro
         deleted,
         year,
         month,
+        employee_id,
     });
     const response = await fetchWithAuth(url);
     return transformLaravelResponse<Payroll>(response, page, perPage);

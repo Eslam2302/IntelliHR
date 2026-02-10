@@ -2,6 +2,7 @@
 
 import { useEntityList } from "@/hooks/useEntityList";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getExpenses, deleteExpense } from "@/services/api/expenses";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
@@ -53,6 +54,10 @@ function statusBadge(status: string | null | undefined) {
 export default function ExpensesPage() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>("");
+    const searchParams = useSearchParams();
+    const employeeIdFromUrl = searchParams.get("employee_id");
+    const employeeId = employeeIdFromUrl ? parseInt(employeeIdFromUrl, 10) : undefined;
+    const validEmployeeId = Number.isFinite(employeeId) ? employeeId : undefined;
 
     const {
         data: expenses,
@@ -78,6 +83,7 @@ export default function ExpensesPage() {
                 sortBy: params.sortBy as SortField,
                 sortOrder: params.sortOrder,
                 status: statusFilter || undefined,
+                employee_id: validEmployeeId,
             }),
         initialParams: {
             page: 1,
@@ -90,6 +96,11 @@ export default function ExpensesPage() {
     useEffect(() => {
         refetch();
     }, [statusFilter, refetch]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+        refetch();
+    }, [validEmployeeId, setCurrentPage, refetch]);
 
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this expense?")) return;

@@ -17,10 +17,17 @@ class AttendanceResource extends JsonResource
         return [
             'id' => $this->id,
             'employee_id' => $this->employee_id,
-            'employee' => [
-                'id' => $this->employee->id ?? null,
-                'name' => $this->employee->name ?? null,
-            ],
+            'employee' => $this->whenLoaded('employee', function () {
+                if (!$this->employee) {
+                    return null;
+                }
+                return [
+                    'id' => $this->employee->id,
+                    'name' => trim($this->employee->first_name . ' ' . $this->employee->last_name),
+                    'first_name' => $this->employee->first_name,
+                    'last_name' => $this->employee->last_name,
+                ];
+            }),
             'date' => $this->date?->format('Y-m-d'),
             'check_in' => $this->check_in?->format('Y-m-d H:i:s'),
             'check_out' => $this->check_out?->format('Y-m-d H:i:s'),

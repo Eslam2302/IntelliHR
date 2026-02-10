@@ -22,6 +22,10 @@ class ExpenseRepository implements ExpenseRepositoryInterface
     {
         $query = $this->model->with(['employee', 'category']);
 
+        if (! empty($filters['employee_id'])) {
+            $query->where('employee_id', (int) $filters['employee_id']);
+        }
+
         $query = $this->applyFilters(
             $query,
             $filters,

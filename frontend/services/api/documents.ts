@@ -21,6 +21,7 @@ export interface GetDocumentsParams {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
     deleted?: "without" | "only" | "with";
+    employee_id?: number;
 }
 
 export async function getDocuments(params: GetDocumentsParams = {}): Promise<DocumentListResponse> {
@@ -31,6 +32,7 @@ export async function getDocuments(params: GetDocumentsParams = {}): Promise<Doc
         sortBy = "created_at",
         sortOrder = "desc",
         deleted = "without",
+        employee_id,
     } = params;
     const url = buildQueryParams(`${API_URL}/documents`, {
         page,
@@ -39,6 +41,7 @@ export async function getDocuments(params: GetDocumentsParams = {}): Promise<Doc
         sortBy,
         sortOrder,
         deleted,
+        employee_id,
     });
     const response = await fetchWithAuth(url);
     return transformLaravelResponse<Document>(response, page, perPage);
@@ -49,10 +52,14 @@ export async function getDocument(id: number): Promise<Document> {
     return data.data ?? data;
 }
 
-export async function getDocumentsByEmployee(employeeId: number, perPage = 10): Promise<DocumentListResponse> {
-    const url = buildQueryParams(`${API_URL}/employees/${employeeId}/documents`, { perPage });
+export async function getDocumentsByEmployee(
+    employeeId: number,
+    perPage = 10,
+    page = 1
+): Promise<DocumentListResponse> {
+    const url = buildQueryParams(`${API_URL}/employees/${employeeId}/documents`, { perPage, page });
     const response = await fetchWithAuth(url);
-    return transformLaravelResponse<Document>(response, 1, perPage);
+    return transformLaravelResponse<Document>(response, page, perPage);
 }
 
 export async function createDocument(payload: CreateDocumentData): Promise<ApiResponse<Document>> {

@@ -86,6 +86,8 @@ class HiringStageController extends Controller implements HasMiddleware
      */
     public function show(HiringStage $hiringStage): JsonResponse
     {
+        $hiringStage->load('job');
+
         return response()->json([
             'status' => 'success',
             'data' => new HiringStageResource($hiringStage),

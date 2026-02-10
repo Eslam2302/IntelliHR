@@ -36,6 +36,7 @@ export interface GetExpensesParams {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
     status?: string;
+    employee_id?: number;
 }
 
 export async function getExpenses(params: GetExpensesParams = {}): Promise<ExpenseListResponse> {
@@ -46,6 +47,7 @@ export async function getExpenses(params: GetExpensesParams = {}): Promise<Expen
         sortBy = "created_at",
         sortOrder = "desc",
         status,
+        employee_id,
     } = params;
     const url = buildQueryParams(`${API_URL}/expenses`, {
         page,
@@ -54,6 +56,7 @@ export async function getExpenses(params: GetExpensesParams = {}): Promise<Expen
         sortBy,
         sortOrder,
         status,
+        employee_id,
     });
     const response = await fetchWithAuth(url);
     return transformLaravelResponse<Expense>(response, page, perPage);

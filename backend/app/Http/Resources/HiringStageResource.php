@@ -17,6 +17,7 @@ class HiringStageResource extends JsonResource
     {
         return [
             'id'         => $this->id,
+            'job_id'     => $this->job_id,
             'job'        => new JobPostResource($this->whenLoaded('job')),
             'stage_name' => $this->stage_name,
             'order'      => $this->order,

@@ -14,7 +14,9 @@ class ApplicantResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'job_id' => $this->job_id,
             'job' => new JobPostResource($this->whenLoaded('job')),
+            'current_stage_id' => $this->current_stage_id,
             'first_name' => $this->first_name,
             'last_name' => $this->last_name,
             'email' => $this->email,

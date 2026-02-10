@@ -1,7 +1,8 @@
 "use client";
 
 import { useEntityList } from "@/hooks/useEntityList";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getAttendances, deleteAttendance } from "@/services/api/attendances";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
@@ -45,6 +46,10 @@ const statusLabels: Record<string, string> = {
 
 export default function AttendancesPage() {
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const searchParams = useSearchParams();
+    const employeeIdFromUrl = searchParams.get("employee_id");
+    const employeeId = employeeIdFromUrl ? parseInt(employeeIdFromUrl, 10) : undefined;
+    const validEmployeeId = Number.isFinite(employeeId) ? employeeId : undefined;
 
     const {
         data: attendances,
@@ -72,6 +77,7 @@ export default function AttendancesPage() {
                 sortBy: params.sortBy as SortField,
                 sortOrder: params.sortOrder,
                 deleted: params.deleted,
+                employee_id: validEmployeeId,
             });
         },
         initialParams: {
@@ -82,6 +88,11 @@ export default function AttendancesPage() {
             deleted: "without",
         },
     });
+
+    useEffect(() => {
+        setCurrentPage(1);
+        refetch();
+    }, [validEmployeeId, setCurrentPage, refetch]);
 
     const handleDelete = async (id: number) => {
         if (!confirm("Are you sure you want to delete this attendance record? This action cannot be undone.")) {

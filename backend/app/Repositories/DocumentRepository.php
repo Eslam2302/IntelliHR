@@ -19,6 +19,10 @@ class DocumentRepository implements DocumentRepositoryInterface
     {
         $query = $this->model->with('employee');
 
+        if (! empty($filters['employee_id'])) {
+            $query->where('employee_id', (int) $filters['employee_id']);
+        }
+
         $query = $this->applyFilters(
             $query,
             $filters,

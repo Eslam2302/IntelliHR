@@ -9,10 +9,17 @@ import type { Department } from "./department";
 export interface JobPosition {
   id: number;
   title: string;
+  grade?: string;
   description?: string;
   department_id?: number;
   created_at?: string;
   updated_at?: string;
+}
+
+// User (when included in employee response)
+export interface EmployeeUser {
+  id: number;
+  personal_email: string;
 }
 
 // Employee database table response
@@ -38,6 +45,7 @@ export interface Employee {
   department?: Department | null;
   job?: JobPosition | null;
   manager?: Employee | null; // Self-referencing relationship
+  user?: EmployeeUser | null;
   roles?: string[]; // Role names when loaded
 }
 

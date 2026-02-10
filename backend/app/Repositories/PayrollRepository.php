@@ -20,6 +20,10 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         $query = $this->model->with(['employee' => fn ($q) => $q->withTrashed()]);
 
+        if (! empty($filters['employee_id'])) {
+            $query->where('employee_id', (int) $filters['employee_id']);
+        }
+
         $query = $this->applyFilters(
             $query,
             $filters,

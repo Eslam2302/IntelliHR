@@ -22,7 +22,7 @@ class ContractRepository implements ContractRepositoryInterface
         $query = $this->applyFilters(
             $query,
             $filters,
-            ['contract_type', 'employee.first_name', 'employee.last_name', 'employee.work_email'],
+            ['id', 'contract_type', 'employee.first_name', 'employee.last_name', 'employee.work_email'],
             ['id', 'employee_id', 'start_date', 'end_date', 'contract_type', 'created_at', 'deleted_at'],
             'created_at',
             'desc'

@@ -59,6 +59,8 @@ class ApplicantController extends Controller implements HasMiddleware
 
     public function show(Applicant $applicant): JsonResponse
     {
+        $applicant->load(['job', 'currentStage']);
+
         return response()->json([
             'status' => 'success',
             'data' => new ApplicantResource($applicant),

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useEntityList } from "@/hooks/useEntityList";
 import { getActivityLog } from "@/services/api/activity-log";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -47,6 +48,10 @@ export default function ActivityLogPage() {
   const [moduleFilter, setModuleFilter] = useState("");
   const moduleFilterRef = useRef(moduleFilter);
   moduleFilterRef.current = moduleFilter;
+  const searchParams = useSearchParams();
+  const employeeIdFromUrl = searchParams.get("employee_id");
+  const employeeId = employeeIdFromUrl ? parseInt(employeeIdFromUrl, 10) : undefined;
+  const validEmployeeId = Number.isFinite(employeeId) ? employeeId : undefined;
 
   const {
     data: activities,
@@ -69,6 +74,7 @@ export default function ActivityLogPage() {
         sortBy: params.sortBy,
         sortOrder: params.sortOrder,
         module: moduleFilterRef.current || undefined,
+        employee_id: validEmployeeId,
       }),
     initialParams: {
       page: 1,
@@ -84,11 +90,11 @@ export default function ActivityLogPage() {
     setCurrentPage(1);
   }, [searchQuery, setCurrentPage]);
 
-  // When module filter changes, reset page and refetch (hook does not depend on moduleFilter; we use ref so fetcher sees latest)
+  // When module filter or employee_id changes, reset page and refetch
   useEffect(() => {
     setCurrentPage(1);
     refetch();
-  }, [moduleFilter, setCurrentPage, refetch]);
+  }, [moduleFilter, validEmployeeId, setCurrentPage, refetch]);
 
   const columns: Column<Activity>[] = [
     {
