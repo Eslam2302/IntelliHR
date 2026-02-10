@@ -346,6 +346,7 @@ Route::middleware(['auth:sanctum', 'throttle:120,1'])->group(function () {
         Route::post('ask', [AIChatController::class, 'ask']);
         Route::get('history', [AIChatController::class, 'history']);
         Route::get('session/{sessionId}', [AIChatController::class, 'getSession']);
+        Route::delete('session/{sessionId}', [AIChatController::class, 'deleteSession']);
         Route::delete('history/{conversation}', [AIChatController::class, 'deleteConversation']);
     });
 

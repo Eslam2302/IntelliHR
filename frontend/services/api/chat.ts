@@ -35,6 +35,13 @@ export async function getSession(sessionId: string): Promise<ChatConversation[]>
   return Array.isArray(data) ? data : [];
 }
 
+export async function deleteSession(sessionId: string): Promise<void> {
+  await fetchWithAuth(
+    `${API_URL}/chat/session/${encodeURIComponent(sessionId)}`,
+    { method: "DELETE" }
+  );
+}
+
 export async function deleteConversation(conversationId: number): Promise<void> {
   await fetchWithAuth(`${API_URL}/chat/history/${conversationId}`, {
     method: "DELETE",

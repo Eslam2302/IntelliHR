@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ask, getHistory, getSession, deleteConversation } from "@/services/api/chat";
+import { ask, getHistory, getSession, deleteSession, deleteConversation } from "@/services/api/chat";
 import type { ChatConversation } from "@/lib/types/chat";
 
 function groupBySession(conversations: ChatConversation[]): Map<string, ChatConversation[]> {
@@ -25,6 +25,8 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<ChatConversation[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const skipLoadSessionRef = useRef(false);
 
@@ -110,13 +112,41 @@ export default function ChatPage() {
     }
   };
 
+  const handleDeleteSession = async (sid: string) => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this chat? All messages in this conversation will be permanently removed. This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+    setDeletingSessionId(sid);
+    setError(null);
+    try {
+      await deleteSession(sid);
+      if (sessionId === sid) {
+        setSessionId(null);
+        setMessages([]);
+      }
+      await loadHistory();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete chat");
+    } finally {
+      setDeletingSessionId(null);
+    }
+  };
+
   const handleDeleteConversation = async (id: number) => {
+    setDeletingId(id);
+    setError(null);
     try {
       await deleteConversation(id);
       setMessages((prev) => prev.filter((m) => m.id !== id));
       await loadHistory();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to delete");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -139,17 +169,36 @@ export default function ChatPage() {
             Array.from(sessions.entries()).map(([sid, convos]) => {
               const last = convos[convos.length - 1];
               const preview = last?.message?.slice(0, 40) || "Chat";
+              const isDeleting = deletingSessionId === sid;
               return (
-                <button
+                <div
                   key={sid}
-                  type="button"
-                  onClick={() => setSessionId(sid)}
-                  className={`w-full text-left py-2 px-3 rounded-lg text-sm mb-1 ${
-                    sessionId === sid ? "bg-indigo-100 text-indigo-900" : "hover:bg-gray-100 text-gray-700"
-                  }`}
+                  className={`group flex items-center gap-1 rounded-lg mb-1 ${sessionId === sid ? "bg-indigo-100" : "hover:bg-gray-100"
+                    }`}
                 >
-                  {preview}{preview.length >= 40 ? "…" : ""}
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => setSessionId(sid)}
+                    className={`flex-1 min-w-0 text-left py-2 px-3 rounded-lg text-sm ${sessionId === sid ? "text-indigo-900" : "text-gray-700"
+                      }`}
+                  >
+                    <span className="truncate block">{preview}{preview.length >= 40 ? "…" : ""}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteSession(sid);
+                    }}
+                    disabled={isDeleting}
+                    title="Delete entire chat"
+                    className="shrink-0 p-1.5 rounded text-gray-400 hover:bg-red-100 hover:text-red-600 disabled:opacity-50"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               );
             })
           )}
@@ -168,24 +217,30 @@ export default function ChatPage() {
             <p className="text-gray-500 text-sm">No messages in this session.</p>
           )}
           {messages.map((m) => (
-            <div key={m.id} className="space-y-2">
-              <div className="flex justify-end">
-                <div className="max-w-[85%] rounded-lg bg-indigo-600 text-white px-4 py-2 text-sm">
-                  {m.message}
-                </div>
-              </div>
-              <div className="flex justify-start items-start gap-2">
-                <div className="max-w-[85%] rounded-lg bg-white border border-gray-200 px-4 py-2 text-sm text-gray-900">
-                  {m.response}
-                </div>
+            <div key={m.id} className="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+              <div className="flex absolute top-2 right-2">
                 <button
                   type="button"
                   onClick={() => handleDeleteConversation(m.id)}
-                  className="text-gray-400 hover:text-red-600 text-xs shrink-0"
-                  title="Delete"
+                  disabled={deletingId === m.id}
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                  title="Delete this message"
                 >
-                  Delete
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  {deletingId === m.id ? "Deleting…" : "Delete"}
                 </button>
+              </div>
+              <div className="space-y-2 pr-24">
+                <div className="flex justify-end">
+                  <div className="max-w-[85%] rounded-lg bg-indigo-600 text-white px-4 py-2 text-sm">
+                    {m.message}
+                  </div>
+                </div>
+                <div className="rounded-lg bg-gray-50 border border-gray-100 px-4 py-2 text-sm text-gray-900 whitespace-pre-wrap">
+                  {m.response}
+                </div>
               </div>
             </div>
           ))}
