@@ -22,6 +22,15 @@ class ContractSeeder extends Seeder
             'salary' => 60000,
             'terms' => 'Standard full-time employment contract terms.',
         ]);
+        Contract::create([
+            'employee_id' => 2,
+            'start_date' => now()->subYears(5)->format('Y-m-d'),
+            'end_date' => null,
+            'contract_type' => 'full_time',
+            'probation_period_days' => 90,
+            'salary' => 60000,
+            'terms' => 'Standard full-time employment contract terms.',
+        ]);
 
     }
 }
